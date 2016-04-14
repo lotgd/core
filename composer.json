@@ -1,0 +1,18 @@
+{
+	"autoload": {
+		"psr-4": {
+			"LotGD\\Core\\": "src/",
+            "LotGD\\Core\\Tests\\": "tests/"
+		}
+	},
+	
+	"require": {
+		"monolog/monolog": "1.16.0",
+		"doctrine/orm": "2.5.*"
+	},
+    
+    "require-dev": {
+        "phpunit/phpunit": "*",
+        "phpunit/dbunit": "*"
+    }
+}
