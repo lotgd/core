@@ -2,6 +2,7 @@
 
 namespace LotGD\Core\Models;
 
+use LotGD\Core\Tools\Model\Creator;
 use Doctrine\ORM\Mapping\Entity;
 
 /**
@@ -11,6 +12,8 @@ use Doctrine\ORM\Mapping\Entity;
  * @Table(name="characters")
  */
 class Character {
+    use Creator;
+    
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
     /** @Column(type="string", length=50, unique=true); */
@@ -18,10 +21,24 @@ class Character {
     /** @Column(type="text", unique=true); */
     private $displayName;
     /** @Column(type="integer", options={"default" = 10}) */
-    private $health = 10;
-    /** @Column(type="integer", options={"default" = 10}) */
     private $maxhealth = 10;
+    /** @Column(type="integer", options={"default" = 10}) */
+    private $health;
     private $properties;
+    
+    /** @var array */
+    protected static $fillable = [
+        "name",
+        "maxhealth",
+    ];
+    
+    /**
+     * Returns the entity's id
+     * @return int The id
+     */
+    public function getId(): int {
+        return $this->id;
+    }
     
     /**
      * Sets the character's name and generates the display name
@@ -45,5 +62,15 @@ class Character {
      */
     protected function generateDisplayName() {
         $this->displayName = $this->name;
+    }
+    
+    /**
+     * Sets the maximum health of a character to a given value. It also sets the
+     * health if none has been set yet.
+     * @param int $maxhealth
+     */
+    protected function setMaxhealth(int $maxhealth) {
+        $this->maxhealth = $maxhealth;
+        $this->health = $this->health??$this->maxhealth;
     }
 }
