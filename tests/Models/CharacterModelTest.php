@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
@@ -15,15 +16,51 @@ use Doctrine\ORM\Mapping as ORM;
 class CharacterModelTest extends ModelTestCase {
     /** @var array */
     protected $entities = [Character::class];
+    
+    /**
+     * Tests character creation
+     */
+    public function testCreation() {
+        $characters = [
+            1 => [
+                "name" => "Testcharacter",
+                "maxhealth" => 250
+            ],
+            2 => [
+                "name" => "Spamegg",
+                "maxhealth" => 42
+            ],
+        ];
+        
+        foreach($characters as $characterId => $characterData) {
+            $characterEntity = Character::create($characterData);
+            $characterEntity->save($this->getEntityManager());
             
-    public function testCreationQuery() {
-        $character = Character::create([
-            "name" => "Testcharacter",
-            "maxhealth" => 250,
-        ]);
+            $this->assertEquals($characterEntity->getId(), $characterId);
+        }
         
-        $character->save($this->getEntityManager());
+        $entities = $this->getEntityManager()->getRepository(Character::class)
+                        ->findAll();
+        $this->assertEquals(count($entities), count($characters));
+    }
+    
+    /**
+     * @expectedException TypeError
+     */
+    public function testCreationTypes() {
+        $faultyCharacters = [
+            1 => [
+                "name" => 16,
+                "maxhealth" => 16,
+            ],
+            2 => [
+                "name" => "Faulter",
+                "maxhealth" => 17.8,
+            ]
+        ];
         
-        $this->assertEquals($character->getId(), 1);
+        foreach($faultyCharacters as $faultyCharacterData) {
+            $char = Character::create($faultyCharacterData);
+        }
     }
 }

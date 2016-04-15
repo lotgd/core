@@ -1,18 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\{
     EntityManager,
+    Mapping\AnsiQuoteStrategy,
     Tools\Setup,
     Tools\SchemaTool
-};
-use Doctrine\ORM\Mapping\{
-    AnsiQuoteStrategy,
-    ClassMetadata,
-    Driver\DriverChain,
-    Driver\AnnotationDriver
 };
 
 /**
@@ -40,7 +35,11 @@ abstract class ModelTestCase extends \PHPUnit_Framework_TestCase {
         $schemaTool->createSchema($metaData);
     }
     
-    protected function getEntityManager() {
+    /**
+     * Returns the entity manager to run tests.
+     * @return \LotGD\Core\Tests\EntityManager
+     */
+    protected function getEntityManager(): EntityManager {
         return $this->_em;
     }
 }

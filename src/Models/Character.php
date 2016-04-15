@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
@@ -64,12 +65,16 @@ class Character {
         $this->displayName = $this->name;
     }
     
+    public function getDisplayName(): string {
+        return $this->displayName;
+    }
+    
     /**
      * Sets the maximum health of a character to a given value. It also sets the
      * health if none has been set yet.
      * @param int $maxhealth
      */
-    protected function setMaxhealth(int $maxhealth) {
+    public function setMaxhealth(int $maxhealth) {
         $this->maxhealth = $maxhealth;
         $this->health = $this->health??$this->maxhealth;
     }
