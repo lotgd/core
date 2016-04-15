@@ -9,6 +9,7 @@ use Doctrine\ORM\{
     Tools\SchemaTool
 };
 use Doctrine\ORM\Mapping\{
+    AnsiQuoteStrategy,
     ClassMetadata,
     Driver\DriverChain,
     Driver\AnnotationDriver
@@ -28,20 +29,15 @@ abstract class ModelTestCase extends \PHPUnit_Framework_TestCase {
      */
     protected function setUp() {        
         $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
+        $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
                 
         $this->_em = EntityManager::create(["url" => "sqlite:///:memory:"], $configuration);
         
+        $metaData = $this->_em->getMetadataFactory()->getAllMetadata();
+        
         // Create Schema
         $schemaTool = new SchemaTool($this->_em);
-        
-        $metaClasses = [];
-        foreach($this->entities as $entity) {
-            $metaClasses[] = new ClassMetadata($entity);
-        }
-        
-        var_dump($metaClasses[0]);
-        
-        $schemaTool->createSchema($metaClasses);
+        $schemaTool->createSchema($metaData);
     }
     
     protected function getEntityManager() {
