@@ -17,9 +17,13 @@ class CharacterModelTest extends ModelTestCase {
     protected $entities = [Character::class];
             
     public function testCreationQuery() {
-        $queryBuilder = $this->_em->getRepository(Character::class)->find(1);
+        $character = Character::create([
+            "name" => "Testcharacter",
+            "maxhealth" => 250,
+        ]);
         
-        $character = new Character();
-        $character->setName("Test");
+        $character->save($this->getEntityManager());
+        
+        $this->assertEquals($character->getId(), 1);
     }
 }
