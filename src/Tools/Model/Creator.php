@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use LotGD\Core\Exceptions\{
     AttributeMissingException,
+    UnexpectedArrayKeyException,
     WrongTypeException
 };
 
@@ -38,7 +39,12 @@ trait Creator {
                 $value = $arguments[$field];
                 
                 $entity->$methodname($value);
+                unset($arguments[$field]);
             }
+        }
+        
+        if(count($arguments) > 0) {
+            throw new UnexpectedArrayKeyException('self::$fillable does allow the properties "'.implode(", ", array_keys($arguments)).'" to be set.');
         }
         
         return $entity;

@@ -14,71 +14,94 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Basilius Sauter
  */
 class CharacterModelTest extends ModelTestCase {
-    /** @var array */
-    protected $entities = [Character::class];
+    /** @var string default data set */
+    protected $dataset = "character";
+    
+    /**
+     * Returns data to create valid characters
+     * @return array $futureId => $characterData
+     */
+    public function validCharacters() {
+        return [
+            [[
+                "name" => "Testcharacter",
+                "maxHealth" => 250
+            ]],
+            [[
+                "name" => "Spamegg",
+                "maxHealth" => 42
+            ]],
+        ];
+    }
+    
+    /**
+     * Returns data to create invalid characters
+     * @return array A list of faulty characters
+     */
+    public function invalidCharacters() {
+        return [
+            [[
+                "name" => 16,
+                "maxHealth" => 16,
+            ]],
+            [[
+                "name" => "Faulter",
+                "maxHealth" => 17.8,
+            ]],
+        ];
+    }
     
     /**
      * Tests character creation
+     * @param array $characterData
+     * @dataProvider validCharacters
      */
-    public function testCreation() {
-        $characters = [
-            1 => [
-                "name" => "Testcharacter",
-                "maxhealth" => 250
-            ],
-            2 => [
-                "name" => "Spamegg",
-                "maxhealth" => 42
-            ],
-        ];
+    public function testCreation(array $characterData) {
+        $em = $this->getEntityManager();
         
-        foreach($characters as $characterId => $characterData) {
-            $characterEntity = Character::create($characterData);
-            $characterEntity->save($this->getEntityManager());
-            
-            $this->assertEquals($characterEntity->getId(), $characterId);
-        }
+        $characterEntity = Character::create($characterData);
+        $characterEntity->save($em);
         
-        $entities = $this->getEntityManager()->getRepository(Character::class)
-                        ->findAll();
-        $this->assertCount(count($characters), $entities);
-        
-        return $entities;
+        $this->assertInternalType("int", $characterEntity->getId());
     }
     
     /**
+     * Tests character creation with faulty data
+     * @param type $characterData
+     * @dataProvider invalidCharacters
      * @expectedException TypeError
      */
-    public function testCreationTypes() {
-        $faultyCharacters = [
-            1 => [
-                "name" => 16,
-                "maxhealth" => 16,
-            ],
-            2 => [
-                "name" => "Faulter",
-                "maxhealth" => 17.8,
-            ]
-        ];
-        
-        foreach($faultyCharacters as $faultyCharacterData) {
-            $char = Character::create($faultyCharacterData);
-        }
+    public function testFaultyCreation(array $characterData) {
+        Character::create($characterData);
     }
     
     /**
-     * @depends testCreation
+     * Tests if invalid array key given during Character::create throws an exception
+     * @expectedException \LotGD\Core\Exceptions\UnexpectedArrayKeyException
      */
-    public function testDeletion(array $characters) {
-        foreach($characters as $character) {
-            $character->save($this->getEntityManager());
-        }
+    public function testUnknownArrayKey() {
+        Character::create([
+            "name" => "Walter",
+            "maxHealth" => 15,
+            "unknownAttribute" => "helloWorld",
+        ]);
+    }
+    
+    /**
+     * Tests if Deletor does it's work
+     */
+    public function testDeletion() {
+        $em = $this->getEntityManager();
         
-        $character = $this->getEntityManager()->getRepository(Character::class)->find(1);
-        $character->delete($this->getEntityManager());
+        // Count rows before
+        $rowsBefore = count($em->getRepository(Character::class)->findAll());
         
-        $entities = $this->getEntityManager()->getRepository(Character::class)
-                        ->findAll();
-        $this->assertCount(1, $entities);
+        // Delete one row
+        $character = $em->getRepository(Character::class)->find(1);
+        $character->delete($em);
+        
+        $rowsAfter = count($em->getRepository(Character::class)->findAll());
+        
+        $this->assertEquals($rowsBefore - 1, $rowsAfter);
     }
 }

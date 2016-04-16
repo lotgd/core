@@ -1,0 +1,13 @@
+characters:
+    -
+        id: 1
+        name: "Testcharacter 1"
+        displayName: "Testcharacter 1"
+        health: 0
+        maxhealth: 100
+    -
+        id: 2
+        name: "Testcharacter 2"
+        displayName: "Testcharacter 2"
+        health: 90
+        maxhealth: 90

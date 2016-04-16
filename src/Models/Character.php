@@ -23,7 +23,7 @@ class Character {
     /** @Column(type="text", unique=true); */
     private $displayName;
     /** @Column(type="integer", options={"default" = 10}) */
-    private $maxhealth = 10;
+    private $maxHealth = 10;
     /** @Column(type="integer", options={"default" = 10}) */
     private $health;
     private $properties;
@@ -31,7 +31,7 @@ class Character {
     /** @var array */
     private static $fillable = [
         "name",
-        "maxhealth",
+        "maxHealth",
     ];
     
     /**
@@ -79,8 +79,32 @@ class Character {
      * health if none has been set yet.
      * @param int $maxhealth
      */
-    public function setMaxhealth(int $maxhealth) {
-        $this->maxhealth = $maxhealth;
-        $this->health = $this->health??$this->maxhealth;
+    public function setMaxHealth(int $maxHealth) {
+        $this->maxHealth = $maxHealth;
+        $this->health = $this->health ?? $this->maxHealth;
+    }
+    
+    /**
+     * Returns the maximum health
+     * @return int
+     */
+    public function getMaxHealth(): int {
+        return $this->maxHealth;
+    }
+    
+    /**
+     * Sets current health
+     * @param int $health
+     */
+    public function setHealth(int $health) {
+        $this->health = $health;
+    }
+    
+    /**
+     * Returns current health
+     * @return int
+     */
+    public function getHealth(): int {
+        return $this->health;
     }
 }
