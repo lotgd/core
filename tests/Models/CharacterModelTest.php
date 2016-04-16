@@ -41,7 +41,9 @@ class CharacterModelTest extends ModelTestCase {
         
         $entities = $this->getEntityManager()->getRepository(Character::class)
                         ->findAll();
-        $this->assertEquals(count($entities), count($characters));
+        $this->assertCount(count($characters), $entities);
+        
+        return $entities;
     }
     
     /**
@@ -62,5 +64,21 @@ class CharacterModelTest extends ModelTestCase {
         foreach($faultyCharacters as $faultyCharacterData) {
             $char = Character::create($faultyCharacterData);
         }
+    }
+    
+    /**
+     * @depends testCreation
+     */
+    public function testDeletion(array $characters) {
+        foreach($characters as $character) {
+            $character->save($this->getEntityManager());
+        }
+        
+        $character = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $character->delete($this->getEntityManager());
+        
+        $entities = $this->getEntityManager()->getRepository(Character::class)
+                        ->findAll();
+        $this->assertCount(1, $entities);
     }
 }

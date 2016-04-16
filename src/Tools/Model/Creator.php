@@ -11,7 +11,7 @@ use LotGD\Core\Exceptions\{
 };
 
 /**
- * Provides methods for creating new instances.
+ * Provides methods for creating new entities
  */
 trait Creator {
     /**

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
-use LotGD\Core\Tools\Model\Creator;
+use LotGD\Core\Tools\Model\{Creator, Deletor};
 use Doctrine\ORM\Mapping\Entity;
 
 /**
@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping\Entity;
  */
 class Character {
     use Creator;
+    use Deletor;
     
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
@@ -28,7 +29,7 @@ class Character {
     private $properties;
     
     /** @var array */
-    protected static $fillable = [
+    private static $fillable = [
         "name",
         "maxhealth",
     ];
@@ -65,6 +66,10 @@ class Character {
         $this->displayName = $this->name;
     }
     
+    /**
+     * Returns displayName, a combination of title, name and suffix, mixed with colour codes
+     * @return string The displayName
+     */
     public function getDisplayName(): string {
         return $this->displayName;
     }
