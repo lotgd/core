@@ -3,5 +3,8 @@
         <testsuite name="Models">
             <directory>tests/Models</directory>
         </testsuite>
+        <testsuite name="Other">
+            <file>tests/TimeKeeperTest.php</file>
+        </testsuite>
     </testsuites>
 </phpunit>
