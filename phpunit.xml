@@ -5,9 +5,4 @@
         <var name="DB_PASSWD" value="" />
         <var name="DB_NAME" value="daenerys" />
     </php>
-    <testsuites>
-        <testsuite name="Models">
-            <directory>tests/Models</directory>
-        </testsuite>
-    </testsuites>
 </phpunit>
