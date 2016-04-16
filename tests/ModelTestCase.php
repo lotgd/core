@@ -1,46 +1,54 @@
 <?php
+declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\{
     EntityManager,
+    EntityManagerInterface,
+    Mapping\AnsiQuoteStrategy,
     Tools\Setup,
     Tools\SchemaTool
-};
-use Doctrine\ORM\Mapping\{
-    AnsiQuoteStrategy,
-    ClassMetadata,
-    Driver\DriverChain,
-    Driver\AnnotationDriver
 };
 
 /**
  * Description of ModelTestCase
  */
-abstract class ModelTestCase extends \PHPUnit_Framework_TestCase {
-    /** @var array */
-    protected $entities = [];
-    /** @var Doctrine\ORM\EntityManager */
-    protected $_em;
+abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase {
+    static private $pdo = null;
+    static private $em = null;
+    private $connection = null;
     
-    /**
-     * Sets up the database and database structure
-     */
-    protected function setUp() {        
-        $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
-        $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
+    final public function getConnection() {
+        if($this->connection === null) {
+            if(self::$pdo === null) {
+                self::$pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS["DB_USER"], $GLOBALS["DB_PASSWD"]);
                 
-        $this->_em = EntityManager::create(["url" => "sqlite:///:memory:"], $configuration);
+                // Read db annotations from model files
+                $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
+                $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
+
+                self::$em = EntityManager::create(["pdo" => self::$pdo], $configuration); 
+
+                // Create Schema
+                $metaData = self::$em->getMetadataFactory()->getAllMetadata();
+                $schemaTool = new SchemaTool(self::$em);
+                $schemaTool->updateSchema($metaData);
+            }
+            
+            $this->conn = $this->createDefaultDBConnection(self::$pdo, $GLOBALS["DB_NAME"]);
+        }
         
-        $metaData = $this->_em->getMetadataFactory()->getAllMetadata();
-        
-        // Create Schema
-        $schemaTool = new SchemaTool($this->_em);
-        $schemaTool->createSchema($metaData);
+        return $this->conn;
     }
     
-    protected function getEntityManager() {
-        return $this->_em;
+    protected function getDataSet(): \PHPUnit_Extensions_Database_DataSet_YamlDataSet {
+        return new \PHPUnit_Extensions_Database_DataSet_YamlDataSet(
+            __DIR__."/datasets/".$this->dataset.".yml"
+        );
+    }
+    
+    protected function getEntityManager(): EntityManagerInterface {
+        return self::$em;
     }
 }

@@ -9,7 +9,7 @@ use Doctrine\ORM\{
 };
 
 $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
-$configuration->setQuoteStrategy(new \Doctrine\ORM\Mapping\AnsiQuoteStrategy());
+$configuration->setQuoteStrategy(new AnsiQuoteStrategy());
 
 $entityManager = EntityManager::create(["url" => "sqlite://:memory:"], $configuration);
 
