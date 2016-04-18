@@ -22,7 +22,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase {
     final public function getConnection() {
         if($this->connection === null) {
             if(self::$pdo === null) {
-                self::$pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS["DB_USER"], $GLOBALS["DB_PASSWD"]);
+                self::$pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS["DB_USER"], $GLOBALS["DB_PASSWORD"]);
                 
                 // Read db annotations from model files
                 $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
