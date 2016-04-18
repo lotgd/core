@@ -73,3 +73,35 @@ cd core
 composer install
 ./t
 ```
+
+## Contributing
+Some notes:
+* Pull requests cannot be accepted that break the continuous integration checks we have in place (like tests, for example).
+* Our git workflow requires squashing your commits into something that resembles a reasonable story, rebasing them onto master, and pushing instead of merging. We want our commit history to be as clean as possible.
+
+Workflow should be something like:
+```bash
+# Start this flow from master:
+git checkout master
+
+# Create a new feature branch, tracking origin/master.
+git checkout -b feature/my-feature-branch -t origin/master
+
+# Make some awesome commits and put up a pull request! Don't forget to push your branch to remote before creating the PR. Try something like hub (https://hub.github.com/) if you want to create PRs from the command line.
+...
+
+# If necessary, squash your commits to ensure a clean commit history.
+git rebase -i
+
+# Edit the last commit message, saying you want to close the PR by adding "closes #[PR number]" to the message.
+git commit --amend
+
+# Rebase to ensure you have the latest changes.
+git pull --rebase
+
+# Push to remote.
+git push origin feature/my-feature-branch:master
+
+# Delete your feature branch.
+git branch -D feature/my-feature-branch
+```
