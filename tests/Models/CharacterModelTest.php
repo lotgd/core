@@ -59,7 +59,7 @@ class CharacterModelTest extends ModelTestCase {
     public function testCreation(array $characterData) {
         $em = $this->getEntityManager();
         
-        $characterEntity = Character::create($characterData);
+        $characterEntity = Character::createAtFullHealth($characterData);
         $characterEntity->save($em);
         
         $this->assertInternalType("int", $characterEntity->getId());

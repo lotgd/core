@@ -2,15 +2,12 @@
     <php>
         <var name="DB_DSN" value="sqlite:dbtest.sqlite" />
         <var name="DB_USER" value="root" />
-        <var name="DB_PASSWD" value="" />
+        <var name="DB_PASSWORD" value="" />
         <var name="DB_NAME" value="daenerys" />
     </php>
     <testsuites>
-        <testsuite name="Models">
-            <directory>tests/Models</directory>
-        </testsuite>
-        <testsuite name="Other">
-            <file>tests/TimeKeeperTest.php</file>
+        <testsuite name="All">
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

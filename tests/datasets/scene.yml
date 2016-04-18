@@ -1,13 +1,26 @@
-characters:
+scenes:
     -
         id: 1
-        name: "Testcharacter 1"
-        displayName: "Testcharacter 1"
-        health: 0
-        maxhealth: 100
+        title: "The Village"
+        description: "This is the village."
+        parent:
     -
         id: 2
-        name: "Testcharacter 2"
-        displayName: "Testcharacter 2"
-        health: 90
-        maxhealth: 90
+        title: "The Forest"
+        description: "This is a very dangerous and dark forest"
+        parent: 1
+    -
+        id: 3
+        title: "The Weaponry"
+        description: "This is the place where you can buy awesome weapons"
+        parent: 1
+    -
+        id: 4
+        title: "Another Village"
+        description: "This is another village"
+        parent:
+    -
+        id: 5
+        title: "Orphan"
+        description: "This is an orphan scene"
+        parent: 
