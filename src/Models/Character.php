@@ -25,7 +25,7 @@ class Character {
     /** @Column(type="integer", options={"default" = 10}) */
     private $maxHealth = 10;
     /** @Column(type="integer", options={"default" = 10}) */
-    private $health;
+    private $health = 10;
     private $properties;
     
     /** @var array */
@@ -33,6 +33,17 @@ class Character {
         "name",
         "maxHealth",
     ];
+    
+    /**
+     * Creates a character at full health
+     * @see LotGD\Core\Tools\Model\Creator
+     */
+    public static function createAtFullHealth(array $arguments): self {
+        $newCharacter = self::create($arguments);
+        $newCharacter->setHealth($newCharacter->getMaxHealth());
+        
+        return $newCharacter;
+    }
     
     /**
      * Returns the entity's id
@@ -77,11 +88,10 @@ class Character {
     /**
      * Sets the maximum health of a character to a given value. It also sets the
      * health if none has been set yet.
-     * @param int $maxhealth
+     * @param int $maxHealth
      */
     public function setMaxHealth(int $maxHealth) {
         $this->maxHealth = $maxHealth;
-        $this->health = $this->health ?? $this->maxHealth;
     }
     
     /**
