@@ -6,8 +6,6 @@ namespace LotGD\Core\Tests\Models;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Tests\ModelTestCase;
 
-use Doctrine\ORM\Mapping as ORM;
-
 /**
  * Description of CharacterModelTest
  *
@@ -21,7 +19,8 @@ class CharacterModelTest extends ModelTestCase {
      * Returns data to create valid characters
      * @return array $futureId => $characterData
      */
-    public function validCharacters() {
+    public function validCharacters(): array
+    {
         return [
             [[
                 "name" => "Testcharacter",
@@ -38,7 +37,8 @@ class CharacterModelTest extends ModelTestCase {
      * Returns data to create invalid characters
      * @return array A list of faulty characters
      */
-    public function invalidCharacters() {
+    public function invalidCharacters(): array
+    {
         return [
             [[
                 "name" => 16,
@@ -56,7 +56,8 @@ class CharacterModelTest extends ModelTestCase {
      * @param array $characterData
      * @dataProvider validCharacters
      */
-    public function testCreation(array $characterData) {
+    public function testCreation(array $characterData)
+    {
         $em = $this->getEntityManager();
         
         $characterEntity = Character::create($characterData);
@@ -71,7 +72,8 @@ class CharacterModelTest extends ModelTestCase {
      * @dataProvider invalidCharacters
      * @expectedException TypeError
      */
-    public function testFaultyCreation(array $characterData) {
+    public function testFaultyCreation(array $characterData)
+    {
         Character::create($characterData);
     }
     
@@ -79,7 +81,8 @@ class CharacterModelTest extends ModelTestCase {
      * Tests if invalid array key given during Character::create throws an exception
      * @expectedException \LotGD\Core\Exceptions\UnexpectedArrayKeyException
      */
-    public function testUnknownArrayKey() {
+    public function testUnknownArrayKey()
+    {
         Character::create([
             "name" => "Walter",
             "maxHealth" => 15,
@@ -90,7 +93,8 @@ class CharacterModelTest extends ModelTestCase {
     /**
      * Tests if Deletor does it's work
      */
-    public function testDeletion() {
+    public function testDeletion()
+    {
         $em = $this->getEntityManager();
         
         // Count rows before
@@ -103,5 +107,31 @@ class CharacterModelTest extends ModelTestCase {
         $rowsAfter = count($em->getRepository(Character::class)->findAll());
         
         $this->assertEquals($rowsBefore - 1, $rowsAfter);
+    }
+    
+    /**
+     * Tests character properties
+     */
+    public function testProperties()
+    {
+        $em = $this->getEntityManager();
+        
+        // test default values
+        $firstCharacter = $em->getRepository(Character::class)->find(1);
+        $this->assertSame(5, $firstCharacter->getProperty("dragonkills", 5));
+        $this->assertNotSame(5, $firstCharacter->getProperty("dragonkills", "5"));
+        $this->assertSame("hanniball", $firstCharacter->getProperty("petname", "hanniball"));
+        
+        // test setting variables, then getting
+        $firstCharacter->setProperty("dragonkills", 5);
+        $this->assertSame(5, $firstCharacter->getProperty("dragonkills"));
+        $this->assertNotSame("5", $firstCharacter->getProperty("dragonkills"));
+        
+        $firstCharacter->setProperty("dragonkills", "20");
+        $this->assertNotSame(20, $firstCharacter->getProperty("dragonkills"));
+        $this->assertSame("20", $firstCharacter->getProperty("dragonkills"));
+        
+        // test precreated property
+        $this->assertSame("hallo", $firstCharacter->getProperty("test"));
     }
 }

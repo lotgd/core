@@ -11,3 +11,8 @@ characters:
         displayName: "Testcharacter 2"
         health: 90
         maxhealth: 90
+character_properties:
+    -
+        owner_id: 1
+        propertyName: "test"
+        propertyValue: 's:5:"hallo";'
