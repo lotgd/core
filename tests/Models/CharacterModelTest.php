@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\Character;
+use LotGD\Core\Models\CharacterProperty;
 use LotGD\Core\Tests\ModelTestCase;
 
 /**
@@ -107,6 +108,9 @@ class CharacterModelTest extends ModelTestCase {
         $rowsAfter = count($em->getRepository(Character::class)->findAll());
         
         $this->assertEquals($rowsBefore - 1, $rowsAfter);
+        
+        // test flushing
+        $em->flush();
     }
     
     /**
@@ -131,7 +135,24 @@ class CharacterModelTest extends ModelTestCase {
         $this->assertNotSame(20, $firstCharacter->getProperty("dragonkills"));
         $this->assertSame("20", $firstCharacter->getProperty("dragonkills"));
         
+        // save some other variables
+        $firstCharacter->setProperty("testvar1", 5);
+        $firstCharacter->setProperty("testvar2", [5 => 18]);
+        $firstCharacter->setProperty("testvar3 9 8", "spam and eggs");
+        $firstCharacter->setProperty("testvar4", true);
+        
         // test precreated property
         $this->assertSame("hallo", $firstCharacter->getProperty("test"));
+        
+        // test flushing
+        $em->flush();
+        
+        // revisit database and retrieve properties, check if the correct number is saved
+        $total = intval($em->createQueryBuilder()
+            ->from(CharacterProperty::class, "u")
+            ->select("COUNT(u.propertyName)")
+            ->getQuery()->getSingleScalarResult());
+        
+        $this->assertSame(6, $total);
     }
 }

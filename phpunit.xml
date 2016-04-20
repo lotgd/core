@@ -1,6 +1,6 @@
 <phpunit bootstrap="bootstrap/bootstrap.php">
     <php>
-        <var name="DB_DSN" value="sqlite:dbtest.sqlite" />
+        <var name="DB_DSN" value="sqlite::memory:" />
         <var name="DB_USER" value="root" />
         <var name="DB_PASSWORD" value="" />
         <var name="DB_NAME" value="daenerys" />

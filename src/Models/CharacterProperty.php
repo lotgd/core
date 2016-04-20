@@ -2,7 +2,6 @@
 
 namespace LotGD\Core\Models;
 
-use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Properties;
 
 /**

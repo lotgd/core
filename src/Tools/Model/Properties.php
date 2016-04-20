@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tools\Model;
 
-const PROPERTY_STRING = 0;
-const PROPERTY_INT = 1;
-const PROPERTY_FLOAT = 2;
-
 /**
  * Provides method and doctrine annotation for a property submodel
  */
@@ -33,7 +29,7 @@ trait Properties
      */
     public function setName(string $name)
     {
-        if($name === "") {
+        if ($name === "") {
             throw new ArgumentEmptyException('The argument $name must not be empty.');
         }
         
