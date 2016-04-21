@@ -34,9 +34,8 @@ class Character
     private $health = 10;
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist"}) */
     private $properties;
-    
-    /** @var string fqcn of the property sub class */
-    private static $propertyClass = CharacterProperty::class;
+    /** @OneToOne(targetEntity="CharacterScene", mappedBy="owner", cascade={"persist"}) */
+    private $characterScene;
     
     /** @var array */
     private static $fillable = [
@@ -138,5 +137,18 @@ class Character
     public function getHealth(): int
     {
         return $this->health;
+    }
+    
+    /**
+     * Returns the current character scene and creates one if it is non-existant
+     * @return \LotGD\Core\Models\CharacterScene
+     */
+    public function getCharacterScene(): CharacterScene
+    {
+        if ($this->characterScene === null) {
+            $this->characterScene = CharacterScene::create(["owner" => $this]);
+        }
+        
+        return $this->characterScene;
     }
 }
