@@ -38,6 +38,7 @@ class CharacterSceneModelTest extends ModelTestCase
         $em->flush();
     }
     
+    // Tests if a scene can be changed correctly.
     public function testSceneChange() {
         $em = $this->getEntityManager();
         
