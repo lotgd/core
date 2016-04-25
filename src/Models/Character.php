@@ -146,7 +146,7 @@ class Character
      * Returns the current character scene and creates one if it is non-existant
      * @return \LotGD\Core\Models\CharacterScene
      */
-    public function getCharacterScene(EntityManagerInterface $em): CharacterScene
+    public function getCharacterScene(): CharacterScene
     {
         if (count($this->characterScene) === 0) {
             $characterScene = CharacterScene::Create(["owner" => $this]);

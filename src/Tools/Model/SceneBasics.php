@@ -9,9 +9,9 @@ namespace LotGD\Core\Tools\Model;
 trait SceneBasics
 {
     /** @Column(type="string", length=255) */
-    private $title = "";
+    private $title = "{No scene set}";
     /** @Column(type="text") */
-    private $description = "";
+    private $description = "{No scene set}";
     
     /**
      * Sets scene title
