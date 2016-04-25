@@ -54,7 +54,8 @@ class Character
         return $newCharacter;
     }
     
-    public function __construct() {
+    public function __construct()
+    {
         $this->properties = new ArrayCollection();
         $this->characterScene = new ArrayCollection();
     }

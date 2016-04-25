@@ -18,13 +18,21 @@ class CharacterSceneModelTest extends ModelTestCase
     public function testGetters() {
         $em = $this->getEntityManager();
         
+        // Test character with a characterScene
         $testCharacter = $em->getRepository(Character::class)->find(2);
         $this->assertSame(2, $testCharacter->getId());
         $characterScene = $testCharacter->getCharacterScene($em);
         
-        /*$this->assertInstanceOf(CharacterScene::class, $characterScene);
+        $this->assertInstanceOf(CharacterScene::class, $characterScene);
         $this->assertSame("The Village", $characterScene->getTitle());
-        $this->assertSame("This is the village.", $characterScene->getDescription());*/
+        $this->assertSame("This is the village.", $characterScene->getDescription());
+        
+        // Test character without a characterScene
+        $testCharacter = $em->getRepository(Character::class)->find(1);
+        $this->assertSame(1, $testCharacter->getId());
+        $characterScene = $testCharacter->getCharacterScene($em);
+        
+        $this->assertInstanceOf(CharacterScene::class, $characterScene);
 
         $em->flush();
     }
