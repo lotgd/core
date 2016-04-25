@@ -7,7 +7,7 @@ use LotGD\Core\Models\Scene;
 use LotGD\Core\Tests\ModelTestCase;
 
 /**
- * Description of CharacterModelTest
+ * Tests for creating scenes and moving them around.
  */
 class SceneModelTest extends ModelTestCase
 {
@@ -27,6 +27,8 @@ class SceneModelTest extends ModelTestCase
         $this->assertInstanceOf(Scene::class, $scene->getParent());
         $this->assertEquals(true, $scene->hasParent());
         $this->assertEquals(false, $scene->hasChildren());
+        
+        $em->flush();
     }
     
     /**
@@ -41,6 +43,8 @@ class SceneModelTest extends ModelTestCase
         
         $this->assertEquals($parentScene, $childScene->getParent());
         $this->assertContains($childScene, $parentScene->getChildren());
+        
+        $em->flush();
     }
     
     /**
@@ -81,5 +85,7 @@ class SceneModelTest extends ModelTestCase
         $this->assertEquals(false, $orphanScene->hasParent());
         $this->assertNotContains($orphanScene, $parentScene1->getChildren());
         $this->assertNotContains($orphanScene, $parentScene2->getChildren());
+        
+        $em->flush();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
@@ -9,14 +10,21 @@ use LotGD\Core\Tools\Model\SceneBasics;
  * A CharacterScene is the current Scene a character is experiencing with
  * all changes from modules included.
  * @Entity
- * @Table(name="character_scene")
+ * @Table(name="character_scenes")
  */
-class CharacterScene {
+class CharacterScene
+{
     use Creator;
     use SceneBasics;
     
-    /** @Id @OneToOne(targetEntity="Character") */
+    /** @Id @ManyToOne(targetEntity="Character", inversedBy="id", cascade="persist") */
     private $owner;
+    /** @Column(type="array") */
+    private $actions = [];
+    /** @Column(type="array") */
+    private $attachements = [];
+    /** @Column(type="array") */
+    private $data = [];
     
     /** @var array */
     private static $fillable = [
@@ -45,8 +53,65 @@ class CharacterScene {
      * Copies the static data from a scene to a characterScene entity
      * @param \LotGD\Core\Models\Scene $scene
      */
-    public function changeFromScene(Scene $scene) {
+    public function changeFromScene(Scene $scene)
+    {
         $this->setTitle($scene->getTitle());
         $this->setDescription($scene->getDescription());
+    }
+    
+    /**
+     * Returns all actions
+     * @return array
+     */
+    public function getActions(): array
+    {
+        return $this->actions;
+    }
+    
+    /**
+     * Sets actions
+     * @param array $actions
+     */
+    public function setActions(array $actions)
+    {
+        $this->actions = $actions;
+    }
+    
+    /**
+     * Returns all data
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+    
+    /**
+     * Sets all data
+     * @param array $data
+     */
+    public function setData(array $data)
+    {
+        $this->data = $data;
+    }
+    
+    /**
+     * Returns a single data field
+     * @param string $fieldname Fieldname
+     * @param type $default default value
+     * @return mixed
+     */
+    public function getDataField(string $fieldname, $default = null)
+    {
+        return $this->data[$fieldname] ?? $default;
+    }
+    
+    /**
+     * Sets a single data field
+     * @param string $fieldname
+     */
+    public function setDataField(string $fieldname, $value)
+    {
+        $this->data[$fieldname] = $value;
     }
 }

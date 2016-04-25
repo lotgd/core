@@ -5,6 +5,7 @@ namespace LotGD\Core\Models;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\EntityManagerInterface;
 
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
@@ -26,7 +27,7 @@ class Character
     private $id;
     /** @Column(type="string", length=50, unique=true); */
     private $name;
-    /** @Column(type="text", unique=true); */
+    /** @Column(type="text"); */
     private $displayName;
     /** @Column(type="integer", options={"default" = 10}) */
     private $maxHealth = 10;
@@ -34,7 +35,7 @@ class Character
     private $health = 10;
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist"}) */
     private $properties;
-    /** @OneToOne(targetEntity="CharacterScene", mappedBy="owner", cascade={"persist"}) */
+    /** @OneToMany(targetEntity="CharacterScene", mappedBy="owner", cascade={"persist"}) */
     private $characterScene;
     
     /** @var array */
@@ -55,6 +56,7 @@ class Character
     
     public function __construct() {
         $this->properties = new ArrayCollection();
+        $this->characterScene = new ArrayCollection();
     }
     
     /**
@@ -143,12 +145,13 @@ class Character
      * Returns the current character scene and creates one if it is non-existant
      * @return \LotGD\Core\Models\CharacterScene
      */
-    public function getCharacterScene(): CharacterScene
+    public function getCharacterScene(EntityManagerInterface $em): CharacterScene
     {
-        if ($this->characterScene === null) {
-            $this->characterScene = CharacterScene::create(["owner" => $this]);
+        if (count($this->characterScene) === 0) {
+            $characterScene = CharacterScene::Create(["owner" => $this]);
+            $this->characterScene->add($characterScene);
         }
         
-        return $this->characterScene;
+        return $this->characterScene->first();
     }
 }

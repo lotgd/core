@@ -1,0 +1,33 @@
+characters:
+    -
+        id: 1
+        name: "Char without a Scene"
+        displayName: "A"
+    -
+        id: 2
+        name: "Char with a Scene"
+        displayName: "B"
+character_scenes:
+    -
+        owner_id: 2
+        title: "The Village"
+        description: "This is the village."
+        data: "a:0:{}"
+        attachements: "a:0:{}"
+        actions: "a:0:{}"
+scenes:
+    -
+        id: 1
+        title: "The Village"
+        description: "This is the village."
+        parent:
+    -
+        id: 2
+        title: "The Forest"
+        description: "This is a very dangerous and dark forest"
+        parent: 1
+    -
+        id: 3
+        title: "The Weaponry"
+        description: "This is the place where you can buy awesome weapons"
+        parent: 1

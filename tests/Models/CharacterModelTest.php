@@ -8,9 +8,7 @@ use LotGD\Core\Models\CharacterProperty;
 use LotGD\Core\Tests\ModelTestCase;
 
 /**
- * Description of CharacterModelTest
- *
- * @author Basilius Sauter
+ * Tests the management of Characters
  */
 class CharacterModelTest extends ModelTestCase {
     /** @var string default data set */
@@ -65,6 +63,8 @@ class CharacterModelTest extends ModelTestCase {
         $characterEntity->save($em);
         
         $this->assertInternalType("int", $characterEntity->getId());
+        
+        $em->flush();
     }
     
     /**
