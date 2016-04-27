@@ -43,7 +43,9 @@ trait PropertyManager
         else {
             $className = $this->properties->getTypeClass()->name;
             $property = new $className();
-            $property->setOwner($this);
+            if (method_exists($property, "setOwner")) {
+                $property->setOwner($this);
+            }
             $property->setName($name);
             $property->setValue($value);
             
