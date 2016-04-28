@@ -120,7 +120,13 @@ class OneToManyCollection implements Collection
      */
     public function contains($element): bool
     {
-        $this->checkElementType($element);
+        try {
+            $this->checkElementType($element);
+        }
+        catch (WrongTypeException $e) {
+            return false;
+        }
+        
         return in_array($element, $this->collection);
     }
     
@@ -209,7 +215,10 @@ class OneToManyCollection implements Collection
     public function set($key, $element)
     {
         $this->checkElementType($element);
+        
+        $this->remove($key);
         $this->collection[$key] = $element;
+        $this->entityManager->persist($element);
     }
     
     /**
