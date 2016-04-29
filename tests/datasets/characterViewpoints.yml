@@ -7,7 +7,7 @@ characters:
         id: 2
         name: "Char with a Scene"
         displayName: "B"
-character_scenes:
+character_viewpoints:
     -
         owner_id: 2
         title: "The Village"

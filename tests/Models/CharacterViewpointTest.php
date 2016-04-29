@@ -4,17 +4,17 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\Character;
-use LotGD\Core\Models\CharacterScene;
+use LotGD\Core\Models\CharacterViewpoint;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Tests\ModelTestCase;
 
 /**
  * Tests the management of CharacterScenes
  */
-class CharacterSceneModelTest extends ModelTestCase
+class CharacterViewpointTest extends ModelTestCase
 {
     /** @var string default data set */
-    protected $dataset = "characterScenes";
+    protected $dataset = "characterViewpoints";
     
     public function testGetters() {
         $em = $this->getEntityManager();
@@ -24,7 +24,7 @@ class CharacterSceneModelTest extends ModelTestCase
         $this->assertSame(2, $testCharacter->getId());
         $characterScene = $testCharacter->getCharacterScene();
         
-        $this->assertInstanceOf(CharacterScene::class, $characterScene);
+        $this->assertInstanceOf(CharacterViewpoint::class, $characterScene);
         $this->assertSame("The Village", $characterScene->getTitle());
         $this->assertSame("This is the village.", $characterScene->getDescription());
         
@@ -33,7 +33,7 @@ class CharacterSceneModelTest extends ModelTestCase
         $this->assertSame(1, $testCharacter->getId());
         $characterScene = $testCharacter->getCharacterScene();
         
-        $this->assertInstanceOf(CharacterScene::class, $characterScene);
+        $this->assertInstanceOf(CharacterViewpoint::class, $characterScene);
 
         $em->flush();
     }

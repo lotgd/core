@@ -10,9 +10,9 @@ use LotGD\Core\Tools\Model\SceneBasics;
  * A CharacterScene is the current Scene a character is experiencing with
  * all changes from modules included.
  * @Entity
- * @Table(name="character_scenes")
+ * @Table(name="character_viewpoints")
  */
-class CharacterScene
+class CharacterViewpoint
 {
     use Creator;
     use SceneBasics;
