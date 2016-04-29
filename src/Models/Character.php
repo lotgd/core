@@ -35,7 +35,7 @@ class Character
     private $health = 10;
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist"}) */
     private $properties;
-    /** @OneToMany(targetEntity="CharacterScene", mappedBy="owner", cascade={"persist"}) */
+    /** @OneToMany(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
     private $characterScene;
     
     /** @var array */
@@ -144,12 +144,12 @@ class Character
     
     /**
      * Returns the current character scene and creates one if it is non-existant
-     * @return \LotGD\Core\Models\CharacterScene
+     * @return \LotGD\Core\Models\CharacterViewpoint
      */
-    public function getCharacterScene(): CharacterScene
+    public function getCharacterScene(): CharacterViewpoint
     {
         if (count($this->characterScene) === 0) {
-            $characterScene = CharacterScene::Create(["owner" => $this]);
+            $characterScene = CharacterViewpoint::Create(["owner" => $this]);
             $this->characterScene->add($characterScene);
         }
         
