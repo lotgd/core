@@ -60,15 +60,20 @@ class Motd
      * @return \LotGD\Core\Models\Character
      */
     public function getAuthor(): Character
-    {
-        return $this->author;
+    {   
+        if (is_null($this->author)) {
+            return Character::create(["name" => "System"]);
+        }
+        else {
+            return $this->author;
+        }
     }
     
     /**
      * Sets the author of this motd
      * @param \LotGD\Core\Models\Character $author
      */
-    public function setAuthor(Character $author)
+    public function setAuthor(Character $author = null)
     {
         $this->author = $author;
     }

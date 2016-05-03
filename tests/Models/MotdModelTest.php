@@ -25,7 +25,8 @@ class MotdModelTest extends ModelTestCase {
         $this->assertSame($author, $motd->getAuthor());
     }
     
-    public function testTimezone() {
+    public function testTimezone()
+    {
         $em = $this->getEntityManager();
         
         $time1 = $em->getRepository(Motd::class)->find(1)->getCreationTime();
@@ -41,5 +42,59 @@ class MotdModelTest extends ModelTestCase {
         $this->assertNotEquals($time1->getTimezone(), $time2->getTimezone());
         $this->assertSame($time1->getTimestamp(), $time3->getTimestamp());
         $this->assertNotEquals($time2->getTimezone(), $time4->getTimezone());
+    }
+    
+    public function dataCreateSaveAndRetrieve(): array
+    {   
+        return [
+            [[
+                "author" => 1,
+                "title" => "ABC_\"EFG",
+                "body" => "Lorem îpsum etc pp",
+            ]],
+            [[
+                "author" => 1,
+                "title" => "AnotherOne",
+                "body" => "Test a Second One",
+            ]],
+            [[
+                "author" => NULL,
+                "title" => "Hallo.",
+                "body" => "Velo.",
+            ]]
+        ];
+    }
+    
+    /**
+     * @dataProvider dataCreateSaveAndRetrieve
+     */
+    public function testCreateSaveAndRetrieve(array $motdCreationArguments)
+    {
+        $em = $this->getEntityManager();
+        // Set Author to the correct author instance. Cannot be moved to the dataProvider.
+        if ($motdCreationArguments["author"] !== NULL) {
+            $motdCreationArguments["author"] = $em->getRepository(Character::class)->find($motdCreationArguments["author"]);
+        }
+        
+        $motd = Motd::create($motdCreationArguments);
+        $motd->save($em);
+        
+        $id = $motd->getId();
+        
+        $em->flush();
+        $em->clear();
+        
+        $checkMotd = $this->getEntityManager()->getRepository(Motd::class)->find($id);
+        
+        if ($motdCreationArguments["author"] === null) {
+            $this->assertSame("System", $checkMotd->getAuthor()->getName());
+        }
+        else {
+            $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getAuthor()->getName());
+        }
+        
+        $this->assertSame($motdCreationArguments["title"], $checkMotd->getTitle());
+        $this->assertSame($motdCreationArguments["body"], $checkMotd->getBody());
+        $this->assertEquals($motd->getCreationTime(), $checkMotd->getCreationTime());
     }
 }

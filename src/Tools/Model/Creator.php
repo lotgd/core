@@ -34,7 +34,7 @@ trait Creator
         $entity = new self();
         
         foreach (self::$fillable as $field) {
-            if (isset($arguments[$field])) {
+            if (array_key_exists($field, $arguments)) {
                 $methodname = "set".$field;
                 $value = $arguments[$field];
                 
