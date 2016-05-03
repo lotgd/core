@@ -4,28 +4,34 @@ declare(strict_types=1);
 namespace LotGD\Core\Models;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\EntityManagerInterface;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\PropertyManager;
+use LotGD\Core\Tools\Model\SoftDeletable;
+use LotGD\Core\Models\Repositories\CharacterRepository;
 
 /**
- * Description of Character
+ * Model for a character
  *
- * @Entity
+ * @Entity(repositoryClass="LotGD\Core\Models\Repositories\CharacterRepository")
  * @Table(name="characters")
  */
-class Character
+class Character implements CharacterInterface, CreateableInterface
 {
     use Creator;
-    use Deletor;
+    use SoftDeletable;
     use PropertyManager;
     
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
-    /** @Column(type="string", length=50, unique=true); */
+    /** @Column(type="string", length=50); */
     private $name;
     /** @Column(type="text"); */
     private $displayName;
@@ -36,7 +42,20 @@ class Character
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist"}) */
     private $properties;
     /** @OneToMany(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
-    private $characterScene;
+    private $characterViewpoint;
+    /** 
+     * @ManyToMany(targetEntity="MessageThread", inversedBy="participants", cascade={"persist"})
+     * @JoinTable(
+     *  name="message_threads_x_characters",
+     *  joinColumns={
+     *      @JoinColumn(name="character_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @JoinColumn(name="messagethread_id", referencedColumnName="id")
+     *  }
+     * )
+     */
+    private $messageThreads;
     
     /** @var array */
     private static $fillable = [
@@ -57,7 +76,8 @@ class Character
     public function __construct()
     {
         $this->properties = new ArrayCollection();
-        $this->characterScene = new ArrayCollection();
+        $this->characterViewpoint = new ArrayCollection();
+        $this->messageThreads = new ArrayCollection();
     }
     
     /**
@@ -146,13 +166,34 @@ class Character
      * Returns the current character scene and creates one if it is non-existant
      * @return \LotGD\Core\Models\CharacterViewpoint
      */
-    public function getCharacterScene(): CharacterViewpoint
+    public function getCharacterViewpoint(): CharacterViewpoint
     {
-        if (count($this->characterScene) === 0) {
+        if (count($this->characterViewpoint) === 0) {
             $characterScene = CharacterViewpoint::Create(["owner" => $this]);
-            $this->characterScene->add($characterScene);
+            $this->characterViewpoint->add($characterScene);
         }
         
-        return $this->characterScene->first();
+        return $this->characterViewpoint->first();
+    }
+    
+    /**
+     * Returns a list of message threads this user has created.
+     * @return Collection
+     */
+    public function getMessageThreads(): Collection
+    {
+        return $this->messageThreads;
+    }
+    
+    public function sendMessageTo(Character $recipient)
+    {
+        // ToDo: implement later
+        throw new \LotGD\Core\Exceptions\NotImplementedException;
+    }
+    
+    public function receiveMessageFrom(Character $author)
+    {
+        // ToDo: implement later
+        throw new \LotGD\Core\Exceptions\NotImplementedException;
     }
 }

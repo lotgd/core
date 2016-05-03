@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\SceneBasics;
 
@@ -12,7 +15,7 @@ use LotGD\Core\Tools\Model\SceneBasics;
  * @Entity
  * @Table(name="character_viewpoints")
  */
-class CharacterViewpoint
+class CharacterViewpoint implements CreateableInterface
 {
     use Creator;
     use SceneBasics;

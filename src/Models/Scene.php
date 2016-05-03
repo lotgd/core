@@ -5,6 +5,9 @@ namespace LotGD\Core\Models;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\Column;
 
 use LotGD\Core\Exceptions\NoParentSetException;
 use LotGD\Core\Exceptions\WrongParentException;
@@ -17,7 +20,7 @@ use LotGD\Core\Tools\Model\SceneBasics;
  * @Entity
  * @Table(name="scenes")
  */
-class Scene
+class Scene implements CreateableInterface
 {
     use Creator;
     use Deletor;

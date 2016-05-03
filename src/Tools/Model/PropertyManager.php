@@ -27,20 +27,18 @@ trait PropertyManager
         
         if (isset($this->propertyStorage[$name])) {
             return $this->propertyStorage[$name]->getValue();
-        }
-        else {
+        } else {
             return $default;
         }
     }
     
-    public function setProperty(string $name, $value) 
+    public function setProperty(string $name, $value)
     {
         $this->loadProperties();
         
         if (isset($this->propertyStorage[$name])) {
             $this->propertyStorage[$name]->setValue($value);
-        }
-        else {
+        } else {
             $className = $this->properties->getTypeClass()->name;
             $property = new $className();
             if (method_exists($property, "setOwner")) {

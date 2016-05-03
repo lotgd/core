@@ -8,12 +8,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Exceptions\AttributeMissingException;
 use LotGD\Core\Exceptions\UnexpectedArrayKeyException;
 use LotGD\Core\Exceptions\WrongTypeException;
+use LotGD\Core\Models\CreateableInterface;
 
 /**
  * Provides methods for creating new entities
  */
 trait Creator
 {
+    use Saveable;
+    
     /**
      * Creates and returns an entity instance and fills values
      * @param array $arguments The values the instance should get
@@ -21,7 +24,7 @@ trait Creator
      * @throws AttributeMissingException
      * @throws WrongTypeException
      */
-    public static function create(array $arguments)
+    public static function create(array $arguments): CreateableInterface
     {
         if (isset(self::$fillable) === false) {
             throw new AttributeMissingException('self::$fillable is not defined.');
@@ -34,7 +37,7 @@ trait Creator
         $entity = new self();
         
         foreach (self::$fillable as $field) {
-            if (isset($arguments[$field])) {
+            if (array_key_exists($field, $arguments)) {
                 $methodname = "set".$field;
                 $value = $arguments[$field];
                 
@@ -48,15 +51,5 @@ trait Creator
         }
         
         return $entity;
-    }
-    
-    /**
-     * Marks the entity as permanent and saves it into the database.
-     * @param EntityManagerInterface $em The Entity Manager
-     */
-    public function save(EntityManagerInterface $em)
-    {
-        $em->persist($this);
-        $em->flush();
     }
 }

@@ -11,6 +11,13 @@ characters:
         displayName: "Testcharacter 2"
         health: 90
         maxhealth: 90
+    -
+        id: 3
+        name: "Testcharacter 3"
+        displayName: "Testcharacter 3 (deleted)"
+        health: 90
+        maxhealth: 90
+        deletedAt: "2011-11-11 11:11:11"
 character_properties:
     -
         owner_id: 1

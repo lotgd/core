@@ -105,7 +105,9 @@ class OneToManyCollectionTest extends ModelTestCase
         $this->assertSame(5, count($collection));
         
         // Test OneToManyCollection::get, remove and contains
-        $testElement1 = $this->getEntityManager()->getRepository(GameConfigurationElement::class)->findByPropertyName("gameVersion")[0];
+        $testElement1 = $this->getEntityManager()
+            ->getRepository(GameConfigurationElement::class)
+            ->findByPropertyName("gameVersion")[0];
         $testElement2 = $collection->get(4);
         $this->assertSame("testConfig", $testElement2->getName());
         $collection->remove(4);

@@ -6,7 +6,6 @@ namespace LotGD\Core\Exceptions;
 /**
  * Exception if a specific, required argument is missing
  */
-class ArgumentEmptyException extends ArgumentException
-{
+class IsNullException extends CoreException {
     
 }

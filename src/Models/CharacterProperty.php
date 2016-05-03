@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+
 use LotGD\Core\Tools\Model\Properties;
 
 /**
@@ -10,7 +13,8 @@ use LotGD\Core\Tools\Model\Properties;
  * @Entity
  * @Table(name="character_properties")
  */
-class CharacterProperty {
+class CharacterProperty
+{
     use Properties;
     
     /** @Id @ManyToOne(targetEntity="Character") */

@@ -1,0 +1,37 @@
+characters:
+    -
+        id: 1
+        name: "Testcharacter 1"
+        displayName: "Testcharacter 1"
+    -
+        id: 2
+        name: "Testcharacter 2"
+        displayName: "Testcharacter 2"
+    -
+        id: 3
+        name: "Testcharacter 1"
+        displayName: "Deleted Testcharacter"
+        deletedAt: "2011-11-11 11:11:11"
+    -
+        id: 4
+        name: "Testcharacter 3"
+        displayName: "Testcharacter 3"
+message_threads:
+    -
+        id: 1
+        threadKey: "messageThread://94ed406c5b7809bbdbf1e092cdbc2e4a"
+messages:
+    -
+        id: 1
+        author_id: 1
+        thread_id: 1
+        message: "Hi!"
+        createdAt: "2000-01-01 00:00:01"
+        systemMessage: false
+message_threads_x_characters:
+    -
+        messagethread_id: 1
+        character_id: 1
+    -
+        messagethread_id: 1
+        character_id: 2
