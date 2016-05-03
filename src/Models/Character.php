@@ -36,7 +36,7 @@ class Character
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist"}) */
     private $properties;
     /** @OneToMany(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
-    private $characterScene;
+    private $characterViewpoint;
     
     /** @var array */
     private static $fillable = [
@@ -57,7 +57,7 @@ class Character
     public function __construct()
     {
         $this->properties = new ArrayCollection();
-        $this->characterScene = new ArrayCollection();
+        $this->characterViewpoint = new ArrayCollection();
     }
     
     /**
@@ -146,13 +146,13 @@ class Character
      * Returns the current character scene and creates one if it is non-existant
      * @return \LotGD\Core\Models\CharacterViewpoint
      */
-    public function getCharacterScene(): CharacterViewpoint
+    public function getCharacterViewpoint(): CharacterViewpoint
     {
-        if (count($this->characterScene) === 0) {
+        if (count($this->characterViewpoint) === 0) {
             $characterScene = CharacterViewpoint::Create(["owner" => $this]);
-            $this->characterScene->add($characterScene);
+            $this->characterViewpoint->add($characterScene);
         }
         
-        return $this->characterScene->first();
+        return $this->characterViewpoint->first();
     }
 }

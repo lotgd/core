@@ -1,0 +1,20 @@
+characters:
+    -
+        id: 1
+        name: "Testcharacter 1"
+        displayName: "Testcharacter 1"
+        health: 0
+        maxhealth: 100
+    -
+        id: 2
+        name: "Testcharacter 2"
+        displayName: "Testcharacter 2"
+        health: 90
+        maxhealth: 90
+motd:
+    -
+        id: 1
+        author_id: 1
+        title: "This is the title"
+        body: "This is the body of the message"
+        creationTime: "2016-05-03 14:19:12"
