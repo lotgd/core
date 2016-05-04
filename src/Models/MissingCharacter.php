@@ -3,21 +3,21 @@ declare(strict_types = 1);
 
 namespace LotGD\Core\Models;
 
+use LotGD\Core\Tools\Model\MockCharacter;
+
 /**
- * Description of MissingCharacter
+ * Provides a basic implementation of CharacterInterface to return the most
+ * important data a missing character might still need.
  */
 class MissingCharacter implements CharacterInterface
 {
+    use MockCharacter;
+    
     private $displayname;
     
     public function __construct(string $displayname)
     {
         $this->displayname = $displayname;
-    }
-    
-    public function getProperty(string $name, $default = null)
-    {
-        return $default;
     }
     
     public function getDisplayName(): string
@@ -28,10 +28,5 @@ class MissingCharacter implements CharacterInterface
     public function getName(): string
     {
         return $this->displayname;
-    }
-    
-    public function getCharacterViewpoint(): CharacterViewpoint
-    {
-        throw new IsNullException();
     }
 }

@@ -10,8 +10,11 @@ namespace LotGD\Core\Models;
  */
 interface CharacterInterface
 {
+    public function getId(): int;
     public function getName(): string;
     public function getDisplayName(): string;
+    public function getHealth(): int;
+    public function getMaxHealth(): int;
     public function getCharacterViewpoint(): CharacterViewpoint;
     public function getProperty(string $name, $default = null);
 }

@@ -4,13 +4,19 @@ declare(strict_types = 1);
 
 namespace LotGD\Core\Models;
 
-use LotGD\Core\Exceptions\IsNullException;
+use LotGD\Core\Tools\Model\MockCharacter;
 
 /**
- * Description of SystemCharacter
+ * Provides a basic system character to provide system information.
+ * 
+ * Whenever a message should be sent by the System instead of a standard character, 
+ * this class is returned by the entity containing the message instead of a standard
+ * character instance.
  */
 class SystemCharacter implements CharacterInterface
 {
+    use MockCharacter;
+    
     static $instance = null;
     static $characterName = "System";
     
@@ -33,15 +39,5 @@ class SystemCharacter implements CharacterInterface
     public function getName(): string
     {
         return self::$characterName;
-    }
-    
-    public function getCharacterViewpoint(): CharacterViewpoint
-    {
-        throw new IsNullException();
-    }
-    
-    public function getProperty(string $name, $default = null)
-    {
-        return $default;
     }
 }
