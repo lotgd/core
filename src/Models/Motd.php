@@ -21,21 +21,26 @@ class Motd
     private $id;
     /** 
      * @ManyToOne(targetEntity="Character", cascade={"all"}, fetch="LAZY")
-     * @JoinColumn(name="author_id", referencedColumnName="id", nullable=True)
+     * @JoinColumn(name="author_id", referencedColumnName="id", nullable=true)
      */
     private $author;
+    /** @Column(type="text"); */
+    private $authorName;
     /** @Column(type="string", length=255, nullable=false) */
     private $title;
     /** @Column(type="text", nullable=false) */
     private $body;
     /** @Column(type="datetime", nullable=false) */
     private $creationTime;
+    /** @Column(type="boolean", nullable=false) */
+    private $systemMessage = false;
     
     /** @var array */
     private static $fillable = [
         "author",
         "title",
-        "body"
+        "body",
+        "systemMessage",
     ];
     
     /**
@@ -57,15 +62,33 @@ class Motd
     
     /**
      * Returns the character who wrote this motd
+     * 
+     * Returns always the real author of the message, even if it is a 
+     * system message. Use $this->getSystemMessage() to check if it is a system
+     * message or $this->getAppearentAuthor() to get the appearent author.
      * @return \LotGD\Core\Models\Character
      */
-    public function getAuthor(): Character
+    public function getAuthor(): CharacterInterface
     {   
         if (is_null($this->author)) {
-            return Character::create(["name" => "System"]);
+            return new MissingCharacter($this->authorName);
         }
         else {
             return $this->author;
+        }
+    }
+    
+    /**
+     * Returns the appearent author of this message.
+     * @return \LotGD\Core\Models\CharacterInterface
+     */
+    public function getApparantAuthor(): CharacterInterface
+    {
+        if ($this->getSystemMessage() === true) {
+            return SystemCharacter::getInstance();
+        }
+        else {
+            return $this->getAuthor();
         }
     }
     
@@ -76,6 +99,7 @@ class Motd
     public function setAuthor(Character $author = null)
     {
         $this->author = $author;
+        $this->authorName = $author->getDisplayName();
     }
     
     /**
@@ -130,5 +154,23 @@ class Motd
     public function setCreationTime(\DateTime $creationTime)
     {
         $this->creationTime = $creationTime;
+    }
+    
+    /**
+     * Returns true if the motd is a system message
+     * @return bool
+     */
+    public function getSystemMessage(): bool
+    {
+        return $this->systemMessage;
+    }
+    
+    /**
+     * Set to true of the message should be a system message
+     * @param bool $isSystemMessage
+     */
+    public function setSystemMessage(bool $isSystemMessage = true)
+    {
+        $this->systemMessage = $isSystemMessage;
     }
 }

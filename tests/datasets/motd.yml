@@ -15,6 +15,25 @@ motd:
     -
         id: 1
         author_id: 1
+        authorName: "Old Display Name"
         title: "This is the title"
         body: "This is the body of the message"
         creationTime: "2016-05-03 14:19:12"
+        systemMessage: false
+    -
+        id: 2
+        author_id: 1
+        authorName: "Old Display Name"
+        title: "This is a system message"
+        body: "This is the body of the system message"
+        creationTime: "2016-05-04 14:19:12"
+        systemMessage: true
+    -
+        id: 3
+        author_id:
+        authorName: "Deleted Character Name"
+        title: "This is an old message."
+        body: "This is an old message."
+        creationTime: "2002-12-09 15:13:59"
+        systemMessage: false
+            

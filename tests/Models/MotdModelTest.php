@@ -14,15 +14,30 @@ class MotdModelTest extends ModelTestCase {
     /** @var string default data set */
     protected $dataset = "motd";
     
-    public function testFetching() {
+    public function testFetching()
+    {
         $em = $this->getEntityManager();
         
         $author = $em->getRepository(Character::class)->find(1);
-        $motd = $em->getRepository(Motd::class)->find(1);
         
-        $this->assertSame("This is the title", $motd->getTitle());
-        $this->assertSame("This is the body of the message", $motd->getBody());
-        $this->assertSame($author, $motd->getAuthor());
+        // Test normal message
+        $motd1 = $em->getRepository(Motd::class)->find(1);
+        $this->assertSame("This is the title", $motd1->getTitle());
+        $this->assertSame("This is the body of the message", $motd1->getBody());
+        $this->assertSame($author, $motd1->getAuthor());
+        $this->assertSame($author, $motd1->getApparantAuthor());
+        $this->assertFalse($motd1->getSystemMessage());
+        
+        // Test System message
+        $motd2 = $em->getRepository(Motd::class)->find(2);
+        $this->assertTrue($motd2->getSystemMessage());
+        $this->assertNotSame($motd2->getAuthor(), $motd2->getApparantAuthor());
+        $this->assertSame($author, $motd2->getAuthor());
+        $this->assertNotSame("Deleted Character Name", $motd2->getAuthor()->getDisplayName());
+        
+        // Test message with unknown author
+        $motd3 = $em->getRepository(Motd::class)->find(3);
+        $this->assertSame("Deleted Character Name", $motd3->getAuthor()->getDisplayName());
     }
     
     public function testTimezone()
@@ -51,17 +66,14 @@ class MotdModelTest extends ModelTestCase {
                 "author" => 1,
                 "title" => "ABC_\"EFG",
                 "body" => "Lorem îpsum etc pp",
+                "systemMessage" => false,
             ]],
             [[
                 "author" => 1,
                 "title" => "AnotherOne",
                 "body" => "Test a Second One",
+                "systemMessage" => true,
             ]],
-            [[
-                "author" => NULL,
-                "title" => "Hallo.",
-                "body" => "Velo.",
-            ]]
         ];
     }
     
@@ -72,9 +84,7 @@ class MotdModelTest extends ModelTestCase {
     {
         $em = $this->getEntityManager();
         // Set Author to the correct author instance. Cannot be moved to the dataProvider.
-        if ($motdCreationArguments["author"] !== NULL) {
-            $motdCreationArguments["author"] = $em->getRepository(Character::class)->find($motdCreationArguments["author"]);
-        }
+        $motdCreationArguments["author"] = $em->getRepository(Character::class)->find($motdCreationArguments["author"]);
         
         $motd = Motd::create($motdCreationArguments);
         $motd->save($em);
@@ -85,16 +95,19 @@ class MotdModelTest extends ModelTestCase {
         $em->clear();
         
         $checkMotd = $this->getEntityManager()->getRepository(Motd::class)->find($id);
-        
-        if ($motdCreationArguments["author"] === null) {
-            $this->assertSame("System", $checkMotd->getAuthor()->getName());
-        }
-        else {
-            $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getAuthor()->getName());
-        }
-        
+
+        $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getAuthor()->getName());
         $this->assertSame($motdCreationArguments["title"], $checkMotd->getTitle());
         $this->assertSame($motdCreationArguments["body"], $checkMotd->getBody());
         $this->assertEquals($motd->getCreationTime(), $checkMotd->getCreationTime());
+        
+        if ($motdCreationArguments["systemMessage"] === true) {
+            $this->assertNotSame($motdCreationArguments["author"]->getName(), $checkMotd->getApparantAuthor()->getName());
+        }
+        else {
+            $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getApparantAuthor()->getName());
+        }
+        
+        $em->flush();
     }
 }

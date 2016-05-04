@@ -17,7 +17,7 @@ use LotGD\Core\Tools\Model\PropertyManager;
  * @Entity
  * @Table(name="characters")
  */
-class Character
+class Character implements CharacterInterface
 {
     use Creator;
     use Deletor;
