@@ -10,7 +10,8 @@ use LotGD\Core\Tests\ModelTestCase;
 /**
  * Tests the management of Characters
  */
-class MotdModelTest extends ModelTestCase {
+class MotdModelTest extends ModelTestCase
+{
     /** @var string default data set */
     protected $dataset = "motd";
     
@@ -60,7 +61,7 @@ class MotdModelTest extends ModelTestCase {
     }
     
     public function dataCreateSaveAndRetrieve(): array
-    {   
+    {
         return [
             [[
                 "author" => 1,
@@ -103,8 +104,7 @@ class MotdModelTest extends ModelTestCase {
         
         if ($motdCreationArguments["systemMessage"] === true) {
             $this->assertNotSame($motdCreationArguments["author"]->getName(), $checkMotd->getApparantAuthor()->getName());
-        }
-        else {
+        } else {
             $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getApparantAuthor()->getName());
         }
         

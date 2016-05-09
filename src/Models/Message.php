@@ -13,9 +13,9 @@ use LotGD\Core\Tools\Model\Deletor;
  * Description of Character
  *
  * @Entity
- * @Table(name="motd")
+ * @Table(name="messages")
  */
-class Motd
+class Message
 {
     use Creator;
     use Deletor;
@@ -27,12 +27,19 @@ class Motd
      * @JoinColumn(name="author_id", referencedColumnName="id", nullable=false)
      */
     private $author;
+    /**
+     * @ManyToOne(targetEntity="Character", cascade={"persist"}, fetch="EAGER")
+     * @JoinColumn(name="addressee_id", referencedColumnName="id", nullable=false)
+     */
+    private $addressee;
     /** @Column(type="string", length=255, nullable=false) */
     private $title;
     /** @Column(type="text", nullable=false) */
     private $body;
     /** @Column(type="datetime", nullable=false) */
     private $creationTime;
+    /** @Column(type="boolean", nullable=false) */
+    private $hasBeenRead = false;
     /** @Column(type="boolean", nullable=false) */
     private $systemMessage = false;
     
@@ -97,6 +104,24 @@ class Motd
     }
     
     /**
+     * Returns the character who has received this message.
+     * @return \LotGD\Core\Models\Character
+     */
+    public function getAddressee(): CharacterInterface
+    {
+        return $this->addressee;
+    }
+    
+    /**
+     * Sets the author of this motd
+     * @param \LotGD\Core\Models\Character $author
+     */
+    public function setAddressee(Character $author = null)
+    {
+        $this->addressee = $author;
+    }
+    
+    /**
      * Returns the title of the message
      * @return string
      */
@@ -148,6 +173,24 @@ class Motd
     public function setCreationTime(\DateTime $creationTime)
     {
         $this->creationTime = $creationTime;
+    }
+    
+    /**
+     * Returns true if the addressee has the message read already.
+     * @return bool
+     */
+    public function hasBeenRead(): bool
+    {
+        return $this->hasBeenRead;
+    }
+    
+    /**
+     * Sets the state of the message
+     * @param bool $hasBeenRead
+     */
+    public function setHasBeenRead(bool $hasBeenRead)
+    {
+        $this->hasBeenRead = $hasBeenRead;
     }
     
     /**

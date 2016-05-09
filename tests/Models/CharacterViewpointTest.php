@@ -16,7 +16,8 @@ class CharacterViewpointTest extends ModelTestCase
     /** @var string default data set */
     protected $dataset = "characterViewpoints";
     
-    public function testGetters() {
+    public function testGetters()
+    {
         $em = $this->getEntityManager();
         
         // Test character with a characterScene
@@ -39,7 +40,8 @@ class CharacterViewpointTest extends ModelTestCase
     }
     
     // Tests if a scene can be changed correctly.
-    public function testSceneChange() {
+    public function testSceneChange()
+    {
         $em = $this->getEntityManager();
         
         $testCharacters = [

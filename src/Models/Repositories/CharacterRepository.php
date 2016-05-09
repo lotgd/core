@@ -13,14 +13,15 @@ use LotGD\Core\Models\Character;
 /**
  * Description of CharacterRepository
  */
-class CharacterRepository extends EntityRepository {
+class CharacterRepository extends EntityRepository
+{
     const SKIP_SOFTDELETED = 0;
     const INCLUDE_SOFTDELETED = 1;
     const ONLY_SOFTDELETED = 2;
     
     protected function modifyQuery(QueryBuilder $queryBuilder, int $level)
     {
-        switch($level) {
+        switch ($level) {
             case self::SKIP_SOFTDELETED:
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->orX(
@@ -50,8 +51,7 @@ class CharacterRepository extends EntityRepository {
         
         try {
             return $queryBuilder->getQuery()->getSingleResult();
-        }
-        catch(NoResultException $e) {
+        } catch (NoResultException $e) {
             return null;
         }
     }

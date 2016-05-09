@@ -11,10 +11,14 @@ use LotGD\Core\Models\Repositories\CharacterRepository;
 /**
  * Tests the management of Characters
  */
-class CharacterModelTest extends ModelTestCase {
+class CharacterModelTest extends ModelTestCase
+{
     /** @var string default data set */
     protected $dataset = "character";
     
+    /**
+     * Tests for soft deletion
+     */
     public function testSoftDeletion()
     {
         $chars = $this->getEntityManager()->getRepository(Character::class)->find(3);
@@ -29,10 +33,14 @@ class CharacterModelTest extends ModelTestCase {
         $this->getEntityManager()->clear();
         
         
-        $allChars = $this->getEntityManager()->getRepository(Character::class)->findAll();
+        $allChars = $this->getEntityManager()
+            ->getRepository(Character::class)
+            ->findAll();
         $this->assertSame(1, count($allChars));
         
-        $allChars = $this->getEntityManager()->getRepository(Character::class)->findAll(CharacterRepository::INCLUDE_SOFTDELETED);
+        $allChars = $this->getEntityManager()
+            ->getRepository(Character::class)
+            ->findAll(CharacterRepository::INCLUDE_SOFTDELETED);
         $this->assertSame(3, count($allChars));
         
         $this->getEntityManager()->getFilters()->enable("soft-deleteable");
