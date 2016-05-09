@@ -6,6 +6,7 @@ namespace LotGD\Core\Tests\Models;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\CharacterProperty;
 use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Models\Repositories\CharacterRepository;
 
 /**
  * Tests the management of Characters
@@ -13,6 +14,29 @@ use LotGD\Core\Tests\ModelTestCase;
 class CharacterModelTest extends ModelTestCase {
     /** @var string default data set */
     protected $dataset = "character";
+    
+    public function testSoftDeletion()
+    {
+        $chars = $this->getEntityManager()->getRepository(Character::class)->find(3);
+        $this->assertSame(null, $chars);
+        
+        $allChars = $this->getEntityManager()->getRepository(Character::class)->findAll();
+        $this->assertSame(2, count($allChars));
+        
+        $char = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $char->delete($this->getEntityManager());
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+        
+        
+        $allChars = $this->getEntityManager()->getRepository(Character::class)->findAll();
+        $this->assertSame(1, count($allChars));
+        
+        $allChars = $this->getEntityManager()->getRepository(Character::class)->findAll(CharacterRepository::INCLUDE_SOFTDELETED);
+        $this->assertSame(3, count($allChars));
+        
+        $this->getEntityManager()->getFilters()->enable("soft-deleteable");
+    }
     
     /**
      * Returns data to create valid characters
@@ -62,6 +86,8 @@ class CharacterModelTest extends ModelTestCase {
         $characterEntity = Character::create($characterData);
         $characterEntity->save($em);
         
+        $em->flush();
+        
         $this->assertInternalType("int", $characterEntity->getId());
         
         $em->flush();
@@ -104,6 +130,8 @@ class CharacterModelTest extends ModelTestCase {
         // Delete one row
         $character = $em->getRepository(Character::class)->find(1);
         $character->delete($em);
+        
+        $em->clear();
         
         $rowsAfter = count($em->getRepository(Character::class)->findAll());
         

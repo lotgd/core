@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\ORM\{
     EntityManager,
     EntityManagerInterface,
@@ -15,7 +16,9 @@ use Doctrine\ORM\{
  * Description of ModelTestCase
  */
 abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase {
+    /** @var \PDO */
     static private $pdo = null;
+    /** @var EntityManager */
     static private $em = null;
     private $connection = null;
     
@@ -27,8 +30,12 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase {
                 // Read db annotations from model files
                 $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
                 $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
+                
+                $configuration->addFilter("soft-deleteable", 'Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter');
 
                 self::$em = EntityManager::create(["pdo" => self::$pdo], $configuration); 
+                self::$em->getFilters()->enable("soft-deleteable");   
+                self::$em->getEventManager()->addEventSubscriber(new \Gedmo\SoftDeleteable\SoftDeleteableListener());
 
                 // Create Schema
                 $metaData = self::$em->getMetadataFactory()->getAllMetadata();

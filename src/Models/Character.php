@@ -5,27 +5,32 @@ namespace LotGD\Core\Models;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\EntityManagerInterface;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\PropertyManager;
+use LotGD\Core\Tools\Model\SoftDeletable;
+use LotGD\Core\Models\Repositories\CharacterRepository;
 
 /**
  * Description of Character
  *
- * @Entity
+ * @Entity(repositoryClass="LotGD\Core\Models\Repositories\CharacterRepository")
  * @Table(name="characters")
  */
 class Character implements CharacterInterface
 {
     use Creator;
-    use Deletor;
+    use SoftDeletable;
     use PropertyManager;
     
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
-    /** @Column(type="string", length=50, unique=true); */
+    /** @Column(type="string", length=50); */
     private $name;
     /** @Column(type="text"); */
     private $displayName;

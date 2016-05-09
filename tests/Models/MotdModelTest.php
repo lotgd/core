@@ -37,7 +37,7 @@ class MotdModelTest extends ModelTestCase {
         
         // Test message with unknown author
         $motd3 = $em->getRepository(Motd::class)->find(3);
-        $this->assertSame("Deleted Character Name", $motd3->getAuthor()->getDisplayName());
+        $this->assertSame("Deleted Testcharacter", $motd3->getAuthor()->getDisplayName());
     }
     
     public function testTimezone()

@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 
@@ -20,12 +23,10 @@ class Motd
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
     /** 
-     * @ManyToOne(targetEntity="Character", cascade={"all"}, fetch="LAZY")
-     * @JoinColumn(name="author_id", referencedColumnName="id", nullable=true)
+     * @ManyToOne(targetEntity="Character", cascade={"persist"}, fetch="EAGER")
+     * @JoinColumn(name="author_id", referencedColumnName="id", nullable=false)
      */
     private $author;
-    /** @Column(type="text"); */
-    private $authorName;
     /** @Column(type="string", length=255, nullable=false) */
     private $title;
     /** @Column(type="text", nullable=false) */

@@ -11,11 +11,17 @@ characters:
         displayName: "Testcharacter 2"
         health: 90
         maxhealth: 90
+    -
+        id: 3
+        name: "Testcharacter 1"
+        displayName: "Deleted Testcharacter"
+        health: 200
+        maxhealth: 200
+        deletedAt: "2011-11-11 11:11:11"
 motd:
     -
         id: 1
         author_id: 1
-        authorName: "Old Display Name"
         title: "This is the title"
         body: "This is the body of the message"
         creationTime: "2016-05-03 14:19:12"
@@ -23,15 +29,13 @@ motd:
     -
         id: 2
         author_id: 1
-        authorName: "Old Display Name"
         title: "This is a system message"
         body: "This is the body of the system message"
         creationTime: "2016-05-04 14:19:12"
         systemMessage: true
     -
         id: 3
-        author_id:
-        authorName: "Deleted Character Name"
+        author_id: 3
         title: "This is an old message."
         body: "This is an old message."
         creationTime: "2002-12-09 15:13:59"
