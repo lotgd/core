@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Models;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,12 +18,12 @@ use LotGD\Core\Tools\Model\SoftDeletable;
 use LotGD\Core\Models\Repositories\CharacterRepository;
 
 /**
- * Description of Character
+ * Model for a character
  *
  * @Entity(repositoryClass="LotGD\Core\Models\Repositories\CharacterRepository")
  * @Table(name="characters")
  */
-class Character implements CharacterInterface
+class Character implements CharacterInterface, CreateableInterface
 {
     use Creator;
     use SoftDeletable;
@@ -42,6 +43,10 @@ class Character implements CharacterInterface
     private $properties;
     /** @OneToMany(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
     private $characterViewpoint;
+    /** @OneToMany(targetEntity="Message", mappedBy="author") */
+    private $sentMessages;
+    /** @OneToMany(targetEntity="Message", mappedBy="addressee") */
+    private $receivedMessages;
     
     /** @var array */
     private static $fillable = [
@@ -63,6 +68,8 @@ class Character implements CharacterInterface
     {
         $this->properties = new ArrayCollection();
         $this->characterViewpoint = new ArrayCollection();
+        $this->sentMessages = new ArrayCollection();
+        $this->receivedMessages = new ArrayCollection();
     }
     
     /**
@@ -159,5 +166,15 @@ class Character implements CharacterInterface
         }
         
         return $this->characterViewpoint->first();
+    }
+    
+    public function listSentMessages(): Collection
+    {
+        return $this->sentMessages;
+    }
+    
+    public function listReceivedMessages(): Collection
+    {
+        return $this->receivedMessages;
     }
 }

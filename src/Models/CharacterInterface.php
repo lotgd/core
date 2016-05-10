@@ -6,7 +6,7 @@ namespace LotGD\Core\Models;
 # use LotGD\Core\Tools\Optional\Optional;
 
 /**
- *
+ * Interface for the character model and all objects that mimick such a model.
  */
 interface CharacterInterface
 {

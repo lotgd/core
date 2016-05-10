@@ -10,12 +10,12 @@ use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 
 /**
- * Description of Character
+ * Model for the message of the day
  *
  * @Entity
  * @Table(name="motd")
  */
-class Motd
+class Motd implements CreateableInterface
 {
     use Creator;
     use Deletor;
@@ -91,7 +91,7 @@ class Motd
      * Sets the author of this motd
      * @param \LotGD\Core\Models\Character $author
      */
-    public function setAuthor(Character $author = null)
+    public function setAuthor(Character $author)
     {
         $this->author = $author;
     }

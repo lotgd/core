@@ -15,7 +15,7 @@ use LotGD\Core\Tools\Model\SceneBasics;
  * @Entity
  * @Table(name="character_viewpoints")
  */
-class CharacterViewpoint
+class CharacterViewpoint implements CreateableInterface
 {
     use Creator;
     use SceneBasics;

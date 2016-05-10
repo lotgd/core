@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Exceptions\AttributeMissingException;
 use LotGD\Core\Exceptions\UnexpectedArrayKeyException;
 use LotGD\Core\Exceptions\WrongTypeException;
+use LotGD\Core\Models\CreateableInterface;
 
 /**
  * Provides methods for creating new entities
@@ -21,7 +22,7 @@ trait Creator
      * @throws AttributeMissingException
      * @throws WrongTypeException
      */
-    public static function create(array $arguments)
+    public static function create(array $arguments): CreateableInterface
     {
         if (isset(self::$fillable) === false) {
             throw new AttributeMissingException('self::$fillable is not defined.');
@@ -51,12 +52,22 @@ trait Creator
     }
     
     /**
+     * Static, protected save function to call from trait-overwriting methods.
+     * @param \LotGD\Core\Tools\Model\CreateableInterface $object
+     * @param EntityManagerInterface $em
+     */
+    protected static function _save(CreateableInterface $object, EntityManagerInterface $em)
+    {
+        $em->persist($object);
+        $em->flush();
+    }
+    
+    /**
      * Marks the entity as permanent and saves it into the database.
      * @param EntityManagerInterface $em The Entity Manager
      */
     public function save(EntityManagerInterface $em)
     {
-        $em->persist($this);
-        $em->flush();
+        self::_save($this, $em);
     }
 }

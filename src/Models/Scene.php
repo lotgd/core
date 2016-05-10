@@ -20,7 +20,7 @@ use LotGD\Core\Tools\Model\SceneBasics;
  * @Entity
  * @Table(name="scenes")
  */
-class Scene
+class Scene implements CreateableInterface
 {
     use Creator;
     use Deletor;
