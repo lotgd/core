@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\Character;
-use LotGD\Core\Models\Motd;
+use LotGD\Core\Models\MotD;
 use LotGD\Core\Tests\ModelTestCase;
 
 /**
  * Tests the management of Characters
  */
-class MotdModelTest extends ModelTestCase
+class MotDModelTest extends ModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "motd";
@@ -22,7 +22,7 @@ class MotdModelTest extends ModelTestCase
         $author = $em->getRepository(Character::class)->find(1);
         
         // Test normal message
-        $motd1 = $em->getRepository(Motd::class)->find(1);
+        $motd1 = $em->getRepository(MotD::class)->find(1);
         $this->assertSame("This is the title", $motd1->getTitle());
         $this->assertSame("This is the body of the message", $motd1->getBody());
         $this->assertSame($author, $motd1->getAuthor());
@@ -30,7 +30,7 @@ class MotdModelTest extends ModelTestCase
         $this->assertFalse($motd1->getSystemMessage());
         
         // Test System message
-        $motd2 = $em->getRepository(Motd::class)->find(2);
+        $motd2 = $em->getRepository(MotD::class)->find(2);
         $this->assertTrue($motd2->getSystemMessage());
         $this->assertNotSame($motd2->getAuthor(), $motd2->getApparantAuthor());
         $this->assertSame($author, $motd2->getAuthor());
@@ -45,7 +45,7 @@ class MotdModelTest extends ModelTestCase
     {
         $em = $this->getEntityManager();
         
-        $time1 = $em->getRepository(Motd::class)->find(1)->getCreationTime();
+        $time1 = $em->getRepository(MotD::class)->find(1)->getCreationTime();
         $time2 = new \DateTime("2016-05-03 14:19:12");
         $time3 = $time2->setTimezone(new \DateTimeZone("Europe/Zurich"));
         $time4 = new \DateTime("2016-05-03 14:19:12");
@@ -87,7 +87,7 @@ class MotdModelTest extends ModelTestCase
         // Set Author to the correct author instance. Cannot be moved to the dataProvider.
         $motdCreationArguments["author"] = $em->getRepository(Character::class)->find($motdCreationArguments["author"]);
         
-        $motd = Motd::create($motdCreationArguments);
+        $motd = MotD::create($motdCreationArguments);
         $motd->save($em);
         
         $id = $motd->getId();
@@ -95,7 +95,7 @@ class MotdModelTest extends ModelTestCase
         $em->flush();
         $em->clear();
         
-        $checkMotd = $this->getEntityManager()->getRepository(Motd::class)->find($id);
+        $checkMotd = $this->getEntityManager()->getRepository(MotD::class)->find($id);
 
         $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getAuthor()->getName());
         $this->assertSame($motdCreationArguments["title"], $checkMotd->getTitle());
