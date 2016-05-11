@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\Character;
+use LotGD\Core\Models\MessageThread;
 use LotGD\Core\Models\Message;
 use LotGD\Core\Models\Repositories\CharacterRepository;
 use LotGD\Core\Tests\ModelTestCase;
@@ -16,216 +17,155 @@ class MessageModelTest extends ModelTestCase
     /** @var string default data set */
     protected $dataset = "messages";
     
-    public function testFetching()
+    public function testSendMessageToSingleCharacter()
+    {
+        $em = $this->getEntityManager();
+        
+        $character1 = $em->getRepository(Character::class)->find(1);
+        $character2 = $em->getRepository(Character::class)->find(4);
+        
+        $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2]);
+        $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character2, $character1]);
+        
+        $this->assertSame($thread1, $thread2);
+        
+        Message::send($character1, "Hi, how are you?", $thread1);
+        Message::send($character2, "I'm fine, and you?", $thread1);
+        Message::send($character1, "Sorry, I need to leave~", $thread1);
+        
+        $this->assertSame(3, count($thread1->getMessages()));
+        
+        // Write changes to database and clear entity cache.
+        $em->flush();
+        $em->clear();
+        
+        $character1 = $em->getRepository(Character::class)->find(1);
+        $character2 = $em->getRepository(Character::class)->find(4);
+        
+        $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2]);
+        
+        // $thread1 should come from the database
+        $this->assertInternalType("int", $thread1->getId());
+        
+        $this->assertSame(3, count($thread1->getMessages()));
+        $this->assertSame(2, count($character1->getMessageThreads()));
+        $this->assertSame(1, count($character2->getMessageThreads()));
+        $this->assertContains($thread1, $character1->getMessageThreads());
+        $this->assertContains($thread1, $character2->getMessageThreads());
+    }
+    
+    public function testSendMessageToMultipleCharacters()
     {
         $em = $this->getEntityManager();
         
         $character1 = $em->getRepository(Character::class)->find(1);
         $character2 = $em->getRepository(Character::class)->find(2);
         $character3 = $em->getRepository(Character::class)->find(3, CharacterRepository::INCLUDE_SOFTDELETED);
+        $character4 = $em->getRepository(Character::class)->find(4);
         
-        $message1 = $em->getRepository(Message::class)->find(1);
-        $this->assertSame("This is the title", $message1->getTitle());
-        $this->assertSame("This is the body of the message", $message1->getBody());
-        $this->assertSame($character1, $message1->getAuthor());
-        $this->assertSame($character1, $message1->getApparantAuthor());
-        $this->assertSame($character2, $message1->getAddressee());
-        $this->assertSame(true, $message1->hasBeenRead());
+        $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2, $character3, $character4]);
+        $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character4, $character2, $character1, $character3]);
+        $this->assertSame($thread1, $thread2);
         
+        Message::send($character1, "Multi-User-Message", $thread1);
+        Message::send($character2, "Multi-User-Message", $thread1);
+        try {
+            $exception = false;
+            Message::send($character3, "Multi-User-Message", $thread1);
+        } catch(\LotGD\Core\Exceptions\ArgumentException $e) {
+            $exception = true;
+        }
+        Message::send($character4, "Multi-User-Message", $thread1);
         
-        $message2 = $em->getRepository(Message::class)->find(2);
-        $this->assertSame("This is an unread message", $message2->getTitle());
-        $this->assertSame("This is the body of the unread message", $message2->getBody());
-        $this->assertSame($character1, $message2->getAuthor());
-        $this->assertSame($character1, $message2->getApparantAuthor());
-        $this->assertSame($character2, $message2->getAddressee());
-        $this->assertSame(false, $message2->hasBeenRead());
+        $this->assertTrue($exception);
+        $this->assertSame(3, count($thread1->getMessages()));
+        $this->assertSame(2, count($character1->getMessageThreads()));
+        $this->assertSame(2, count($character2->getMessageThreads()));
+        $this->assertSame(1, count($character3->getMessageThreads()));
+        $this->assertSame(1, count($character4->getMessageThreads()));
         
-        $message3 = $em->getRepository(Message::class)->find(3);
-        $this->assertSame("This is an old message.", $message3->getTitle());
-        $this->assertSame("This is an old message.", $message3->getBody());
-        $this->assertSame($character3, $message3->getAuthor());
-        $this->assertSame($character3, $message3->getApparantAuthor());
-        $this->assertSame($character1, $message3->getAddressee());
-        $this->assertSame(true, $message3->hasBeenRead());
+        $em->flush();
+        
+        $character1 = $em->getRepository(Character::class)->find(1);
+        $character2 = $em->getRepository(Character::class)->find(2);
+        $character3 = $em->getRepository(Character::class)->find(3, CharacterRepository::INCLUDE_SOFTDELETED);
+        $character4 = $em->getRepository(Character::class)->find(4);
+        
+        $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2, $character3, $character4]);
+        
+        // $thread1 should come from the database
+        $this->assertInternalType("int", $thread1->getId());
+        $this->assertSame(3, count($thread1->getMessages()));
+        $this->assertSame(2, count($character1->getMessageThreads()));
+        $this->assertSame(2, count($character2->getMessageThreads()));
+        $this->assertSame(1, count($character3->getMessageThreads()));
+        $this->assertSame(1, count($character4->getMessageThreads()));
     }
     
-    public function testSendAndReceiving()
+    public function testSendSystemMessageToSingleCharacter()
     {
         $em = $this->getEntityManager();
         
-        // Create a message and store it in the database.
         $character1 = $em->getRepository(Character::class)->find(1);
         $character2 = $em->getRepository(Character::class)->find(2);
         
-        $message = Message::send($character2, $character1, "Hello testSendAndReceiving", "Message 1.");
-        $message->save($em);
+        $thread1 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character1]);
+        $thread2 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character2]);
         
-        $em->clear();
+        $this->assertNotSame($thread1, $thread2);
         
-        // Create a message and persist it, but don't store it in the database.
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(2);
-        
-        $message = Message::send($character2, $character1, "Hello testSendAndReceiving", "Message 2.");
-        $message->save($em);
-        
-        // Check sent messages
-        $messagesSent = $em->getRepository(Character::class)->find(2)->listSentMessages();
-        $found = 0;
-        foreach ($messagesSent as $message) {
-            if ($message->getAuthor()->getId() === 2
-                && $message->getTitle() === "Hello testSendAndReceiving"
-            ) {
-                $found++;
-            }
-        }
-        $this->assertSame(2, $found);
-        
-        // Check received messages
-        $messagesReceived = $em->getRepository(Character::class)->find(1)->listReceivedMessages();
-        $found = 0;
-        foreach ($messagesReceived as $message) {
-            if ($message->getAddressee()->getId() === 1
-                && $message->getTitle() === "Hello testSendAndReceiving"
-            ) {
-                $found++;
-            }
-        }
-        $this->assertSame(2, $found);
-        
-        // Create the message a third time and persist it.
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(2);
-        
-        $message = Message::send($character2, $character1, "Hello testSendAndReceiving", "Message 3");
-        $message->save($em);
-        
-        // Check sent messages again, now there should be 3 entries.
-        $messagesSent = $em->getRepository(Character::class)->find(2)->listSentMessages();
-        $found = 0;
-        foreach ($messagesSent as $message) {
-            if ($message->getAuthor()->getId() === 2
-                && $message->getTitle() === "Hello testSendAndReceiving"
-            ) {
-                $found++;
-            }
-        }
-        $this->assertSame(3, $found);
-        
-        // Check received messages again, now there should be 3 entries.
-        $messagesReceived = $em->getRepository(Character::class)->find(1)->listReceivedMessages();
-        $found = 0;
-        foreach ($messagesReceived as $message) {
-            if ($message->getAddressee()->getId() === 1
-                && $message->getTitle() === "Hello testSendAndReceiving"
-            ) {
-                $found++;
-            }
-        }
-        $this->assertSame(3, $found);
-    }
-    
-    /**
-     * @expectedException \LotGD\Core\Exceptions\InvalidModelException
-     * @expectedExceptionMessage The Addressee of Message model must not be null.
-     */
-    public function testEmptyAddresseeException()
-    {
-        $newMessage = Message::create([
-            "title" => "Hello",
-            "body" => "Hello World.",
-        ]);
-        
-        $newMessage->save($this->getEntityManager());
-    }
-    
-    /**
-     * @expectedException \LotGD\Core\Exceptions\InvalidModelException
-     * @expectedExceptionMessage Author of Message model cannot be empty without beeing a system message.
-     */
-    public function testEmptyAuthorException()
-    {
-        
-        $em = $this->getEntityManager();
-        
-        $newMessage = Message::create([
-            "title" => "Hello",
-            "body" => "Hello World.",
-        ]);
-        
-        $newMessage->setAddressee($em->getRepository(Character::class)->find(1));
-        
-        $newMessage->save($em);
-    }
-    
-    public function testTimezone()
-    {
-        $em = $this->getEntityManager();
-        
-        $time1 = $em->getRepository(Message::class)->find(1)->getCreationTime();
-        $time2 = new \DateTime("2016-05-03 14:19:12");
-        $time3 = $time2->setTimezone(new \DateTimeZone("Europe/Zurich"));
-        $time4 = new \DateTime("2016-05-03 14:19:12");
-        $time4->setTimezone(new \DateTimeZone("America/Los_Angeles"));
-        
-        $this->assertSame($time1->getTimestamp(), $time2->getTimestamp());
-        $this->assertEquals($time1, $time2);
-        $this->assertSame($time2, $time3);
-        $this->assertEquals($time2->getTimezone(), $time3->getTimezone());
-        $this->assertNotEquals($time1->getTimezone(), $time2->getTimezone());
-        $this->assertSame($time1->getTimestamp(), $time3->getTimestamp());
-        $this->assertNotEquals($time2->getTimezone(), $time4->getTimezone());
-    }
-    
-    /*public function dataCreateSaveAndRetrieve(): array
-    {
-        return [
-            [[
-                "author" => 1,
-                "title" => "ABC_\"EFG",
-                "body" => "Lorem îpsum etc pp",
-                "systemMessage" => false,
-            ]],
-            [[
-                "author" => 1,
-                "title" => "AnotherOne",
-                "body" => "Test a Second One",
-                "systemMessage" => true,
-            ]],
-        ];
-    }*/
-    
-    /**
-     * @dataProvider dataCreateSaveAndRetrieve
-     */
-    /*public function testCreateSaveAndRetrieve(array $motdCreationArguments)
-    {
-        $em = $this->getEntityManager();
-        // Set Author to the correct author instance. Cannot be moved to the dataProvider.
-        $motdCreationArguments["author"] = $em->getRepository(Character::class)->find($motdCreationArguments["author"]);
-        
-        $motd = Motd::create($motdCreationArguments);
-        $motd->save($em);
-        
-        $id = $motd->getId();
+        Message::sendSystemMessage("This is a Systemmessage for Character 1.", $thread1);
+        Message::sendSystemMessage("This is a Systemmessage for Character 2.", $thread2);
         
         $em->flush();
         $em->clear();
         
-        $checkMotd = $this->getEntityManager()->getRepository(Motd::class)->find($id);
-
-        $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getAuthor()->getName());
-        $this->assertSame($motdCreationArguments["title"], $checkMotd->getTitle());
-        $this->assertSame($motdCreationArguments["body"], $checkMotd->getBody());
-        $this->assertEquals($motd->getCreationTime(), $checkMotd->getCreationTime());
+        $character1 = $em->getRepository(Character::class)->find(1);
+        $character2 = $em->getRepository(Character::class)->find(2);
         
-        if ($motdCreationArguments["systemMessage"] === true) {
-            $this->assertNotSame($motdCreationArguments["author"]->getName(), $checkMotd->getApparantAuthor()->getName());
-        } else {
-            $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getApparantAuthor()->getName());
+        $thread1 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character1]);
+        $thread2 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character2]);
+        
+        $this->assertSame(1, count($thread1->getMessages()));
+        $this->assertSame(1, count($thread2->getMessages()));
+        
+        // Test the impossibility to answer to a system message thread, but another system message 
+        // needs to be able to get attached
+        try {
+            $exception = false;
+            Message::send($character1, "A normal message", $thread1);
+        } catch (\LotGD\Core\Exceptions\CoreException $ex) {
+            $exception = true;
         }
         
+        Message::sendSystemMessage("A second system Message", $thread1);
+        
+        $this->assertTrue($exception);
+        $this->assertSame(2, count($thread1->getMessages()));
+    }
+    
+    public function testSendSystemMessageToMultipleCharacters()
+    {
+        $em = $this->getEntityManager();
+        
+        $character1 = $em->getRepository(Character::class)->find(1);
+        $character2 = $em->getRepository(Character::class)->find(2);
+        
+        $thread1 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character1, $character2]);
+        $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2]);
+        
+        $this->assertNotSame($thread1, $thread2);
+        
+        Message::sendSystemMessage("A system message to 2 recipients", $thread1);
+        
         $em->flush();
-    }*/
+        $em->clear();
+        
+        $character1 = $em->getRepository(Character::class)->find(1);
+        $character2 = $em->getRepository(Character::class)->find(2);
+        
+        $thread1 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character1, $character2]);
+        
+        $this->assertSame(1, count($thread1->getMessages()));
+    }
 }

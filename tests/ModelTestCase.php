@@ -50,6 +50,9 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
             $this->conn = $this->createDefaultDBConnection(self::$pdo, $GLOBALS["DB_NAME"]);
         }
         
+        // It is important to clear the cache of the entity manager every time a new test runs!
+        self::$em->clear();
+        
         return $this->conn;
     }
     

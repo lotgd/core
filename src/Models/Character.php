@@ -43,10 +43,19 @@ class Character implements CharacterInterface, CreateableInterface
     private $properties;
     /** @OneToMany(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
     private $characterViewpoint;
-    /** @OneToMany(targetEntity="Message", mappedBy="author") */
-    private $sentMessages;
-    /** @OneToMany(targetEntity="Message", mappedBy="addressee") */
-    private $receivedMessages;
+    /** 
+     * @ManyToMany(targetEntity="MessageThread", inversedBy="participants", cascade={"persist"})
+     * @JoinTable(
+     *  name="message_threads_x_characters",
+     *  joinColumns={
+     *      @JoinColumn(name="character_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @JoinColumn(name="messagethread_id", referencedColumnName="id")
+     *  }
+     * )
+     */
+    private $messageThreads;
     
     /** @var array */
     private static $fillable = [
@@ -68,8 +77,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         $this->properties = new ArrayCollection();
         $this->characterViewpoint = new ArrayCollection();
-        $this->sentMessages = new ArrayCollection();
-        $this->receivedMessages = new ArrayCollection();
+        $this->messageThreads = new ArrayCollection();
     }
     
     /**
@@ -168,13 +176,24 @@ class Character implements CharacterInterface, CreateableInterface
         return $this->characterViewpoint->first();
     }
     
-    public function listSentMessages(): Collection
+    /**
+     * Returns a list of message threads this user has created.
+     * @return Collection
+     */
+    public function getMessageThreads(): Collection
     {
-        return $this->sentMessages;
+        return $this->messageThreads;
     }
     
-    public function listReceivedMessages(): Collection
+    public function sendMessageTo(Character $recipient)
     {
-        return $this->receivedMessages;
+        // ToDo: implement later
+        throw new \LotGD\Core\Exceptions\NotImplementedException;
+    }
+    
+    public function receiveMessageFrom(Character $author)
+    {
+        // ToDo: implement later
+        throw new \LotGD\Core\Exceptions\NotImplementedException;
     }
 }

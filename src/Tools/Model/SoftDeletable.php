@@ -56,7 +56,7 @@ trait SoftDeletable
      * Returns true if this entity is soft deleted
      * @return bool
      */
-    public function isSoftDeleted(): bool
+    public function isDeleted(): bool
     {
         return is_null($this->deletedAt) ? false : true;
     }

@@ -15,6 +15,8 @@ use LotGD\Core\Models\CreateableInterface;
  */
 trait Creator
 {
+    use Saveable;
+    
     /**
      * Creates and returns an entity instance and fills values
      * @param array $arguments The values the instance should get
@@ -49,25 +51,5 @@ trait Creator
         }
         
         return $entity;
-    }
-    
-    /**
-     * Static, protected save function to call from trait-overwriting methods.
-     * @param \LotGD\Core\Tools\Model\CreateableInterface $object
-     * @param EntityManagerInterface $em
-     */
-    protected static function _save(CreateableInterface $object, EntityManagerInterface $em)
-    {
-        $em->persist($object);
-        $em->flush();
-    }
-    
-    /**
-     * Marks the entity as permanent and saves it into the database.
-     * @param EntityManagerInterface $em The Entity Manager
-     */
-    public function save(EntityManagerInterface $em)
-    {
-        self::_save($this, $em);
     }
 }

@@ -15,7 +15,7 @@ use LotGD\Core\Tools\Model\Deletor;
  * @Entity
  * @Table(name="motd")
  */
-class Motd implements CreateableInterface
+class MotD implements CreateableInterface
 {
     use Creator;
     use Deletor;

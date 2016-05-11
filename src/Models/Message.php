@@ -3,109 +3,106 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use DateTime;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Exceptions\InvalidModelException;
-use LotGD\Core\Tools\Model\Creator;
+use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Tools\Model\Deletor;
+use LotGD\Core\Tools\Model\Saveable;
 
 /**
- * Model for messages between 2 characters or for system messages to characters.
- *
- * This entity is not configured to persist - meaning that this->save has to be
- * called explicitly in order to access the message from the author's and addressee's
- * collections.
+ * Model for messages
  * @Entity
  * @Table(name="messages")
  */
-class Message implements CreateableInterface
+class Message
 {
-    use Creator;
-    use Deletor;
-    
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
     /**
-     * @ManyToOne(targetEntity="Character", inversedBy="sentMessages", fetch="EAGER")
+     * @ManyToOne(targetEntity="Character", fetch="EAGER")
      * @JoinColumn(name="author_id", referencedColumnName="id", nullable=true)
      */
     private $author;
-    /**
-     * @ManyToOne(targetEntity="Character", inversedBy="receivedMessages", fetch="EAGER")
-     * @JoinColumn(name="addressee_id", referencedColumnName="id", nullable=false)
-     */
-    private $addressee;
-    /** @Column(type="string", length=255, nullable=false) */
-    private $title;
     /** @Column(type="text", nullable=false) */
-    private $body;
+    private $message;
+    /** @ManyToOne(targetEntity="MessageThread", inversedBy="messages", fetch="EAGER") */
+    private $thread;
     /** @Column(type="datetime", nullable=false) */
-    private $creationTime;
-    /** @Column(type="boolean", nullable=false) */
-    private $hasBeenRead = false;
+    private $createdAt;
     /** @Column(type="boolean", nullable=false) */
     private $systemMessage = false;
     
-    /** @var array */
-    private static $fillable = [
-        "title",
-        "body",
-    ];
-    
     /**
-     * Creates a message with author, addressee, title and body and returns it. 
+     * Sends a message to a MessageThread
      * @param \LotGD\Core\Models\Character $from
-     * @param \LotGD\Core\Models\Character $to
-     * @param string $title
-     * @param string $body
+     * @param string $message
+     * @param \LotGD\Core\Models\MessageThread $thread
+     * @param bool $systemMessage
      * @return \LotGD\Core\Models\Message
      */
-    public static function send(Character $from, Character $to, string $title, string $body): Message
-    {
-        $newMessage = self::create([
-            "title" => $title,
-            "body" => $body
-        ]);
-        
-        $newMessage->setAuthor($from);
-        $newMessage->setAddressee($to);
-        
-        return $newMessage;
+    public static function send(
+        Character $from,
+        string $message,
+        MessageThread $thread,
+        bool $systemMessage = false
+    ) {
+        $thread->addMessage(new self($from, $message, $thread, $systemMessage));
     }
     
     /**
-     * Creates a system message with addressee, title and body and returns it. 
-     * @param \LotGD\Core\Models\Character $from
-     * @param \LotGD\Core\Models\Character $to
-     * @param string $title
-     * @param string $body
+     * Sends a system message to a MessageThread
+     * @param string $message
+     * @param \LotGD\Core\Models\MessageThread $thread
      * @return \LotGD\Core\Models\Message
      */
-    public static function sendSystemMessage(Charactter $to, string $title, string $body): Message
-    {
-        $newMessage = self::create([
-            "title" => $title,
-            "body" => $body,
-        ]);
-        
-        $newMessage->setAddressee($to);
-        $newMessage->setSystemMessage(true);
-        
-        return $newMessage;
+    public static function sendSystemMessage(
+        string $message,
+        MessageThread $thread
+    ) {
+        $thread->addMessage(new self(SystemCharacter::getInstance(), $message, $thread, true));
     }
     
     /**
-     * Constructs an entity and sets default datetime to now.
+     * Constructs the message.
+     * 
+     * This method has been made protected to prevent from accessing it directly. Use
+     * the static methods self::send() and self::sendSystemMessage() instead.
+     * @param \LotGD\Core\Models\Character $from
+     * @param string $message
+     * @param \LotGD\Core\Models\Thread $thread
+     * @param bool $systemMessage
+     * @throws ArgumentException
      */
-    public function __construct()
+    protected function __construct(CharacterInterface $from, string $message, MessageThread $thread, bool $systemMessage)
     {
-        $this->creationTime = new \DateTime("now");
+        if ($from instanceof Character) {
+            if ($from->isDeleted() === true) {
+                throw new ArgumentException("A message cannot get written by a deleted character.");
+            }
+            $this->author = $from;
+        } elseif ($systemMessage === false) {
+            // This should not happen since the constructor is not a public method
+            throw new ArgumentException(
+                sprintf(
+                    'If $from is not an instance of %s, $systemMessage must be true',
+                    Character::class
+                )
+            );
+        }
+        
+        $this->message = $message;
+        $this->thread = $thread;
+        $this->createdAt = new DateTime("now");
+        $this->systemMessage = $systemMessage;
     }
     
     /**
-     * Returns the entities ID
+     * Returns the id
      * @return int
      */
     public function getId(): int
@@ -114,17 +111,13 @@ class Message implements CreateableInterface
     }
     
     /**
-     * Returns the character who wrote this motd
-     *
-     * Returns always the real author of the message, even if it is a
-     * system message. Use $this->getSystemMessage() to check if it is a system
-     * message or $this->getAppearentAuthor() to get the appearent author.
-     * @return \LotGD\Core\Models\Character
+     * Returns the true character of the message
+     * @return \LotGD\Core\Models\CharacterInterface
      */
     public function getAuthor(): CharacterInterface
     {
         if (is_null($this->author)) {
-            return new MissingCharacter();
+            return SystemCharacter::getInstance();
         }
         else {
             return $this->author;
@@ -132,163 +125,72 @@ class Message implements CreateableInterface
     }
     
     /**
-     * Returns the appearent author of this message.
+     * Returns the apparant character of the message.
+     * 
+     * If a character sends a system message, this method will return the SystemCharacter message
+     * instead of the true author.
      * @return \LotGD\Core\Models\CharacterInterface
      */
     public function getApparantAuthor(): CharacterInterface
     {
-        if ($this->getSystemMessage() === true) {
+        if ($this->isSystemMessage()) {
             return SystemCharacter::getInstance();
-        } else {
+        }
+        else {
             return $this->getAuthor();
         }
     }
     
     /**
-     * Sets the author of this motd
-     * @param \LotGD\Core\Models\Character $author
-     */
-    public function setAuthor(Character $author)
-    {
-        if ($this->author !== null) {
-            throw new ParentAlreadySetException("A message's author cannot be changed.");
-        }
-        
-        $this->author = $author;
-    }
-    
-    /**
-     * Returns the character who has received this message.
-     * @return \LotGD\Core\Models\Character
-     */
-    public function getAddressee(): CharacterInterface
-    {
-        return $this->addressee;
-    }
-    
-    /**
-     * Sets the author of this motd
-     * @param \LotGD\Core\Models\Character $addressee
-     */
-    public function setAddressee(Character $addressee)
-    {
-        if ($this->addressee !== null) {
-            throw new ParentAlreadySetException("A message cannot be moved.");
-        }
-        
-        $this->addressee = $addressee;
-    }
-    
-    /**
-     * Returns the title of the message
+     * Returns the message
      * @return string
      */
-    public function getTitle(): string
+    public function getMessage(): string
     {
-        return $this->title;
+        return $this->message;
     }
     
     /**
-     * Sets the title of the message
-     * @param string $title
+     * Returns the thread this message belongs to
+     * @return \LotGD\Core\Models\MessageThread
      */
-    public function setTitle(string $title)
+    public function getThread(): MessageThread
     {
-        $this->title = $title;
+        return $this->thread;
     }
     
     /**
-     * Returns the body of the message
-     * @return string
+     * Sets the thread this message belongs to, once.
+     * 
+     * A message that belongs to a thread needs to stay there - there is no need for messages to
+     * switch the thread and end up in a complete different discussion.
+     * @param \LotGD\Core\Models\MessageThread $thread
+     * @throws ParentAlreadySetException
      */
-    public function getBody(): string
+    public function setThread(MessageThread $thread)
     {
-        return $this->body;
+        if (is_null($this->thread) === false) {
+            throw new ParentAlreadySetException("A message's thread cannot be changed.");
+        }
+        
+        $this->thread = $thread;
     }
     
     /**
-     * Sets the body of the message
-     * @param string $body
+     * Returns the datetime this message was created at
+     * @return DateTime
      */
-    public function setBody(string $body)
+    public function getCreatedAt(): DateTime
     {
-        $this->body = $body;
+        return $this->createdAt;
     }
     
     /**
-     * Returns the creation time. Modification of this has no effect.
-     * @return \DateTime
-     */
-    public function getCreationTime(): \DateTime
-    {
-        return $this->creationTime;
-    }
-    
-    /**
-     * Sets the creation time. Needs to be set to a new datetime instance.
-     * @param \DateTime $creationTime
-     */
-    public function setCreationTime(\DateTime $creationTime)
-    {
-        $this->creationTime = $creationTime;
-    }
-    
-    /**
-     * Returns true if the addressee has the message read already.
+     * Returns true if the message is a system message
      * @return bool
      */
-    public function hasBeenRead(): bool
-    {
-        return $this->hasBeenRead;
-    }
-    
-    /**
-     * Sets the state of the message
-     * @param bool $hasBeenRead
-     */
-    public function setHasBeenRead(bool $hasBeenRead)
-    {
-        $this->hasBeenRead = $hasBeenRead;
-    }
-    
-    /**
-     * Returns true if the motd is a system message
-     * @return bool
-     */
-    public function getSystemMessage(): bool
+    public function isSystemMessage(): bool
     {
         return $this->systemMessage;
-    }
-    
-    /**
-     * Set to true of the message should be a system message
-     * @param bool $isSystemMessage
-     */
-    public function setSystemMessage(bool $isSystemMessage = true)
-    {
-        $this->systemMessage = $isSystemMessage;
-    }
-    
-    /**
-     * Checks model validity and persists it (essentially sending it).
-     * @param EntityManagerInterface $em
-     * @throws InvalidModelException
-     */
-    public function save(EntityManagerInterface $em)
-    {
-        if ($this->addressee === null) {
-            throw new InvalidModelException("The Addressee of Message model must not be null.");
-        }
-        
-        if ($this->author === null && $this->getSystemMessage() === false) {
-            throw new InvalidModelException("Author of Message model cannot be empty without beeing a system message.");
-        }
-        
-        // Add manually to received and set messages list
-        $this->getAddressee()->listReceivedMessages()->add($this);
-        $this->getAuthor()->listSentMessages()->add($this);
-        
-        // Persist and flush
-        self::_save($this, $em);
     }
 }

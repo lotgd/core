@@ -9,8 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 /**
  * Interface for createable models
  */
-interface CreateableInterface
+interface CreateableInterface extends SaveableInterface
 {
     public static function create(array $arguments): CreateableInterface;
-    public function save(EntityManagerInterface $em);
 }
