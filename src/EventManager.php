@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 use LotGD\Core\Models\EventSubscription;
 use LotGD\Core\EventHandler;
-use LotGD\Core\Excpetions\ClassNotFoundException;
-use LotGD\Core\Excpetions\SubscriptionNotFoundException;
+use LotGD\Core\Exceptions\ClassNotFoundException;
+use LotGD\Core\Exceptions\SubscriptionNotFoundException;
+use LotGD\Core\Exceptions\WrongTypeException;
 
 /**
  * Manages a simple publish/subscribe system based on regular expressions
@@ -14,6 +17,13 @@ use LotGD\Core\Excpetions\SubscriptionNotFoundException;
  */
 class EventManager
 {
+    private $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     /**
      * Publish an event. Will immediately cause handleEvent() to be called on all
      * subscribed classes. This does not ensure any order in which the handlers
@@ -21,7 +31,7 @@ class EventManager
      *
      * @param string $event The name of the event to publish.
      */
-    public function publish(string $event, array $context)
+    public function publish(string $event, array &$context)
     {
         // For right now, implement the naive approach of iterating every entry
         // in the subscription database, checking the regular expression. We
@@ -29,7 +39,7 @@ class EventManager
         // TODO: Add an in-memory cache here. Will likely only be in the 1000s of
         // patterns, so no need to go to the remote key-value store.
 
-        $subscriptions = EventSubscription::findAll();
+        $subscriptions = $this->getSubscriptions();
         foreach ($subscriptions as $s) {
             if (preg_match($s->getPattern(), $event)) {
                 $class = $s->getClass();
@@ -59,11 +69,11 @@ class EventManager
         try {
             // Can we resolve this class?
             $klass = new \ReflectionClass($class);
-        } catch (LogicException $Exception) {
+        } catch (\LogicException $e) {
             // Currently we do the same thing on not found as on some other
             // exception. Maybe we should do something different.
             throw new ClassNotFoundException();
-        } catch (ReflectionException $Exception) {
+        } catch (\ReflectionException $e) {
             throw new ClassNotFoundException();
         }
 
@@ -74,14 +84,15 @@ class EventManager
         }
 
         // Validate the regular expression.
-        if (preg_match($pattern, null) === false) {
-            throw new WrontTypeException('Invalid regular expression');
+        if (@preg_match($pattern, '') === false) {
+            throw new WrongTypeException('Invalid regular expression');
         }
 
-        EventSubscription::create([
+        $e = EventSubscription::create([
             'pattern' => $pattern,
             'class' => $class
         ]);
+        $e->save($this->em);
     }
 
     /**
@@ -95,9 +106,21 @@ class EventManager
      */
     public function unsubscribe(string $pattern, string $class)
     {
-        EventSubscriotion::delete([
+        $e = $this->em->getRepository(EventSubscription::class)->find(array(
             'pattern' => $pattern,
             'class' => $class
-        ]);
+        ));
+        if (!$e) {
+            throw new SubscriptionNotFoundException("Subscription not found with pattern={$pattern} class={$class}.");
+        }
+        $e->delete($this->em);
+    }
+
+    /**
+     * Return a list of existing subscriptions.
+     */
+    public function getSubscriptions(): array
+    {
+        return $this->em->getRepository(EventSubscription::class)->findAll();
     }
 }

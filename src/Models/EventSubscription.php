@@ -40,6 +40,11 @@ class EventSubscription
         return $this->pattern;
     }
 
+    public function setPattern(string $pattern)
+    {
+        $this->pattern = $pattern;
+    }
+
     /**
      * Returns the class name subscribed to this event.
      * @return string
@@ -47,5 +52,10 @@ class EventSubscription
     public function getClass(): string
     {
         return $this->class;
+    }
+
+    public function setClass(string $class)
+    {
+        $this->class = $class;
     }
 }

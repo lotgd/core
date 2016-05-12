@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace LotGD\Core\Exceptions;
 
 /**
- * Exception if a module already exists.
+ * Exception if a module does not exists.
  */
-class ModuleAlreadyExistsException extends CoreException {
+class ModuleDoesNotExistException extends CoreException {
 
 }
