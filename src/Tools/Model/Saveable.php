@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Models\SaveableInterface;
 
 /**
- * Provides methods for creating new entities
+ * Provides methods for persisting Saveable entities.
  */
 trait Saveable
 {

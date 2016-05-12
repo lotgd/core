@@ -11,10 +11,16 @@ use Doctrine\ORM\QueryBuilder;
 use LotGD\Core\Models\MessageThread;
 
 /**
- * Description of CharacterRepository
+ * Repository for MessageThreads
  */
 class MessageThreadRepository extends EntityRepository
 {
+    /**
+     * Creates a thread key based on the participating characters and a schema.
+     * @param array $listOfCharacters
+     * @param string $messageSchema
+     * @return string
+     */
     public static function createThreadKey(array $listOfCharacters, string $messageSchema): string
     {
         // ToDo: Replace array with CharacterCollection
@@ -33,20 +39,26 @@ class MessageThreadRepository extends EntityRepository
         return $messageSchema . "://" . md5($threadParticipants);
     }
     
+    /**
+     * Finds a messageThread
+     * @param array $listOfCharacters
+     * @return MessageThread
+     */
     public function findOrCreateFor(array $listOfCharacters): MessageThread
     {
         $threadKey = self::createThreadKey($listOfCharacters, "messageThread");
         
         try {
             $thread = $this->getEntityManager()->createQueryBuilder()
-            ->select("e")
-            ->from($this->getEntityName(), "e")
-            ->where("e.threadKey = :threadKey")
-            ->setParameter("threadKey", $threadKey)
-            ->getQuery()->getSingleResult();
+                ->select("e")
+                ->from($this->getEntityName(), "e")
+                ->where("e.threadKey = :threadKey")
+                ->setParameter("threadKey", $threadKey)
+                ->getQuery()
+                ->getSingleResult();
             
             return $thread;
-        } catch (\Doctrine\ORM\NoResultException $e) {
+        } catch (NoResultException $e) {
             $newMessageThread = new MessageThread($threadKey, $listOfCharacters, false);
             $newMessageThread->save($this->getEntityManager());
             
@@ -54,20 +66,26 @@ class MessageThreadRepository extends EntityRepository
         }
     }
     
+    /**
+     * Finds a systemMessage or returns a newly created, read-only thread.
+     * @param array $listOfCharacters
+     * @return MessageThread
+     */
     public function findOrCreateReadonlyFor(array $listOfCharacters): MessageThread
     {
         $threadKey = self::createThreadKey($listOfCharacters, "systemMessage");
         
         try {
             $thread = $this->getEntityManager()->createQueryBuilder()
-            ->select("e")
-            ->from($this->getEntityName(), "e")
-            ->where("e.threadKey = :threadKey")
-            ->setParameter("threadKey", $threadKey)
-            ->getQuery()->getSingleResult();
+                ->select("e")
+                ->from($this->getEntityName(), "e")
+                ->where("e.threadKey = :threadKey")
+                ->setParameter("threadKey", $threadKey)
+                ->getQuery()
+                ->getSingleResult();
             
             return $thread;
-        } catch (\Doctrine\ORM\NoResultException $e) {
+        } catch (NoResultException $e) {
             $newMessageThread = new MessageThread($threadKey, $listOfCharacters, true);
             $newMessageThread->save($this->getEntityManager());
             
