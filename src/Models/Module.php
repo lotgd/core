@@ -22,7 +22,7 @@ class Module
     private $library;
 
     /** @Column(type="datetime") */
-    private $created;
+    private $createdAt;
 
     public function __construct(string $library)
     {
@@ -34,9 +34,9 @@ class Module
      * Returns the time this module was added to the system.
      * @return DateTime
      */
-    public function getCreated(): \DateTime
+    public function getCreatedAt(): \DateTime
     {
-        return $this->created;
+        return $this->createdAt;
     }
 
     /**

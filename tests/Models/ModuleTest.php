@@ -23,7 +23,7 @@ class ModuleTest extends ModelTestCase
         $scene = $em->getRepository(Module::class)->find('lotgd/test');
 
         $this->assertEquals("lotgd/test", $scene->getLibrary());
-        $this->assertEquals(new \DateTime('2016-05-01'), $scene->getCreated());
+        $this->assertEquals(new \DateTime('2016-05-01'), $scene->getCreatedAt());
 
         $em->flush();
     }
