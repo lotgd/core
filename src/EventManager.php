@@ -19,6 +19,9 @@ class EventManager
 {
     private $em;
 
+    /**
+     * @param EntityManagerInterface $em The database entity manager.
+     */
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
