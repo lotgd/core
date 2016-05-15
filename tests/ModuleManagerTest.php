@@ -67,7 +67,9 @@ class ModuleManagerTest extends ModelTestCase
 
     public function testUnregisterWithNoEvents()
     {
-        $package = $this->getMockBuilder(PackageInterface::class)->getMock();
+        $package = $this->getMockBuilder(PackageInterface::class)
+                        ->setMethods(['getExtra'])
+                        ->getMock();
         $package->method('getExtra')->willReturn(array());
 
         $eventManager = $this->getMockBuilder(EventManager::class)->getMock();
@@ -97,7 +99,9 @@ class ModuleManagerTest extends ModelTestCase
             ),
         );
 
-        $package = $this->getMockBuilder(PackageInterface::class)->getMock();
+        $package = $this->getMockBuilder(PackageInterface::class)
+                        ->setMethods(['getExtra'])
+                        ->getMock();
         $package->method('getExtra')->willReturn(array(
             'subscriptions' => $subscriptions
         ));
@@ -137,7 +141,9 @@ class ModuleManagerTest extends ModelTestCase
             ),
         );
 
-        $package = $this->getMockBuilder(PackageInterface::class)->getMock();
+        $package = $this->getMockBuilder(PackageInterface::class)
+                        ->setMethods(['getExtra'])
+                        ->getMock();
         $package->method('getExtra')->willReturn(array(
             'subscriptions' => $subscriptions
         ));
@@ -165,7 +171,9 @@ class ModuleManagerTest extends ModelTestCase
 
     public function testRegisterWithNoEvents()
     {
-        $package = $this->getMockBuilder(PackageInterface::class)->getMock();
+      $package = $this->getMockBuilder(PackageInterface::class)
+                      ->setMethods(['getExtra'])
+                      ->getMock();
         $package->method('getExtra')->willReturn(array());
 
         $eventManager = $this->getMockBuilder(EventManager::class)->getMock();
@@ -200,7 +208,9 @@ class ModuleManagerTest extends ModelTestCase
             ),
         );
 
-        $package = $this->getMockBuilder(PackageInterface::class)->getMock();
+        $package = $this->getMockBuilder(PackageInterface::class)
+                        ->setMethods(['getExtra'])
+                        ->getMock();
         $package->method('getExtra')->willReturn(array(
             'subscriptions' => $subscriptions
         ));
@@ -245,7 +255,9 @@ class ModuleManagerTest extends ModelTestCase
             ),
         );
 
-        $package = $this->getMockBuilder(PackageInterface::class)->getMock();
+        $package = $this->getMockBuilder(PackageInterface::class)
+                        ->setMethods(['getExtra'])
+                        ->getMock();
         $package->method('getExtra')->willReturn(array(
             'subscriptions' => $subscriptions
         ));
