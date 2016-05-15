@@ -30,7 +30,9 @@ class ModuleManagerTest extends ModelTestCase
 
     public function testModuleAlreadyExists()
     {
-        $game = $this->getMockBuilder(Game::class)->getMock();
+        $game = $this->getMockBuilder(Game::class)
+                     ->disableOriginalConstructor()
+                     ->getMock();
         $game->method('db')->willReturn($this->getEntityManager());
 
         $package = $this->getMockBuilder(PackageInterface::class)->getMock();
@@ -57,7 +59,9 @@ class ModuleManagerTest extends ModelTestCase
     {
         $package = $this->getMockBuilder(PackageInterface::class)->getMock();
 
-        $game = $this->getMockBuilder(Game::class)->getMock();
+        $game = $this->getMockBuilder(Game::class)
+                     ->disableOriginalConstructor()
+                     ->getMock();
         $game->method('db')->willReturn($this->getEntityManager());
 
         $mm = new ModuleManager($this->getEntityManager());
@@ -77,7 +81,9 @@ class ModuleManagerTest extends ModelTestCase
                              ->disableOriginalConstructor()
                              ->getMock();
 
-        $game = $this->getMockBuilder(Game::class)->getMock();
+        $game = $this->getMockBuilder(Game::class)
+                     ->disableOriginalConstructor()
+                     ->getMock();
         $game->method('db')->willReturn($this->getEntityManager());
         $game->method('events')->willReturn($eventManager);
 
@@ -120,7 +126,9 @@ class ModuleManagerTest extends ModelTestCase
                          array($this->equalTo($subscriptions[1]['pattern']), $this->equalTo($subscriptions[1]['class']))
                      );
 
-        $game = $this->getMockBuilder(Game::class)->getMock();
+        $game = $this->getMockBuilder(Game::class)
+                     ->disableOriginalConstructor()
+                     ->getMock();
         $game->method('db')->willReturn($this->getEntityManager());
         $game->method('events')->willReturn($eventManager);
 
@@ -162,7 +170,9 @@ class ModuleManagerTest extends ModelTestCase
                          array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']))
                      );
 
-        $game = $this->getMockBuilder(Game::class)->getMock();
+        $game = $this->getMockBuilder(Game::class)
+                     ->disableOriginalConstructor()
+                     ->getMock();
         $game->method('db')->willReturn($this->getEntityManager());
         $game->method('events')->willReturn($eventManager);
 
@@ -185,7 +195,9 @@ class ModuleManagerTest extends ModelTestCase
                              ->disableOriginalConstructor()
                              ->getMock();
 
-        $game = $this->getMockBuilder(Game::class)->getMock();
+        $game = $this->getMockBuilder(Game::class)
+                     ->disableOriginalConstructor()
+                     ->getMock();
         $game->method('db')->willReturn($this->getEntityManager());
         $game->method('events')->willReturn($eventManager);
 
@@ -233,7 +245,9 @@ class ModuleManagerTest extends ModelTestCase
                          array($this->equalTo($subscriptions[1]['pattern']), $this->equalTo($subscriptions[1]['class']))
                      );
 
-        $game = $this->getMockBuilder(Game::class)->getMock();
+        $game = $this->getMockBuilder(Game::class)
+                     ->disableOriginalConstructor()
+                     ->getMock();
         $game->method('db')->willReturn($this->getEntityManager());
         $game->method('events')->willReturn($eventManager);
 
@@ -280,7 +294,9 @@ class ModuleManagerTest extends ModelTestCase
                          array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']))
                      );
 
-        $game = $this->getMockBuilder(Game::class)->getMock();
+        $game = $this->getMockBuilder(Game::class)
+                     ->disableOriginalConstructor()
+                     ->getMock();
         $game->method('db')->willReturn($this->getEntityManager());
         $game->method('events')->willReturn($eventManager);
 

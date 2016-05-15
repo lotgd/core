@@ -10,6 +10,14 @@ class Game
     private $entityManager;
     private $eventManager;
 
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        EventManager $eventManager)
+    {
+        $this->entityManager = $entityManager;
+        $this->eventManager = $eventManager;
+    }
+
     /**
      * Returns the game's entity manager.
      * @return EntityManagerInterface The game's database entity manager.
