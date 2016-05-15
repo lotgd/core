@@ -3,7 +3,7 @@ declare (strict_types=1);
 
 namespace LotGD\Core;
 
-class Game implements GameInterface
+class Game
 {
     private $entityManager;
     private $eventManager;

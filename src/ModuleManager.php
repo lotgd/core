@@ -53,7 +53,7 @@ class ModuleManager
      * Called when a module is added to the system. Performs setup tasks like
      * registering the events this module responds to.
      *
-     * @param GameInterface $g The game.
+     * @param Game $g The game.
      * @param string $library Name of the module, in 'vendor/module-name' format.
      * @param PackageInterface $package Composer package containing this module.
      * @throws ModuleAlreadyExistsException if the module is already installed.
@@ -61,7 +61,7 @@ class ModuleManager
      * @throws WrongTypeException if an event subscription class does not implement the EventHandler
      * interface or the pattern is not a valid regular expression.
      */
-    public static function register(GameInterface $g, string $library, PackageInterface $package)
+    public static function register(Game $g, string $library, PackageInterface $package)
     {
         $m = $g->getEntityManager()->getRepository(Module::class)->find($library);
         if ($m) {
@@ -86,12 +86,12 @@ class ModuleManager
      * Called when a module is removed from the system. Performs teardown tasks like
      * unregistering the events this module responds to.
      *
-     * @param GameInterface $g The game.
+     * @param Game $g The game.
      * @param string $library Name of the module, in 'vendor/module-name' format.
      * @param PackageInterface $package Composer package containing this module.
      * @throws ModuleDoesNotExistException if the module is not installed.
      */
-    public static function unregister(GameInterface $g, string $library, PackageInterface $package)
+    public static function unregister(Game $g, string $library, PackageInterface $package)
     {
         $m = $g->getEntityManager()->getRepository(Module::class)->find($library);
         if (!$m) {
