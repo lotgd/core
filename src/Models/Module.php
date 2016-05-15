@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+
 use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
@@ -13,7 +16,7 @@ use LotGD\Core\Tools\Model\Deletor;
  * @Entity
  * @Table(name="modules")
  */
-class Module
+class Module implements SaveableInterface
 {
     use Creator;
     use Deletor;

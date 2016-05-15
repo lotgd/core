@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace LotGD\Core\Models;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 
@@ -13,7 +16,7 @@ use LotGD\Core\Tools\Model\Deletor;
  * @Entity
  * @Table(name="event_subscriptions")
  */
-class EventSubscription
+class EventSubscription implements CreateableInterface
 {
     use Creator;
     use Deletor;
