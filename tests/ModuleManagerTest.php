@@ -33,7 +33,7 @@ class ModuleManagerTest extends ModelTestCase
         $game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('db')->willReturn($this->getEntityManager());
+        $game->method('getEntityManager')->willReturn($this->getEntityManager());
 
         $package = $this->getMockBuilder(PackageInterface::class)->getMock();
 
@@ -62,7 +62,7 @@ class ModuleManagerTest extends ModelTestCase
         $game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('db')->willReturn($this->getEntityManager());
+        $game->method('getEntityManager')->willReturn($this->getEntityManager());
 
         $mm = new ModuleManager($this->getEntityManager());
 
@@ -84,8 +84,8 @@ class ModuleManagerTest extends ModelTestCase
         $game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('db')->willReturn($this->getEntityManager());
-        $game->method('events')->willReturn($eventManager);
+        $game->method('getEntityManager')->willReturn($this->getEntityManager());
+        $game->method('getEventManager')->willReturn($eventManager);
 
         $mm = new ModuleManager($this->getEntityManager());
 
@@ -129,8 +129,8 @@ class ModuleManagerTest extends ModelTestCase
         $game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('db')->willReturn($this->getEntityManager());
-        $game->method('events')->willReturn($eventManager);
+        $game->method('getEntityManager')->willReturn($this->getEntityManager());
+        $game->method('getEventManager')->willReturn($eventManager);
 
         $mm = new ModuleManager($this->getEntityManager());
 
@@ -173,8 +173,8 @@ class ModuleManagerTest extends ModelTestCase
         $game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('db')->willReturn($this->getEntityManager());
-        $game->method('events')->willReturn($eventManager);
+        $game->method('getEntityManager')->willReturn($this->getEntityManager());
+        $game->method('getEventManager')->willReturn($eventManager);
 
         $mm = new ModuleManager($this->getEntityManager());
 
@@ -198,8 +198,8 @@ class ModuleManagerTest extends ModelTestCase
         $game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('db')->willReturn($this->getEntityManager());
-        $game->method('events')->willReturn($eventManager);
+        $game->method('getEntityManager')->willReturn($this->getEntityManager());
+        $game->method('getEventManager')->willReturn($eventManager);
 
         $mm = new ModuleManager($this->getEntityManager());
 
@@ -248,8 +248,8 @@ class ModuleManagerTest extends ModelTestCase
         $game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('db')->willReturn($this->getEntityManager());
-        $game->method('events')->willReturn($eventManager);
+        $game->method('getEntityManager')->willReturn($this->getEntityManager());
+        $game->method('getEventManager')->willReturn($eventManager);
 
         $mm = new ModuleManager($this->getEntityManager());
 
@@ -297,8 +297,8 @@ class ModuleManagerTest extends ModelTestCase
         $game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('db')->willReturn($this->getEntityManager());
-        $game->method('events')->willReturn($eventManager);
+        $game->method('getEntityManager')->willReturn($this->getEntityManager());
+        $game->method('getEventManager')->willReturn($eventManager);
 
         $mm = new ModuleManager($this->getEntityManager());
 

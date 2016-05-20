@@ -11,7 +11,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 class Bootstrap
 {
-    public static function game(): Game
+    public static function createGame(): Game
     {
         $pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS["DB_USER"], $GLOBALS["DB_PASSWORD"]);
 

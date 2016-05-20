@@ -22,7 +22,7 @@ class Game
      * Returns the game's entity manager.
      * @return EntityManagerInterface The game's database entity manager.
      */
-    public function db(): EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -31,7 +31,7 @@ class Game
      * Returns the game's event manager.
      * @return EventManager The game's event manager.
      */
-    public function events(): EventManager
+    public function getEventManager(): EventManager
     {
         return $this->eventManager;
     }

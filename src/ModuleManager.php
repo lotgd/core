@@ -63,13 +63,13 @@ class ModuleManager
      */
     public static function register(Game $g, string $library, PackageInterface $package)
     {
-        $m = $g->db()->getRepository(Module::class)->find($library);
+        $m = $g->getEntityManager()->getRepository(Module::class)->find($library);
         if ($m) {
             throw new ModuleAlreadyExistsException($library);
         } else {
             // TODO: handle error cases here.
             $m = new Module($library);
-            $m->save($g->db());
+            $m->save($g->getEntityManager());
 
             // Subscribe to the module's events.
             $subscriptions = ModuleManager::getPackageSubscriptions($package);
@@ -77,7 +77,7 @@ class ModuleManager
                 $pattern = $s['pattern'];
                 $class = $s['class'];
 
-                $g->events()->subscribe($pattern, $class);
+                $g->getEventManager()->subscribe($pattern, $class);
             }
         }
     }
@@ -93,12 +93,12 @@ class ModuleManager
      */
     public static function unregister(Game $g, string $library, PackageInterface $package)
     {
-        $m = $g->db()->getRepository(Module::class)->find($library);
+        $m = $g->getEntityManager()->getRepository(Module::class)->find($library);
         if (!$m) {
             throw new ModuleDoesNotExistException($library);
         } else {
             // TODO: handle error cases here.
-            $m->delete($g->db());
+            $m->delete($g->getEntityManager());
 
             // Unsubscribe the module's events.
             $subscriptions = ModuleManager::getPackageSubscriptions($package);
@@ -107,7 +107,7 @@ class ModuleManager
                 $class = $s['class'];
 
                 try {
-                    $g->events()->unsubscribe($pattern, $class);
+                    $g->getEventManager()->unsubscribe($pattern, $class);
                 } catch (SubscriptionNotFoundException $e) {
                     // TODO: log this but continue on.
                 }
