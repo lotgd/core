@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use LotGD\Core\Exceptions\InvalidConfigurationException;
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\AnsiQuoteStrategy;
@@ -11,9 +13,28 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 class Bootstrap
 {
+    /**
+     * Create a new Game object, with all the necessary configuration.
+     * @throws InvalidConfigurationException
+     * @return Game The newly created Game object.
+     */
     public static function createGame(): Game
     {
-        $pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS["DB_USER"], $GLOBALS["DB_PASSWORD"]);
+        $dsn = getenv('DB_DSN');
+        $user = getenv('DB_USER');
+        $passwd = getenv('DB_PASSWORD');
+
+        if ($dsn === false || strlen($dsn) == 0) {
+          throw new InvalidConfigurationException("Invalid or missing data source name: '{$dsn}'");
+        }
+        if ($user === false || strlen($user) == 0) {
+          throw new InvalidConfigurationException("Invalid or missing database user: '{$user}'");
+        }
+        if ($passwd === false) {
+          throw new InvalidConfigurationException("Invalid or missing database password: '{$passwd}'");
+        }
+
+        $pdo = new \PDO($dsn, $user, $passwd);
 
         // Read db annotations from model files
         $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);

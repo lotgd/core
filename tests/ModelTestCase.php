@@ -29,7 +29,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
     {
         if ($this->connection === null) {
             if (self::$pdo === null) {
-                self::$pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS["DB_USER"], $GLOBALS["DB_PASSWORD"]);
+                self::$pdo = new \PDO(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASSWORD'));
 
                 // Read db annotations from model files
                 $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
@@ -47,7 +47,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
                 $schemaTool->updateSchema($metaData);
             }
 
-            $this->connection = $this->createDefaultDBConnection(self::$pdo, $GLOBALS["DB_NAME"]);
+            $this->connection = $this->createDefaultDBConnection(self::$pdo, getenv('DB_NAME'));
         }
 
         // It is important to clear the cache of the entity manager every time a new test runs!
