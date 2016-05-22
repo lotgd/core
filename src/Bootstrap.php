@@ -37,7 +37,7 @@ class Bootstrap
         $pdo = new \PDO($dsn, $user, $passwd);
 
         // Read db annotations from model files
-        $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
+        $configuration = Setup::createAnnotationMetadataConfiguration([__DIR__ . '/Models'], true);
         $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
 
         $configuration->addFilter("soft-deleteable", 'Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter');
