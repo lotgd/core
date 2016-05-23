@@ -32,4 +32,23 @@ class DiceBagTests extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(0, $db->normal(0., 0.));
     }
+    
+    public function testPseudoBell()
+    {
+        $db = new DiceBag();
+        $value = $db->pseudoBell();
+        $this->assertGreaterThanOrEqual(0, $value);
+        $this->assertLessThanOrEqual(mt_getrandmax(), $value);
+        
+        $value = $db->pseudoBell(5, 5);
+        $this->assertSame(5, $value);
+        
+        $value = $db->pseudoBell(1, 3);
+        $this->assertGreaterThanOrEqual(1, $value);
+        $this->assertLessThanOrEqual(3, $value);
+        
+        $value = $db->pseudoBell(3, 1);
+        $this->assertGreaterThanOrEqual(1, $value);
+        $this->assertLessThanOrEqual(3, $value);
+    }
 }
