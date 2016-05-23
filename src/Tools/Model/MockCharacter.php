@@ -36,7 +36,37 @@ trait MockCharacter
         throw new IsNullException();
     }
     
+    public function damage(int $damage)
+    {
+        throw new IsNullException();
+    }
+    
+    public function heal(int $heal, bool $overheal = false)
+    {
+        throw new IsNullException();
+    }
+    
     public function getMaxHealth(): int
+    {
+        throw new IsNullException();
+    }
+    
+    public function getLevel(): int
+    {
+        throw new IsNullException();
+    }
+    
+    public function isAlive(): bool
+    {
+        throw new IsNullException();
+    }
+    
+    public function getAttack(): int
+    {
+        throw new IsNullException();
+    }
+    
+    public function getDefense(): int
     {
         throw new IsNullException();
     }
