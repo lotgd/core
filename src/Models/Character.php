@@ -33,10 +33,12 @@ class Character implements CharacterInterface, CreateableInterface
     private $name;
     /** @Column(type="text"); */
     private $displayName;
-    /** @Column(type="integer", options={"default" = 10}) */
+    /** @Column(type="integer", options={"default":10}) */
     private $maxHealth = 10;
-    /** @Column(type="integer", options={"default" = 10}) */
+    /** @Column(type="integer", options={"default":10}) */
     private $health = 10;
+    /** @Column(type="integer", options={"default":1})/ */
+    private $level = 1;
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist"}) */
     private $properties;
     /** @OneToMany(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
@@ -59,6 +61,7 @@ class Character implements CharacterInterface, CreateableInterface
     private static $fillable = [
         "name",
         "maxHealth",
+        "level",
     ];
     
     /**
@@ -158,6 +161,76 @@ class Character implements CharacterInterface, CreateableInterface
     public function getHealth(): int
     {
         return $this->health;
+    }
+    
+    /**
+     * Does damage to the entity.
+     * @param int $damage
+     */
+    public function damage(int $damage)
+    {
+        $this->health -= $damage;
+        
+        if ($this->health < 0) {
+            $this->health = 0;
+        }
+    }
+    
+    /**
+     * Heals the enemy
+     * @param int $heal
+     * @param type $overheal True if healing bigger than maxhealth is desired.
+     */
+    public function heal(int $heal, bool $overheal = false)
+    {
+        $this->health += $heal;
+        
+        if ($this->health > $this->getMaxHealth() && $overheal === false) {
+            $this->health = $this->getMaxHealth();
+        }
+    }
+    
+    /**
+     * Returns true if the character is alive.
+     * @return bool
+     */
+    public function isAlive(): bool
+    {
+        return $this->getHealth() > 0;
+    }
+    
+    /**
+     * Returns the character's level
+     * @return int
+     */
+    public function getLevel(): int
+    {
+        return $this->level;
+    }
+    
+    /**
+     * Returns the character's virtual attribute "attack"
+     */
+    public function getAttack(): int
+    {
+        return $this->level;
+    }
+    
+    /**
+     * Returns the character's virtual attribute "defense"
+     */
+    public function getDefense(): int
+    {
+        return $this->level;
+    }
+    
+    /**
+     * Sets the character's level
+     * @param int $level
+     */
+    public function setLevel(int $level)
+    {
+        $this->level = $level;
     }
     
     /**

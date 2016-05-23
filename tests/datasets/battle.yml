@@ -1,0 +1,13 @@
+characters:
+    -
+        id: 1
+        name: "Player"
+        displayName: "The Player"
+        health: 100
+        maxhealth: 100
+        level: 10
+monsters:
+    -
+        id: 1
+        name: "Evil Monster"
+        level: 5

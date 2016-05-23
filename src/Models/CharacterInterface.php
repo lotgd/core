@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
-# use LotGD\Core\Tools\Optional\Optional;
-
 /**
  * Interface for the character model and all objects that mimick such a model.
  */
-interface CharacterInterface
+interface CharacterInterface extends FighterInterface
 {
     public function getId(): int;
     public function getName(): string;
