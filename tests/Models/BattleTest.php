@@ -19,6 +19,9 @@ class BattleTest extends ModelTestCase
     /** @var string default data set */
     protected $dataset = "battle";
     
+    /**
+     * Tests basic monster functionality
+     */
     public function testBasicMonster()
     {
         $em = $this->getEntityManager();
@@ -32,6 +35,9 @@ class BattleTest extends ModelTestCase
         $this->assertSame($monster->getMaxHealth(), $monster->getHealth());
     }
     
+    /**
+     * Tests a fair fight between a monster and a player.
+     */
     public function testFairBattle()
     {
         $em = $this->getEntityManager();
@@ -59,6 +65,9 @@ class BattleTest extends ModelTestCase
         $this->assertTrue($character->isAlive() xor $monster->isAlive());
     }
     
+    /**
+     * Tests a fight which the player has to win (lvl 100 vs lvl 1)
+     */
     public function testPlayerWinBattle()
     {
         $em = $this->getEntityManager();
@@ -89,6 +98,9 @@ class BattleTest extends ModelTestCase
         $this->assertSame($battle->getWinner(), $highLevelPlayer);
     }
     
+    /**
+     * Tests a fight which the player has to loose (lvl 1 vs lvl 100)
+     */
     public function testPlayerLooseBattle()
     {
         $em = $this->getEntityManager();
@@ -117,5 +129,55 @@ class BattleTest extends ModelTestCase
         
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getWinner(), $highLevelMonster);
+    }
+    
+    /**
+     * @expectedException LotGD\Core\Exceptions\BattleNotOverException
+     */
+    public function testBattleNotOverExceptionFromWinner()
+    {
+        $em = $this->getEntityManager();
+        
+        $character = $em->getRepository(Character::class)->find(1);
+        $monster = $em->getRepository(Monster::class)->find(1);
+        
+        $battle = new Battle($character, $monster);
+        
+        $battle->getWinner();
+    }
+    
+    /**
+     * @expectedException LotGD\Core\Exceptions\BattleNotOverException
+     */
+    public function testBattleNotOverExceptionFromLooser()
+    {
+        $em = $this->getEntityManager();
+        
+        $character = $em->getRepository(Character::class)->find(1);
+        $monster = $em->getRepository(Monster::class)->find(1);
+        
+        $battle = new Battle($character, $monster);
+        
+        $battle->getLooser();
+    }
+    
+    /**
+     * Tests if the BattleIsOverException gets thrown.
+     * @expectedException LotGD\Core\Exceptions\BattleIsOverException
+     */
+    public function testBattleIsOverException()
+    {
+        $em = $this->getEntityManager();
+        
+        $character = $em->getRepository(Character::class)->find(1);
+        $monster = $em->getRepository(Monster::class)->find(1);
+        
+        $battle = new Battle($character, $monster);
+        
+        // Fighting for 99 rounds should be enough for determining a looser - and to
+        // throw the exception.
+        for ($n = 0; $n < 99; $n++) {
+            $battle->fightNRounds(1);
+        }
     }
 }
