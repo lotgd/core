@@ -213,7 +213,7 @@ class Character implements CharacterInterface, CreateableInterface
      */
     public function getAttack(): int
     {
-        return $this->level;
+        return $this->level * 2;
     }
     
     /**
@@ -221,7 +221,7 @@ class Character implements CharacterInterface, CreateableInterface
      */
     public function getDefense(): int
     {
-        return $this->level;
+        return $this->level * 2;
     }
     
     /**

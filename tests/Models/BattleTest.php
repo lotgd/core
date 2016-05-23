@@ -32,7 +32,7 @@ class BattleTest extends ModelTestCase
         $this->assertSame($monster->getMaxHealth(), $monster->getHealth());
     }
     
-    public function testBattle()
+    public function testFairBattle()
     {
         $em = $this->getEntityManager();
         
@@ -50,11 +50,72 @@ class BattleTest extends ModelTestCase
             $this->assertLessThanOrEqual($oldPlayerHealth, $character->getHealth());
             $this->assertLessThanOrEqual($oldMonsterHealth, $monster->getHealth());
             
-            if ($character->isAlive() === false && $monster->isAlive() === false) {
+            if ($battle->isOver()) {
                 break;
             }
         }
         
+        $this->assertTrue($battle->isOver());
         $this->assertTrue($character->isAlive() xor $monster->isAlive());
+    }
+    
+    public function testPlayerWinBattle()
+    {
+        $em = $this->getEntityManager();
+        
+        $highLevelPlayer = $em->getRepository(Character::class)->find(2);
+        $lowLevelMonster = $em->getRepository(Monster::class)->find(3);
+        
+        $battle = new Battle($highLevelPlayer, $lowLevelMonster);
+        
+        for ($n = 0; $n < 99; $n++) {
+            $oldPlayerHealth = $highLevelPlayer->getHealth();
+            $oldMonsterHealth = $lowLevelMonster->getHealth();
+            
+            $battle->fightNRounds(1);
+            
+            $this->assertLessThanOrEqual($oldPlayerHealth, $highLevelPlayer->getHealth());
+            $this->assertLessThanOrEqual($oldMonsterHealth, $lowLevelMonster->getHealth());
+            
+            if ($battle->isOver()) {
+                break;
+            }
+        }
+        
+        $this->assertTrue($highLevelPlayer->isAlive());
+        $this->assertFalse($lowLevelMonster->isAlive());
+        
+        $this->assertTrue($battle->isOver());
+        $this->assertSame($battle->getWinner(), $highLevelPlayer);
+    }
+    
+    public function testPlayerLooseBattle()
+    {
+        $em = $this->getEntityManager();
+        
+        $lowLevelPlayer = $em->getRepository(Character::class)->find(3);
+        $highLevelMonster = $em->getRepository(Monster::class)->find(2);
+        
+        $battle = new Battle($lowLevelPlayer, $highLevelMonster);
+        
+        for ($n = 0; $n < 99; $n++) {
+            $oldPlayerHealth = $lowLevelPlayer->getHealth();
+            $oldMonsterHealth = $highLevelMonster->getHealth();
+            
+            $battle->fightNRounds(1);
+            
+            $this->assertLessThanOrEqual($oldPlayerHealth, $lowLevelPlayer->getHealth());
+            $this->assertLessThanOrEqual($oldMonsterHealth, $highLevelMonster->getHealth());
+            
+            if ($battle->isOver()) {
+                break;
+            }
+        }
+        
+        $this->assertFalse($lowLevelPlayer->isAlive());
+        $this->assertTrue($highLevelMonster->isAlive());
+        
+        $this->assertTrue($battle->isOver());
+        $this->assertSame($battle->getWinner(), $highLevelMonster);
     }
 }
