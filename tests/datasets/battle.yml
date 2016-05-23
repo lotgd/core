@@ -6,8 +6,30 @@ characters:
         health: 100
         maxhealth: 100
         level: 10
+    -
+        id: 2
+        name: "High Level Char"
+        displayName: "High Level Char"
+        health: 1000
+        maxhealth: 1000
+        level: 100
+    -
+        id: 3
+        name: "Low Level Char"
+        displayName: "Low Level Char"
+        health: 10
+        maxhealth: 10
+        level: 1
 monsters:
     -
         id: 1
         name: "Evil Monster"
         level: 5
+    -
+        id: 2
+        name: "High Dragon"
+        level: 100
+    -
+        id: 3
+        name: "Stone"
+        level: 1

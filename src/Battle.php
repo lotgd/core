@@ -6,6 +6,8 @@ namespace LotGD\Core;
 use LotGD\Core\{
     DiceBag,
     Exceptions\ArgumentException,
+    Exceptions\BattleIsOverException,
+    Exceptions\BattleNotOverException,
     Models\FighterInterface
 };
 
@@ -21,6 +23,9 @@ class Battle
     protected $player;
     protected $monster;
     protected $diceBag;
+    protected $isOver = false;
+    protected $winner;
+    protected $looser;
     
     public function __construct(FighterInterface $player, FighterInterface $monster)
     {
@@ -40,6 +45,39 @@ class Battle
     }
     
     /**
+     * Returns true if the battle is over.
+     * @return type
+     */
+    public function isOver()
+    {
+        return $this->isOver;
+    }
+    
+    /**
+     * Returns the winner of this fight
+     * @return FighterInterface
+     */
+    public function getWinner(): FighterInterface
+    {
+        if (is_null($this->winner)) {
+            throw new BattleNotOverException('There is no winner yet.');
+        }
+        return $this->winner;
+    }
+    
+    /**
+     * Returns the looser of this fight
+     * @return FighterInterface
+     */
+    public function getLooser(): FighterInterface
+    {
+        if (is_null($this->looser)) {
+            throw new BattleNotOverException('There is no looser yet.');
+        }
+        return $this->looser;
+    }
+    
+    /**
      * Fights the number of rounds given by the parameter $n and returns the number
      * of actual rounds fought.
      * @param int $n
@@ -52,11 +90,20 @@ class Battle
             throw new ArgumentException('$firstDamageRound must not be 0.');
         }
         
+        if ($this->isOver === true) {
+            throw new BattleIsOverException('This battle has already ended. You cannot fight anymore rounds.');
+        }
+        
         for ($count = 0; $count < $n; $count++) {
-            if ($this->player->isAlive() > 0 && $this->monster->isAlive()) {
-                $this->fightOneRound($firstDamageRound);
-                $isSurprised = self::DAMAGEROUND_BOTH;
-            } else {
+            $this->fightOneRound($firstDamageRound);
+            $isSurprised = self::DAMAGEROUND_BOTH;
+            
+            // If one of the participants is dead, abort.
+            if ($this->player->isAlive() === false || $this->monster->isAlive() === false) {
+                $this->isOver = true;
+                
+                $this->winner = $this->player->isAlive() ? $this->player : $this->monster;
+                $this->looser = $this->player->isAlive() ? $this->monster : $this->player;
                 break;
             }
         }
