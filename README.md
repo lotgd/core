@@ -54,9 +54,8 @@ vagrant ssh
 # Install git:
 sudo apt-get -y install git
 
-# Install composer:
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/local/bin/composer
+# Install zip/unzip for composer's use
+sudo apt-get -y install zip unzip
 
 # Install php7:
 sudo LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php
@@ -64,11 +63,14 @@ sudo apt-get update
 sudo apt-get -y install php7.0 php7.0-fpm php7.0-mysql php7.0-mbstring php-xml
 ```
 
+# Install composer:
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+
 ### Clone the repo and test
 ```
-sudo apt-get -y install git
 cd /vagrant
-git clone git@github.com:lotgd/core.git
+git clone https://github.com/lotgd/core.git
 cd core
 composer install
 ./t
