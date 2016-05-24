@@ -12,7 +12,9 @@ use LotGD\Core\{
 };
 
 /**
- * Description of Battle
+ * Class for managing and running battles between 2 participants.
+ * Original damage calculation is from LotGD 0.9.7+jt by Eric Stevens and JTraub,
+ * released originally under GPL 2.0.
  */
 class Battle
 {
@@ -127,7 +129,7 @@ class Battle
         ) {
             if ($monsterDamage < 0) {
                 // The damage done to the monster is negative.
-                // This means that the monster conters the player's attack
+                // This means that the monster counters the player's attack
                 $this->player->damage(0 - $monsterDamage);
             } elseif ($monsterDamage > 0) {
                 // The damage done to the monster is positive.
@@ -146,7 +148,7 @@ class Battle
         ) {
             if ($playerDamage > 0) {
                 // The damage done to the player is negative
-                // THis means that the player conters the monster's attack
+                // THis means that the player counters the monster's attack
                 $this->monster->damage(0 - $playerDamage);
             } elseif($playerDamage > 0) {
                 // The damage done to the player is positive.
@@ -189,6 +191,7 @@ class Battle
             $monsterDamage = $playerAtkRoll - $monsterDefRoll;
             
             if ($monsterDamage < 0) {
+                // Counter attack is only half as hard
                 $monsterDamage /= 2;
             }
             
@@ -198,6 +201,7 @@ class Battle
             $playerDamage = $monsterAtkRoll - $playerDefRoll;
             
             if ($playerDamage < 0) {
+                // Counter attack is only half as hard
                 $playerDamage /= 2;
             }
         }
