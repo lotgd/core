@@ -3,17 +3,18 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\{
+    ArrayCollection,
+    Collection
+};
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
-use Doctrine\ORM\EntityManagerInterface;
 
-use LotGD\Core\Tools\Model\Creator;
-use LotGD\Core\Tools\Model\Deletor;
-use LotGD\Core\Tools\Model\PropertyManager;
-use LotGD\Core\Tools\Model\SoftDeletable;
-use LotGD\Core\Models\Repositories\CharacterRepository;
+use LotGD\Core\Tools\Model\{
+    Creator,
+    PropertyManager,
+    SoftDeletable
+};
 
 /**
  * Model for a character
@@ -56,6 +57,8 @@ class Character implements CharacterInterface, CreateableInterface
      * )
      */
     private $messageThreads;
+    /** @OneToMany(targetEntity="Buff", mappedBy="character", cascade={"persist"}) */
+    private $buffs;
     
     /** @var array */
     private static $fillable = [
@@ -78,6 +81,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         $this->properties = new ArrayCollection();
         $this->characterViewpoint = new ArrayCollection();
+        $this->buffs = new ArrayCollection();
         $this->messageThreads = new ArrayCollection();
     }
     
