@@ -5,6 +5,8 @@ namespace LotGD\Core;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+use LotGD\Core\Models\Character;
+
 class Game
 {
     private $entityManager;
@@ -34,5 +36,23 @@ class Game
     public function getEventManager(): EventManager
     {
         return $this->eventManager;
+    }
+    
+    /**
+     * Returns the game's dice bag.
+     * @return DiceBag
+     */
+    public function getDiceBag(): DiceBag
+    {
+        return $this->diceBag;
+    }
+    
+    /**
+     * Returns the active character for this game run
+     * @return Character
+     */
+    public function getCharacter(): Character
+    {
+        return $this->character;
     }
 }
