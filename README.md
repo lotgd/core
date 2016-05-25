@@ -61,11 +61,11 @@ sudo apt-get -y install zip unzip
 sudo LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php
 sudo apt-get update
 sudo apt-get -y install php7.0 php7.0-fpm php7.0-mysql php7.0-mbstring php-xml
-```
 
-## Install composer:
+# Install composer:
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
+```
 
 ### Clone the repo and test
 ```
