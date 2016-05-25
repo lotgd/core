@@ -40,11 +40,7 @@ class Bootstrap
         $configuration = Setup::createAnnotationMetadataConfiguration([__DIR__ . '/Models'], true);
         $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
 
-        $configuration->addFilter("soft-deleteable", 'Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter');
-
         $entityManager = EntityManager::create(["pdo" => $pdo], $configuration);
-        $entityManager->getFilters()->enable("soft-deleteable");
-        $entityManager->getEventManager()->addEventSubscriber(new \Gedmo\SoftDeleteable\SoftDeleteableListener());
 
         // Create Schema
         $metaData = $entityManager->getMetadataFactory()->getAllMetadata();

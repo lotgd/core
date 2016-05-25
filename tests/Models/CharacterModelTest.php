@@ -42,8 +42,6 @@ class CharacterModelTest extends ModelTestCase
             ->getRepository(Character::class)
             ->findAll(CharacterRepository::INCLUDE_SOFTDELETED);
         $this->assertSame(3, count($allChars));
-        
-        $this->getEntityManager()->getFilters()->enable("soft-deleteable");
     }
     
     /**
