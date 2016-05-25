@@ -63,7 +63,7 @@ sudo apt-get update
 sudo apt-get -y install php7.0 php7.0-fpm php7.0-mysql php7.0-mbstring php-xml
 ```
 
-# Install composer:
+## Install composer:
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
 
@@ -77,8 +77,13 @@ composer install
 ```
 
 ## Contributing
+Looking to help us? Awesome! Check out the [Help Wanted Issues](https://github.com/lotgd/core/labels/help%20wanted) to find out what needs to be done, or reach out on Slack.
+
+Lots of communication is happening on our [Slack channel](http://lotgd.slack.com). Reach out to austenmc by opening an issue or contacting @austenmc on [Dragon Prime](http://dragonprime.net).
+
 Some notes:
 * Pull requests cannot be accepted that break the continuous integration checks we have in place (like tests, for example).
+* Please include tests for new functionality. Not sure how to test? Say so in your PR and we'll help you.
 * Our git workflow requires squashing your commits into something that resembles a reasonable story, rebasing them onto master, and pushing instead of merging. We want our commit history to be as clean as possible.
 
 Workflow should be something like:
@@ -107,3 +112,12 @@ git push origin feature/my-feature-branch:master
 # Delete your feature branch.
 git branch -D feature/my-feature-branch
 ```
+
+## Contributors
+
+Leads
+* [vassyli](https://github.com/vassyli)
+* [austenmc](https://github.com/austenmc)
+
+Other Contributors
+* [nekosune](https://github.com/nekosune)
