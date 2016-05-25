@@ -10,6 +10,8 @@ use Doctrine\Common\Collections\{
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
+use LotGD\Core\Game;
+use LotGD\Core\Tools\Exceptions\BuffSlotOccupiedException;
 use LotGD\Core\Tools\Model\{
     Creator,
     PropertyManager,
@@ -215,7 +217,7 @@ class Character implements CharacterInterface, CreateableInterface
     /**
      * Returns the character's virtual attribute "attack"
      */
-    public function getAttack(): int
+    public function getAttack(Game $game, bool $ignoreBuffs = false): int
     {
         return $this->level * 2;
     }
@@ -223,7 +225,7 @@ class Character implements CharacterInterface, CreateableInterface
     /**
      * Returns the character's virtual attribute "defense"
      */
-    public function getDefense(): int
+    public function getDefense(Game $game, bool $ignoreBuffs = false): int
     {
         return $this->level * 2;
     }
@@ -252,23 +254,32 @@ class Character implements CharacterInterface, CreateableInterface
     }
     
     /**
+     * Returns a list of buffs
+     */
+    public function getBuffs(): BuffList
+    {
+        $this->buffList ?? new BuffList($this->buffs);
+        return $this->buffList;
+    }
+    
+    /**
+     * Adds a buff to the buffList
+     */
+    public function addBuff(Buff $buff, bool $override = false)
+    {
+        try {
+            $this->getBuffs()->add($buff);
+        } catch(BuffSlotOccupiedException $e) {
+            $this->getBuffs()->renew($buff);
+        }
+    }
+    
+    /**
      * Returns a list of message threads this user has created.
      * @return Collection
      */
     public function getMessageThreads(): Collection
     {
         return $this->messageThreads;
-    }
-    
-    public function sendMessageTo(Character $recipient)
-    {
-        // ToDo: implement later
-        throw new \LotGD\Core\Exceptions\NotImplementedException;
-    }
-    
-    public function receiveMessageFrom(Character $author)
-    {
-        // ToDo: implement later
-        throw new \LotGD\Core\Exceptions\NotImplementedException;
     }
 }

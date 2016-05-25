@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace LotGD\Core\Tools\Model;
 
+use LotGD\Core\Game;
 use LotGD\Core\Exceptions\IsNullException;
 use LotGD\Core\Models\CharacterViewpoint;
 
@@ -61,12 +62,12 @@ trait MockCharacter
         throw new IsNullException();
     }
     
-    public function getAttack(): int
+    public function getAttack(Game $game, bool $ignoreBuffs = false): int
     {
         throw new IsNullException();
     }
     
-    public function getDefense(): int
+    public function getDefense(Game $game, bool $ignoreBuffs = false): int
     {
         throw new IsNullException();
     }

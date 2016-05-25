@@ -3,12 +3,19 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use LotGD\Core\{
     DiceBag,
     Exceptions\ArgumentException,
     Exceptions\BattleIsOverException,
     Exceptions\BattleNotOverException,
     Models\FighterInterface
+};
+use LotGD\Core\Models\BattleEvents\{
+    CriticalHitEvent,
+    DamageEvent,
+    DeathEvent
 };
 
 /**
@@ -22,18 +29,23 @@ class Battle
     const DAMAGEROUND_MONSTER = 0b10;
     const DAMAGEROUND_BOTH = 0b11;
     
+    const RESULT_UNDECIDED = 0;
+    const RESULT_PLAYERDEATH = 1;
+    const RESULT_MONSTERDEATH = 2;
+    
     protected $player;
     protected $monster;
-    protected $diceBag;
-    protected $isOver = false;
-    protected $winner;
-    protected $looser;
+    protected $game;
+    protected $events;
+    protected $result = 0;
+    protected $round = 0;
     
-    public function __construct(FighterInterface $player, FighterInterface $monster)
+    public function __construct(Game $game, FighterInterface $player, FighterInterface $monster)
     {
+        $this->game = $game;
         $this->player = $player;
         $this->monster = $monster;
-        $this->diceBag = new DiceBag();
+        $this->events = new ArrayCollection();
     }
     
     public function getActions()
@@ -52,7 +64,7 @@ class Battle
      */
     public function isOver()
     {
-        return $this->isOver;
+        return $this->result !== self::RESULT_UNDECIDED;
     }
     
     /**
@@ -61,22 +73,24 @@ class Battle
      */
     public function getWinner(): FighterInterface
     {
-        if (is_null($this->winner)) {
+        if ($this->isOver() === false) {
             throw new BattleNotOverException('There is no winner yet.');
         }
-        return $this->winner;
+        
+        return $this->result === self::RESULT_PLAYERDEATH ? $this->monster : $this->player;
     }
     
     /**
      * Returns the looser of this fight
      * @return FighterInterface
      */
-    public function getLooser(): FighterInterface
+    public function getLoser(): FighterInterface
     {
-        if (is_null($this->looser)) {
-            throw new BattleNotOverException('There is no looser yet.');
+        if ($this->isOver() === false) {
+            throw new BattleNotOverException('There is no winner yet.');
         }
-        return $this->looser;
+        
+        return $this->result === self::RESULT_PLAYERDEATH ? $this->player : $this->monster;
     }
     
     /**
@@ -92,20 +106,15 @@ class Battle
             throw new ArgumentException('$firstDamageRound must not be 0.');
         }
         
-        if ($this->isOver === true) {
+        if ($this->isOver()) {
             throw new BattleIsOverException('This battle has already ended. You cannot fight anymore rounds.');
         }
         
         for ($count = 0; $count < $n; $count++) {
             $this->fightOneRound($firstDamageRound);
-            $isSurprised = self::DAMAGEROUND_BOTH;
+            $firstDamageRound = self::DAMAGEROUND_BOTH;
             
-            // If one of the participants is dead, abort.
-            if ($this->player->isAlive() === false || $this->monster->isAlive() === false) {
-                $this->isOver = true;
-                
-                $this->winner = $this->player->isAlive() ? $this->player : $this->monster;
-                $this->looser = $this->player->isAlive() ? $this->monster : $this->player;
+            if ($this->isOver()) {
                 break;
             }
         }
@@ -119,97 +128,78 @@ class Battle
      */
     protected function fightOneRound(int $firstDamageRound)
     {
-        // playerDamage is the damage done to the player, to the monster.
-        list($playerDamage, $monsterDamage, $playerAttack) = $this->calculateDamage();
+        $damageHasBeenDone = false;
         
-        // Player does damage to the monster
-        if ($firstDamageRound & self::DAMAGEROUND_PLAYER
-            && $this->player->isAlive()
-            && $this->monster->isAlive()
-        ) {
-            if ($monsterDamage < 0) {
-                // The damage done to the monster is negative.
-                // This means that the monster counters the player's attack
-                $this->player->damage(0 - $monsterDamage);
-            } elseif ($monsterDamage > 0) {
-                // The damage done to the monster is positive.
-                // This means that this is a normal attack
-                $this->monster->damage($monsterDamage);
-            } else {
-                // The damage done to the monster is 0.
-                // We interpretate this as a miss.
+        do {
+            $offenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_PLAYER ? $this->turn($this->player, $this->monster) : new ArrayCollection();
+            $defenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_MONSTER ? $this->turn($this->monster, $this->player) : new ArrayCollection();
+
+            $events = new ArrayCollection(array_merge($offenseTurnEvents->toArray(), $defenseTurnEvents->toArray()));
+            $eventsToAdd = new ArrayCollection();
+
+            foreach($events as $event) {
+                $event->apply();
+                
+                if ($event instanceof DamageEvent && $event->getDamage() !== 0) {
+                    $damageHasBeenDone = true;
+                }
+
+                $eventsToAdd->add($event);
+
+                if ($this->player->getHealth() <= 0) {
+                    $this->events->add(new DeathEvent($this->player));
+                    $this->result = self::RESULT_PLAYERDEATH;
+                    break;
+                }
+
+                if ($this->monster->getHealth() <= 0) {
+                    $this->events->add(new DeathEvent($this->monster));
+                    $this->result = self::RESULT_MONSTERDEATH;
+                    break;
+                }
             }
-        }
+        } while($damageHasBeenDone === false);
         
-        // Monster does damage to the player
-        if ($firstDamageRound & self::DAMAGEROUND_MONSTER
-            && $this->player->isAlive()
-            && $this->monster->isAlive()
-        ) {
-            if ($playerDamage > 0) {
-                // The damage done to the player is negative
-                // THis means that the player counters the monster's attack
-                $this->monster->damage(0 - $playerDamage);
-            } elseif($playerDamage > 0) {
-                // The damage done to the player is positive.
-                // This means that this is a normal attack
-                $this->player->damage($playerDamage);
-            }
-            else {
-                // The damage done to the player is 0.
-                // We interpretate this as a miss.
-            }
-        }
+        $this->round++;
+        $this->events = new ArrayCollection(array_merge($this->events->toArray(), $eventsToAdd->toArray()));
     }
     
     /**
-     * Returns the damage done to the player and to the monster.
-     * @return array [playerDamage, monsterDamage, playerAttack]
+     * Runs one turn.
+     * @param FighterInterface $attacker
+     * @param FighterInterface $defender
      */
-    protected function calculateDamage(): array
+    protected function turn(FighterInterface $attacker, FighterInterface $defender): ArrayCollection
     {
-        $monsterDefense = $this->monster->getDefense();
-        $monsterAttack = $this->monster->getAttack();
-        $playerDefense = $this->player->getDefense();
-        $playerAttack = $this->player->getAttack();
+        $events = new ArrayCollection();
         
-        $monsterDamage = 0;
-        $playerDamage = 0;
+        $attackersAttack = $attacker->getAttack($this->game);
+        $defendersDefense = $defender->getDefense($this->game);
         
-        while ($monsterDamage === 0 && $playerDamage === 0) {
-            $atk = $playerAttack;
-            
-            // Critical hit probablity is derived from the old e_rand() function.
-            // e_rand(1, 3) == 3 has a probablity of ~25%.
-            if ($this->diceBag->chance(0.25)) {
-                $atk *= 3;
-            }
-            
-            // Calculate damage done to the monster
-            $playerAtkRoll = $this->diceBag->normal(0, $atk);
-            $monsterDefRoll = $this->diceBag->normal(0, $monsterDefense);
-            $monsterDamage = $playerAtkRoll - $monsterDefRoll;
-            
-            if ($monsterDamage < 0) {
-                // Counter attack is only half as hard
-                $monsterDamage /= 2;
-            }
-            
-            // Calculate damage done to the player
-            $playerDefRoll = $this->diceBag->normal(0, $playerDefense);
-            $monsterAtkRoll = $this->diceBag->normal(0, $monsterAttack);
-            $playerDamage = $monsterAtkRoll - $playerDefRoll;
-            
-            if ($playerDamage < 0) {
-                // Counter attack is only half as hard
-                $playerDamage /= 2;
+        if ($attacker === $this->game->getCharacter()) {
+            // Players can land critical hits
+            if ($this->game->getDiceBag()->chance(0.25)) {
+                $attackersAttack *= 3;
             }
         }
         
-        return [
-            (int)round($playerDamage, 0),
-            (int)round($monsterDamage, 0),
-            $atk
-        ];
+        $attackersAtkRoll = $this->game->getDiceBag()->normal(0, $attackersAttack);
+        $defendersDefRoll = $this->game->getDiceBag()->normal(0, $defendersDefense);
+        $damage = $attackersAtkRoll - $defendersDefRoll;
+        
+        if ($attackersAttack > $attacker->getAttack($this->game, true)) {
+            $events->add(new CriticalHitEvent($attacker, $attackersAttack));
+        }
+        
+        if ($damage < 0) {
+            // RIPOSTE are only half as damaging than normal attacks
+            $damage /= 2;
+        }
+        
+        $damage = (int)round($damage, 0);
+        
+        $events->add(new DamageEvent($attacker, $defender, $damage));
+        
+        return $events;
     }
 }
