@@ -26,9 +26,136 @@ wrapped in the interface of your choice.
 
 ### Non-Goals
 
-* Backward compatibility. It may be controversial since it would mean existing admins can't upgrade to this version, but keeping the old database schema would be seriously limiting to the quality of the codebase. If we actually finish this, then writing an importer wouldn't be too hard.
+* Backward compatibility. It may be controversial since it would mean existing
+admins can't upgrade to this version, but keeping the old database schema would
+be seriously limiting to the quality of the codebase. If we actually finish this,
+then writing an importer wouldn't be too hard.
+
+## How it Works
+Here are some quick notes to get our contributors moving. Anticipated (as in,
+not yet implemented) bits are marked with [PLANNED].
+
+### Introduction
+This core is not a game; it's the guts of a game, some code around which a game
+could be built. It provides (or will provide) the concepts of fighting and communicating characters in an
+RPG and how those characters move through a turn-based, text-based world. It does not provide
+implementation details like user interface, login or authentication or even
+anything about the text-based world (like specific locations, etc.). While designed
+with the Legend of the Green Dragon game in mind, it could be used to build a wide
+variety of MUD-style games.
+
+The core is designed to be wrapped by something we call a "crate." The crate
+makes the core into a playable game by providing a UI, locations for the characters
+to interact and actions for them to take (along with consequences).
+Crates are separate pieces of software, living in separate repos (see our [Sample Crate](https://github.com/lotgd/crate-sample) and
+[GraphQL API Crate](https://github.com/lotgd/crate-graphql-relay)), and can
+make use of "modules," which are plug-and-play pieces of code that interact with
+the core and each other.
+
+Some technical notes:
+* The core's data model is based around [Doctrine](http://www.doctrine-project.org/).
+
+### Configuration
+The crate is responsible for configuring the game, which is done through
+environment variables. Here's a list of environment variables currently in use:
+
+* `DB_DSN`: [Data Source Name](https://en.wikipedia.org/wiki/Data_source_name),
+a way to describe where the database is.
+* `DB_USER`: user name that has access to the database.
+* `DB_PASSWORD`: password for the `DB_USER`.
+* `DB_NAME`: name of the database to access inside the specified DSN.
+
+### Initialization/Installation [PLANNED]
+Check out the [Sample Crate's README](https://github.com/lotgd/crate-sample/blob/master/README.md)
+for how we're boostrapping the
+initialization and installation of a game, including installing modules. This
+has not been thought through yet, consider this a stopgap measure.
+
+### Scenes
+Locations in the game (like where a character is) are represented by `Scene`
+objects (see the [Scene model](https://github.com/lotgd/core/blob/master/src/Models/Scene.php)).
+Conceptually, scenes have a title, description (the text to display to the user about
+where they are) and a menu.
+
+Scenes are designed to be hierarchical, with parents and children, so that one
+could display all the locations in the game as a tree. In fact, we hope to build
+configuration tools to help game creators visualize their world using tree structures. This
+also provides for an easy way for users to go "back" to the previous screen without
+the `Scene` object needing to explicitly know about its parent, or for the same
+`Scene` data to appear in the tree multiple times, with different parents/children
+(in the LotGD world, this is like the Healer being accessible from the Village and
+the Forest).
+
+### Main Loop [PLANNED]
+The crate interacts with the game via the `Game` object. Make a `Game` object
+by using the `Bootstrap::createGame()` method. All the initialization (like
+database connections) will be done within this method. After that, we'll have to
+figure out a way to specify which user is being played currently---a game should
+really represent only a single user.
+
+"Playing" the game involves sending the `Game` object messages about actions taken
+by the player and receiving menus and forms back to display to the user. This interface
+has not been finalized, but possibly something like `$game->takeAction($someAction)` where
+`$someAction` could be an object representing a menu item or the result of a form
+entry.
+
+Then something like `$s = $game->getScene()` would return the new scene to display
+to the user. The crate would acquire input then send it back through `takeAction()`
+and the loop would continue.
+
+### Events
+Events are a way for modules and parts of the core to communicate with each other
+without having to know exactly what communication should take place. Events are
+represented by strings. There are a
+number of uses for events, with these rough naming conventions:
+
+* `e/[vendor]/[module]/[event-name]`: Simple announcement events, just saying
+that something has occurred. Possible Examples:
+`e/lotgd/core/startup`.
+* `h/[vendor]/[module]/[event-name]`: Hooks, or events that are designed to
+seek input from other parts of the system (like modules). Possible examples:
+`h/lotgd/core/get-attack-value`.
+* `a/[vendor]/[module]/[event-name]`: Analytic events, those only for tracking
+purposes. Possible examples: `a/lotgd/core/startup-perf`, `a/lotgd/core/motd-new`.
+
+Events are handled by a class that implements the `EventHandler` interface and
+has been previously subscribed to events by calling `$game->getEventManager()->subscribe()`.
+Subscriptions use regular expressions: subscribers provide a regex
+to match against event names and any published event that matches the regex
+triggers a call to the class's `handleEvent()` method. See the [Sample Crate](https://github.com/lotgd/crate-sample) and
+the [Hello World Module](https://github.com/lotgd/module-helloworld) for an example.
+
+Events are published via `$game->getEventManager()->publish()` and can pass an
+`array()` which represents the context of the event. This `array()` is a so-called
+"in-out" variable, so changes made to the `array()` in `handleEvent()` calls will
+be visible to the publisher. This is how hooks will communicate their input to
+the publisher.
+
+### Modules
+Modules extend the core or provide some additional functionality. Modules do
+this work by either adding/modifying database tables and/or subscribing to events.
+
+Scenes are modules, providing `Scene` models to the database. You can also
+imagine any number of utility modules, like analytic event aggregators or whole
+new permission systems.
+
+Modules are installed via [Composer](http://getcomposer.org) packages. Composer
+is a common dependency manager for PHP, providing centralized storage and easy
+installation of code. We are hosting our own repository of packages at http://code.lot.gd.
+
+Check out the [installation instructions](https://github.com/lotgd/code.lot.gd) in
+the code.lot.gd repo to learn more.
+
+[PLANNED] Modules will need to be registered with the core before they can be
+used, so event subscriptions can be established and any database changes can be made.
+The `ModuleManager` class takes care of this. We expect crate admins to run a
+tool after installing a Composer package (with the module code) that will do this
+registration. See https://github.com/lotgd/core/issues/29 for more about this tool.
 
 ## Development Environment
+
+To ensure a consistent development environment, we encourage you to use Vagrant,
+which is a VM environment that runs on OS X, Linux or Windows.
 
 ### Install Vagrant
 * Download from https://www.vagrantup.com/downloads.html and install following the instructions on the site.
@@ -61,11 +188,11 @@ sudo apt-get -y install zip unzip
 sudo LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php
 sudo apt-get update
 sudo apt-get -y install php7.0 php7.0-fpm php7.0-mysql php7.0-mbstring php-xml
-```
 
 # Install composer:
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
+```
 
 ### Clone the repo and test
 ```
@@ -77,8 +204,13 @@ composer install
 ```
 
 ## Contributing
+Looking to help us? Awesome! Check out the [Help Wanted Issues](https://github.com/lotgd/core/labels/help%20wanted) to find out what needs to be done, or reach out on Slack.
+
+Lots of communication is happening on our [Slack channel](http://lotgd.slack.com). Reach out to austenmc by opening an issue or contacting @austenmc on [Dragon Prime](http://dragonprime.net).
+
 Some notes:
 * Pull requests cannot be accepted that break the continuous integration checks we have in place (like tests, for example).
+* Please include tests for new functionality. Not sure how to test? Say so in your PR and we'll help you.
 * Our git workflow requires squashing your commits into something that resembles a reasonable story, rebasing them onto master, and pushing instead of merging. We want our commit history to be as clean as possible.
 
 Workflow should be something like:
@@ -107,3 +239,12 @@ git push origin feature/my-feature-branch:master
 # Delete your feature branch.
 git branch -D feature/my-feature-branch
 ```
+
+## Contributors
+
+Leads
+* [vassyli](https://github.com/vassyli)
+* [austenmc](https://github.com/austenmc)
+
+Other Contributors
+* [nekosune](https://github.com/nekosune)
