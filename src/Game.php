@@ -11,6 +11,7 @@ class Game
 {
     private $entityManager;
     private $eventManager;
+    private $composerManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -18,6 +19,18 @@ class Game
     {
         $this->entityManager = $entityManager;
         $this->eventManager = $eventManager;
+    }
+
+    /**
+     * Returns the game's composer manager.
+     * @return ComposerManager The game's composer manager.
+     */
+    public function getComposerManager(): ComposerManager
+    {
+        if ($this->composerManager === null) {
+            $this->composerManager = new ComposerManager($this);
+        }
+        return $this->composerManager;
     }
 
     /**
@@ -37,7 +50,7 @@ class Game
     {
         return $this->eventManager;
     }
-    
+
     /**
      * Returns the game's dice bag.
      * @return DiceBag
@@ -46,7 +59,7 @@ class Game
     {
         return $this->diceBag;
     }
-    
+
     /**
      * Returns the active character for this game run
      * @return Character

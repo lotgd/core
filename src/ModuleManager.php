@@ -120,4 +120,64 @@ class ModuleManager
     public function getModules(): array {
         return $this->g->getEntityManager()->getRepository(Module::class)->findAll();
     }
+
+    /**
+     * Validate that all modules are installed correctly. Currently checks for
+     * all the proper event subscriptions.
+     * @return array of strings describing issues. An empty array is returned
+     * on successful validation.
+     */
+    public function validate(): array
+    {
+        $result = array();
+
+        $modules = $this->getModules();
+        $packages = $this->g->getComposerManager()->getModulePackages();
+
+        // Quick validation for the count of the modules.
+        $diff = count($packages) - count($modules);
+        if ($diff < 0) {
+            $d = -$diff;
+            array_push($result, "Error: Found {$d} more installed modules than there are configured with Composer.");
+        }
+        if ($diff > 0) {
+            array_push($result, "Error: Found {$diff} more modules configured with Composer than installed.");
+        }
+
+        // Validate event subscriptions.
+        // TODO: Replace this n^2 algorithm to valiate event subscriptions with something faster. :)
+        $currentSubscriptions = $this->g->getEventManager()->getSubscriptions();
+        foreach ($packages as $p) {
+            $name = $p->getName();
+
+            $expectedSubscriptions = ModuleManager::getPackageSubscriptions($p);
+            $currentSubscriptionsForThisPackage = array_filter($currentSubscriptions, function($s) use ($name) {
+                return $s->getLibrary() === $name;
+            });
+
+            if (count($currentSubscriptionsForThisPackage) > count($expectedSubscriptions)) {
+                array_push($result, "Warning: There are event subscriptions for module ${name} not present in the configuration for that module.");
+            }
+            foreach ($expectedSubscriptions as $e) {
+                $found = false;
+                foreach ($currentSubscriptionsForThisPackage as $c) {
+                    // Count the subscriptions for this
+                    if ($c->getPattern() === $e['pattern'] &&
+                        $c->getClass() === $e['class'] &&
+                        $c->getLibrary() === $p->getName())
+                    {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $pattern = $e['pattern'];
+                    $class = $e['class'];
+                    array_push($result, "Error: Couldn't find subscription ({$pattern} => ${class}) for module {$name}.");
+                }
+            }
+        }
+
+        return $result;
+    }
 }
