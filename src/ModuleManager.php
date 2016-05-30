@@ -15,14 +15,14 @@ use Composer\Package\PackageInterface;
  */
 class ModuleManager
 {
-    private $em;
+    private $g;
 
     /**
-     * @param EntityManagerInterface $em The database entity manager.
+     * @param Game $g The game.
      */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(Game $g)
     {
-        $this->em = $em;
+        $this->g = $g;
     }
 
     private static function getPackageSubscriptions(PackageInterface $package): array
@@ -120,6 +120,6 @@ class ModuleManager
      * @return array<Module> Array of modules.
      */
     public function getModules(): array {
-        return $this->em->getRepository(Module::class)->findAll();
+        return $this->g->getEntityManager()->getRepository(Module::class)->findAll();
     }
 }

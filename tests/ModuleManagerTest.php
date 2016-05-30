@@ -12,6 +12,7 @@ use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
 use LotGD\Core\Tests\ModelTestCase;
 use Composer\Package\PackageInterface;
+use Composer\Composer;
 
 class ModuleManagerTestSubscriber implements EventHandler
 {
@@ -28,26 +29,32 @@ class ModuleManagerTest extends ModelTestCase
     /** @var string default data set */
     protected $dataset = "module";
 
-    public function testModuleAlreadyExists()
+    protected $game;
+    protected $mm;
+
+    public function setUp()
     {
-        $game = $this->getMockBuilder(Game::class)
+        parent::setUp();
+
+        $this->game = $this->getMockBuilder(Game::class)
                      ->disableOriginalConstructor()
                      ->getMock();
-        $game->method('getEntityManager')->willReturn($this->getEntityManager());
+        $this->game->method('getEntityManager')->willReturn($this->getEntityManager());
 
+        $this->mm = new ModuleManager($this->game);
+    }
+
+    public function testModuleAlreadyExists()
+    {
         $package = $this->getMockForAbstractClass(PackageInterface::class);
 
-        $mm = new ModuleManager($this->getEntityManager());
-
         $this->expectException(ModuleAlreadyExistsException::class);
-        $mm->register($game, 'lotgd/tests', $package);
+        $this->mm->register($this->game, 'lotgd/tests', $package);
     }
 
     public function testGetModules()
     {
-        $mm = new ModuleManager($this->getEntityManager());
-
-        $modules = $mm->getModules();
+        $modules = $this->mm->getModules();
         $this->assertContainsOnlyInstancesOf(Module::class, $modules);
 
         // This is a little fragile, but assertContains() doesn't seem to work.
@@ -59,15 +66,8 @@ class ModuleManagerTest extends ModelTestCase
     {
         $package = $this->getMockForAbstractClass(PackageInterface::class);
 
-        $game = $this->getMockBuilder(Game::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        $game->method('getEntityManager')->willReturn($this->getEntityManager());
-
-        $mm = new ModuleManager($this->getEntityManager());
-
         $this->expectException(ModuleDoesNotExistException::class);
-        $mm->unregister($game, 'lotgd/no-module', $package);
+        $this->mm->unregister($this->game, 'lotgd/no-module', $package);
     }
 
     public function testUnregisterWithNoEvents()
@@ -79,17 +79,11 @@ class ModuleManagerTest extends ModelTestCase
                              ->disableOriginalConstructor()
                              ->getMock();
 
-        $game = $this->getMockBuilder(Game::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        $game->method('getEntityManager')->willReturn($this->getEntityManager());
-        $game->method('getEventManager')->willReturn($eventManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $mm = new ModuleManager($this->getEntityManager());
+        $this->mm->unregister($this->game, 'lotgd/tests', $package);
 
-        $mm->unregister($game, 'lotgd/tests', $package);
-
-        $modules = $mm->getModules();
+        $modules = $this->mm->getModules();
         $this->assertEmpty($modules);
     }
 
@@ -124,17 +118,11 @@ class ModuleManagerTest extends ModelTestCase
                          array($this->equalTo($subscriptions[1]['pattern']), $this->equalTo($subscriptions[1]['class']), $library)
                      );
 
-        $game = $this->getMockBuilder(Game::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        $game->method('getEntityManager')->willReturn($this->getEntityManager());
-        $game->method('getEventManager')->willReturn($eventManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $mm = new ModuleManager($this->getEntityManager());
+        $this->mm->unregister($this->game, $library, $package);
 
-        $mm->unregister($game, $library, $package);
-
-        $modules = $mm->getModules();
+        $modules = $this->mm->getModules();
         $this->assertEmpty($modules);
     }
 
@@ -168,17 +156,11 @@ class ModuleManagerTest extends ModelTestCase
                          array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']), $library)
                      );
 
-        $game = $this->getMockBuilder(Game::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        $game->method('getEntityManager')->willReturn($this->getEntityManager());
-        $game->method('getEventManager')->willReturn($eventManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $mm = new ModuleManager($this->getEntityManager());
+        $this->mm->unregister($this->game, $library, $package);
 
-        $mm->unregister($game, $library, $package);
-
-        $modules = $mm->getModules();
+        $modules = $this->mm->getModules();
         $this->assertEmpty($modules);
     }
 
@@ -193,17 +175,11 @@ class ModuleManagerTest extends ModelTestCase
                              ->disableOriginalConstructor()
                              ->getMock();
 
-        $game = $this->getMockBuilder(Game::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        $game->method('getEntityManager')->willReturn($this->getEntityManager());
-        $game->method('getEventManager')->willReturn($eventManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $mm = new ModuleManager($this->getEntityManager());
+        $this->mm->register($this->game, $library, $package);
 
-        $mm->register($game, $library, $package);
-
-        $modules = $mm->getModules();
+        $modules = $this->mm->getModules();
 
         // Timestamps should be within 5 seconds :)
         $timeDiff = (new \DateTime())->getTimestamp() - $modules[1]->getCreatedAt()->getTimestamp();
@@ -243,17 +219,11 @@ class ModuleManagerTest extends ModelTestCase
                          array($this->equalTo($subscriptions[1]['pattern']), $this->equalTo($subscriptions[1]['class']), $library)
                      );
 
-        $game = $this->getMockBuilder(Game::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        $game->method('getEntityManager')->willReturn($this->getEntityManager());
-        $game->method('getEventManager')->willReturn($eventManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $mm = new ModuleManager($this->getEntityManager());
+        $this->mm->register($this->game, $library, $package);
 
-        $mm->register($game, $library, $package);
-
-        $modules = $mm->getModules();
+        $modules = $this->mm->getModules();
 
         // Timestamps should be within 5 seconds :)
         $timeDiff = (new \DateTime())->getTimestamp() - $modules[1]->getCreatedAt()->getTimestamp();
@@ -292,17 +262,11 @@ class ModuleManagerTest extends ModelTestCase
                          array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']), $library)
                      );
 
-        $game = $this->getMockBuilder(Game::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        $game->method('getEntityManager')->willReturn($this->getEntityManager());
-        $game->method('getEventManager')->willReturn($eventManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $mm = new ModuleManager($this->getEntityManager());
+        $this->mm->register($this->game, $library, $package);
 
-        $mm->register($game, $library, $package);
-
-        $modules = $mm->getModules();
+        $modules = $this->mm->getModules();
 
         // Timestamps should be within 5 seconds :)
         $timeDiff = (new \DateTime())->getTimestamp() - $modules[1]->getCreatedAt()->getTimestamp();
