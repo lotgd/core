@@ -39,7 +39,7 @@ class EventManagerTest extends ModelTestCase
         $em = new EventManager($this->getEntityManager());
 
         $this->expectException(ClassNotFoundException::class);
-        $em->subscribe("/test.event/", 'LotGD\Core\Tests\NoClassHere');
+        $em->subscribe("/test.event/", 'LotGD\Core\Tests\NoClassHere', 'lotgd/tests');
     }
 
     public function testSubscribeInvalidClass()
@@ -47,7 +47,7 @@ class EventManagerTest extends ModelTestCase
         $em = new EventManager($this->getEntityManager());
 
         $this->expectException(WrongTypeException::class);
-        $em->subscribe("/test.event/", 'LotGD\Core\Tests\EventManagerTestInvalidSubscriber');
+        $em->subscribe("/test.event/", 'LotGD\Core\Tests\EventManagerTestInvalidSubscriber', 'lotgd/tests');
     }
 
     public function testSubscribeInvalidRegexp()
@@ -55,7 +55,7 @@ class EventManagerTest extends ModelTestCase
         $em = new EventManager($this->getEntityManager());
 
         $this->expectException(WrongTypeException::class);
-        $em->subscribe("/test.event", 'LotGD\Core\Tests\EventManagerTestSubscriber');
+        $em->subscribe("/test.event", 'LotGD\Core\Tests\EventManagerTestSubscriber', 'lotgd/tests');
     }
 
     public function testGetSubscriptions()
@@ -64,10 +64,12 @@ class EventManagerTest extends ModelTestCase
 
       $pattern = "/test\\.foo.*/";
       $class = 'LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber';
+      $library = 'lotgd/tests';
 
       $sub = EventSubscription::create([
           'pattern' => $pattern,
           'class' => $class,
+          'library' => $library
       ]);
 
       $subscriptions = $em->getSubscriptions();
@@ -83,12 +85,14 @@ class EventManagerTest extends ModelTestCase
 
         $pattern = "/test.event/";
         $class = 'LotGD\Core\Tests\EventManagerTestSubscriber';
+        $library = 'lotgd/tests';
 
-        $em->subscribe($pattern, $class);
+        $em->subscribe($pattern, $class, $library);
 
         $sub = EventSubscription::create([
             'pattern' => $pattern,
             'class' => $class,
+            'library' => $library
         ]);
 
         $subscriptions = $em->getSubscriptions();
@@ -102,7 +106,7 @@ class EventManagerTest extends ModelTestCase
     {
         $em = new EventManager($this->getEntityManager());
 
-        $em->unsubscribe("/test\\.foo.*/", 'LotGD\Core\Tests\EventManagerTestInstalledSubscriber');
+        $em->unsubscribe("/test\\.foo.*/", 'LotGD\Core\Tests\EventManagerTestInstalledSubscriber', 'lotgd/tests');
 
         $subscriptions = $em->getSubscriptions();
         $this->assertEmpty($subscriptions);
@@ -113,7 +117,7 @@ class EventManagerTest extends ModelTestCase
         $em = new EventManager($this->getEntityManager());
 
         $this->expectException(SubscriptionNotFoundException::class);
-        $em->unsubscribe("/notfound/", 'LotGD\Core\Tests\EventManagerTestInstalledSubscriber');
+        $em->unsubscribe("/notfound/", 'LotGD\Core\Tests\EventManagerTestInstalledSubscriber', 'lotgd/tests');
     }
 
     public function testPublish()

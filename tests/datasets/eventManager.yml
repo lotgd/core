@@ -2,3 +2,4 @@ event_subscriptions:
     -
         pattern: "/test\\.foo.*/"
         class: "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber"
+        library: "lotgd/tests"

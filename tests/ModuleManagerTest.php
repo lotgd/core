@@ -40,7 +40,7 @@ class ModuleManagerTest extends ModelTestCase
         $mm = new ModuleManager($this->getEntityManager());
 
         $this->expectException(ModuleAlreadyExistsException::class);
-        $mm->register($game, 'lotgd/test', $package);
+        $mm->register($game, 'lotgd/tests', $package);
     }
 
     public function testGetModules()
@@ -52,7 +52,7 @@ class ModuleManagerTest extends ModelTestCase
 
         // This is a little fragile, but assertContains() doesn't seem to work.
         $this->assertEquals(new \DateTime('2016-05-01'), $modules[0]->getCreatedAt());
-        $this->assertEquals('lotgd/test', $modules[0]->getLibrary());
+        $this->assertEquals('lotgd/tests', $modules[0]->getLibrary());
     }
 
     public function testModuleDoesNotExist()
@@ -87,7 +87,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $mm = new ModuleManager($this->getEntityManager());
 
-        $mm->unregister($game, 'lotgd/test', $package);
+        $mm->unregister($game, 'lotgd/tests', $package);
 
         $modules = $mm->getModules();
         $this->assertEmpty($modules);
@@ -106,6 +106,8 @@ class ModuleManagerTest extends ModelTestCase
             ),
         );
 
+        $library = 'lotgd/tests';
+
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array(
             'subscriptions' => $subscriptions
@@ -118,8 +120,8 @@ class ModuleManagerTest extends ModelTestCase
         $eventManager->expects($this->exactly(2))
                      ->method('unsubscribe')
                      ->withConsecutive(
-                         array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class'])),
-                         array($this->equalTo($subscriptions[1]['pattern']), $this->equalTo($subscriptions[1]['class']))
+                         array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']), $library),
+                         array($this->equalTo($subscriptions[1]['pattern']), $this->equalTo($subscriptions[1]['class']), $library)
                      );
 
         $game = $this->getMockBuilder(Game::class)
@@ -130,7 +132,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $mm = new ModuleManager($this->getEntityManager());
 
-        $mm->unregister($game, 'lotgd/test', $package);
+        $mm->unregister($game, $library, $package);
 
         $modules = $mm->getModules();
         $this->assertEmpty($modules);
@@ -149,6 +151,8 @@ class ModuleManagerTest extends ModelTestCase
             ),
         );
 
+        $library = 'lotgd/tests';
+
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array(
             'subscriptions' => $subscriptions
@@ -161,7 +165,7 @@ class ModuleManagerTest extends ModelTestCase
         $eventManager->expects($this->exactly(1))
                      ->method('unsubscribe')
                      ->withConsecutive(
-                         array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']))
+                         array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']), $library)
                      );
 
         $game = $this->getMockBuilder(Game::class)
@@ -172,7 +176,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $mm = new ModuleManager($this->getEntityManager());
 
-        $mm->unregister($game, 'lotgd/test', $package);
+        $mm->unregister($game, $library, $package);
 
         $modules = $mm->getModules();
         $this->assertEmpty($modules);
@@ -182,6 +186,8 @@ class ModuleManagerTest extends ModelTestCase
     {
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array());
+
+        $library = 'lotgd/tests2';
 
         $eventManager = $this->getMockBuilder(EventManager::class)
                              ->disableOriginalConstructor()
@@ -195,7 +201,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $mm = new ModuleManager($this->getEntityManager());
 
-        $mm->register($game, 'lotgd/test2', $package);
+        $mm->register($game, $library, $package);
 
         $modules = $mm->getModules();
 
@@ -203,7 +209,7 @@ class ModuleManagerTest extends ModelTestCase
         $timeDiff = (new \DateTime())->getTimestamp() - $modules[1]->getCreatedAt()->getTimestamp();
         $this->assertLessThanOrEqual(5, $timeDiff);
         $this->assertGreaterThanOrEqual(-5, $timeDiff);
-        $this->assertEquals('lotgd/test2', $modules[1]->getLibrary());
+        $this->assertEquals($library, $modules[1]->getLibrary());
     }
 
     public function testRegisterWithEvents()
@@ -219,6 +225,8 @@ class ModuleManagerTest extends ModelTestCase
             ),
         );
 
+        $library = 'lotgd/tests2';
+
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array(
             'subscriptions' => $subscriptions
@@ -231,8 +239,8 @@ class ModuleManagerTest extends ModelTestCase
         $eventManager->expects($this->exactly(2))
                      ->method('subscribe')
                      ->withConsecutive(
-                         array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class'])),
-                         array($this->equalTo($subscriptions[1]['pattern']), $this->equalTo($subscriptions[1]['class']))
+                         array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']), $library),
+                         array($this->equalTo($subscriptions[1]['pattern']), $this->equalTo($subscriptions[1]['class']), $library)
                      );
 
         $game = $this->getMockBuilder(Game::class)
@@ -243,7 +251,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $mm = new ModuleManager($this->getEntityManager());
 
-        $mm->register($game, 'lotgd/test2', $package);
+        $mm->register($game, $library, $package);
 
         $modules = $mm->getModules();
 
@@ -251,7 +259,7 @@ class ModuleManagerTest extends ModelTestCase
         $timeDiff = (new \DateTime())->getTimestamp() - $modules[1]->getCreatedAt()->getTimestamp();
         $this->assertLessThanOrEqual(5, $timeDiff);
         $this->assertGreaterThanOrEqual(-5, $timeDiff);
-        $this->assertEquals('lotgd/test2', $modules[1]->getLibrary());
+        $this->assertEquals($library, $modules[1]->getLibrary());
     }
 
     public function testRegisterWithInvalidEvents()
@@ -267,6 +275,8 @@ class ModuleManagerTest extends ModelTestCase
             ),
         );
 
+        $library = 'lotgd/tests2';
+
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array(
             'subscriptions' => $subscriptions
@@ -279,7 +289,7 @@ class ModuleManagerTest extends ModelTestCase
         $eventManager->expects($this->exactly(1))
                      ->method('subscribe')
                      ->withConsecutive(
-                         array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']))
+                         array($this->equalTo($subscriptions[0]['pattern']), $this->equalTo($subscriptions[0]['class']), $library)
                      );
 
         $game = $this->getMockBuilder(Game::class)
@@ -290,7 +300,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $mm = new ModuleManager($this->getEntityManager());
 
-        $mm->register($game, 'lotgd/test2', $package);
+        $mm->register($game, $library, $package);
 
         $modules = $mm->getModules();
 
@@ -298,6 +308,6 @@ class ModuleManagerTest extends ModelTestCase
         $timeDiff = (new \DateTime())->getTimestamp() - $modules[1]->getCreatedAt()->getTimestamp();
         $this->assertLessThanOrEqual(5, $timeDiff);
         $this->assertGreaterThanOrEqual(-5, $timeDiff);
-        $this->assertEquals('lotgd/test2', $modules[1]->getLibrary());
+        $this->assertEquals($library, $modules[1]->getLibrary());
     }
 }

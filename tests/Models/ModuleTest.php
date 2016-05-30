@@ -20,9 +20,9 @@ class ModuleTest extends ModelTestCase
     public function testGetters()
     {
         $em = $this->getEntityManager();
-        $scene = $em->getRepository(Module::class)->find('lotgd/test');
+        $scene = $em->getRepository(Module::class)->find('lotgd/tests');
 
-        $this->assertEquals("lotgd/test", $scene->getLibrary());
+        $this->assertEquals("lotgd/tests", $scene->getLibrary());
         $this->assertEquals(new \DateTime('2016-05-01'), $scene->getCreatedAt());
 
         $em->flush();

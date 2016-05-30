@@ -27,10 +27,14 @@ class EventSubscription implements CreateableInterface
     /** @Id @Column(type="string"); */
     private $class;
 
+    /** @Id @Column(type="string"); */
+    private $library;
+
     /** @var array */
     private static $fillable = [
         "pattern",
         "class",
+        "library",
     ];
 
     /**
@@ -60,5 +64,19 @@ class EventSubscription implements CreateableInterface
     public function setClass(string $class)
     {
         $this->class = $class;
+    }
+
+    /**
+     * Returns the library that this subscription is part of, in vendor/module format.
+     * @return string
+     */
+    public function getLibrary(): string
+    {
+        return $this->library;
+    }
+
+    public function setLibrary(string $library)
+    {
+        $this->library = $library;
     }
 }

@@ -77,7 +77,7 @@ class ModuleManager
                 $pattern = $s['pattern'];
                 $class = $s['class'];
 
-                $g->getEventManager()->subscribe($pattern, $class);
+                $g->getEventManager()->subscribe($pattern, $class, $library);
             }
         }
     }
@@ -107,7 +107,7 @@ class ModuleManager
                 $class = $s['class'];
 
                 try {
-                    $g->getEventManager()->unsubscribe($pattern, $class);
+                    $g->getEventManager()->unsubscribe($pattern, $class, $library);
                 } catch (SubscriptionNotFoundException $e) {
                     // TODO: log this but continue on.
                 }

@@ -1,4 +1,4 @@
 modules:
     -
-        library: "lotgd/test"
+        library: "lotgd/tests"
         createdAt: "2016-05-01"

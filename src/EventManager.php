@@ -63,11 +63,12 @@ class EventManager
      * @param string $class Fully qualified class name, which implements the
      * EventHandler interface, that will receive the handleEvent() method call when
      * events matching $pattern are published.
+     * @param string $library Library this subscription belongs to.
      * @throws ClassNotFoundException if class cannot be resolved into a class.
      * @throws WrongTypeException if class does not implement the EventHandler
      * interface or the pattern is not a valid regular expression.
      */
-    public function subscribe(string $pattern, string $class)
+    public function subscribe(string $pattern, string $class, string $library)
     {
         try {
             // Can we resolve this class?
@@ -88,12 +89,13 @@ class EventManager
 
         // Validate the regular expression.
         if (@preg_match($pattern, '') === false) {
-            throw new WrongTypeException('Invalid regular expression');
+            throw new WrongTypeException("Invalid regular expression: {$pattern}");
         }
 
         $e = EventSubscription::create([
             'pattern' => $pattern,
-            'class' => $class
+            'class' => $class,
+            'library' => $library
         ]);
         $e->save($this->em);
     }
@@ -107,14 +109,15 @@ class EventManager
      * @param string $class Fully qualified class name.
      * @throws SubscriptionNotFoundException if the specified subscription does not exist.
      */
-    public function unsubscribe(string $pattern, string $class)
+    public function unsubscribe(string $pattern, string $class, string $library)
     {
         $e = $this->em->getRepository(EventSubscription::class)->find(array(
             'pattern' => $pattern,
-            'class' => $class
+            'class' => $class,
+            'library' => $library
         ));
         if (!$e) {
-            throw new SubscriptionNotFoundException("Subscription not found with pattern={$pattern} class={$class}.");
+            throw new SubscriptionNotFoundException("Subscription not found with pattern={$pattern} class={$class} library={$library}.");
         }
         $e->delete($this->em);
     }
