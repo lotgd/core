@@ -53,7 +53,6 @@ class ModuleManager
      * Called when a module is added to the system. Performs setup tasks like
      * registering the events this module responds to.
      *
-     * @param Game $g The game.
      * @param string $library Name of the module, in 'vendor/module-name' format.
      * @param PackageInterface $package Composer package containing this module.
      * @throws ModuleAlreadyExistsException if the module is already installed.
@@ -61,15 +60,15 @@ class ModuleManager
      * @throws WrongTypeException if an event subscription class does not implement the EventHandler
      * interface or the pattern is not a valid regular expression.
      */
-    public static function register(Game $g, string $library, PackageInterface $package)
+    public function register(string $library, PackageInterface $package)
     {
-        $m = $g->getEntityManager()->getRepository(Module::class)->find($library);
+        $m = $this->g->getEntityManager()->getRepository(Module::class)->find($library);
         if ($m) {
             throw new ModuleAlreadyExistsException($library);
         } else {
             // TODO: handle error cases here.
             $m = new Module($library);
-            $m->save($g->getEntityManager());
+            $m->save($this->g->getEntityManager());
 
             // Subscribe to the module's events.
             $subscriptions = ModuleManager::getPackageSubscriptions($package);
@@ -77,7 +76,7 @@ class ModuleManager
                 $pattern = $s['pattern'];
                 $class = $s['class'];
 
-                $g->getEventManager()->subscribe($pattern, $class, $library);
+                $this->g->getEventManager()->subscribe($pattern, $class, $library);
             }
         }
     }
@@ -86,19 +85,18 @@ class ModuleManager
      * Called when a module is removed from the system. Performs teardown tasks like
      * unregistering the events this module responds to.
      *
-     * @param Game $g The game.
      * @param string $library Name of the module, in 'vendor/module-name' format.
      * @param PackageInterface $package Composer package containing this module.
      * @throws ModuleDoesNotExistException if the module is not installed.
      */
-    public static function unregister(Game $g, string $library, PackageInterface $package)
+    public function unregister(string $library, PackageInterface $package)
     {
-        $m = $g->getEntityManager()->getRepository(Module::class)->find($library);
+        $m = $this->g->getEntityManager()->getRepository(Module::class)->find($library);
         if (!$m) {
             throw new ModuleDoesNotExistException($library);
         } else {
             // TODO: handle error cases here.
-            $m->delete($g->getEntityManager());
+            $m->delete($this->g->getEntityManager());
 
             // Unsubscribe the module's events.
             $subscriptions = ModuleManager::getPackageSubscriptions($package);
@@ -107,7 +105,7 @@ class ModuleManager
                 $class = $s['class'];
 
                 try {
-                    $g->getEventManager()->unsubscribe($pattern, $class, $library);
+                    $this->g->getEventManager()->unsubscribe($pattern, $class, $library);
                 } catch (SubscriptionNotFoundException $e) {
                     // TODO: log this but continue on.
                 }

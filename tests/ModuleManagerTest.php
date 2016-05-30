@@ -49,7 +49,7 @@ class ModuleManagerTest extends ModelTestCase
         $package = $this->getMockForAbstractClass(PackageInterface::class);
 
         $this->expectException(ModuleAlreadyExistsException::class);
-        $this->mm->register($this->game, 'lotgd/tests', $package);
+        $this->mm->register('lotgd/tests', $package);
     }
 
     public function testGetModules()
@@ -67,7 +67,7 @@ class ModuleManagerTest extends ModelTestCase
         $package = $this->getMockForAbstractClass(PackageInterface::class);
 
         $this->expectException(ModuleDoesNotExistException::class);
-        $this->mm->unregister($this->game, 'lotgd/no-module', $package);
+        $this->mm->unregister('lotgd/no-module', $package);
     }
 
     public function testUnregisterWithNoEvents()
@@ -81,7 +81,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->unregister($this->game, 'lotgd/tests', $package);
+        $this->mm->unregister('lotgd/tests', $package);
 
         $modules = $this->mm->getModules();
         $this->assertEmpty($modules);
@@ -120,7 +120,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->unregister($this->game, $library, $package);
+        $this->mm->unregister($library, $package);
 
         $modules = $this->mm->getModules();
         $this->assertEmpty($modules);
@@ -158,7 +158,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->unregister($this->game, $library, $package);
+        $this->mm->unregister($library, $package);
 
         $modules = $this->mm->getModules();
         $this->assertEmpty($modules);
@@ -177,7 +177,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->register($this->game, $library, $package);
+        $this->mm->register($library, $package);
 
         $modules = $this->mm->getModules();
 
@@ -221,7 +221,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->register($this->game, $library, $package);
+        $this->mm->register($library, $package);
 
         $modules = $this->mm->getModules();
 
@@ -264,7 +264,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->register($this->game, $library, $package);
+        $this->mm->register($library, $package);
 
         $modules = $this->mm->getModules();
 
