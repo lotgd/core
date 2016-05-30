@@ -324,4 +324,205 @@ class ModuleManagerTest extends ModelTestCase
         $r = $this->mm->validate();
         $this->assertEmpty($r);
     }
+
+    public function testValidateFailMissingSubscription()
+    {
+        $pattern = '/test\\.foo.*/';
+        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $library = 'lotgd/tests';
+        $subscriptions = array(
+            array(
+                'pattern' => $pattern,
+                'class' => $class
+            ),
+            array(
+              'pattern' => '/another pattern/',
+              'class' => $class
+            )
+        );
+
+        $p1 = $this->getMockBuilder(PackageInterface::class)
+                   ->getMock();
+        $p1->method('getName')->willReturn($library);
+        $p1->method('getExtra')->willReturn(array(
+            'subscriptions' => $subscriptions
+        ));
+
+        $packages = array($p1);
+
+        $composerManager = $this->getMockBuilder(ComposerManager::class)
+                                ->disableOriginalConstructor()
+                                ->setMethods(array('getModulePackages'))
+                                ->getMock();
+        $composerManager->method('getModulePackages')->willReturn($packages);
+
+        $s1 = $this->getMockBuilder(EventSubscription::class)
+                   ->disableOriginalConstructor()
+                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
+                   ->getMock();
+        $s1->method('getPattern')->willReturn($pattern);
+        $s1->method('getClass')->willReturn($class);
+        $s1->method('getLibrary')->willReturn($library);
+        $installedSubscriptions = array($s1);
+
+        $eventManager = $this->getMockBuilder(EventManager::class)
+                             ->disableOriginalConstructor()
+                             ->getMock();
+        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
+
+        $this->game->method('getComposerManager')->willReturn($composerManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
+
+        $r = $this->mm->validate();
+        $this->assertTrue(strpos($r[0], "Couldn't find subscription") !== false);
+    }
+
+    public function testValidateFailMoreInstalledModules()
+    {
+        $pattern = '/test\\.foo.*/';
+        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $library = 'lotgd/tests';
+
+        $packages = array();
+
+        $composerManager = $this->getMockBuilder(ComposerManager::class)
+                                ->disableOriginalConstructor()
+                                ->setMethods(array('getModulePackages'))
+                                ->getMock();
+        $composerManager->method('getModulePackages')->willReturn($packages);
+
+        $s1 = $this->getMockBuilder(EventSubscription::class)
+                   ->disableOriginalConstructor()
+                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
+                   ->getMock();
+        $s1->method('getPattern')->willReturn($pattern);
+        $s1->method('getClass')->willReturn($class);
+        $s1->method('getLibrary')->willReturn($library);
+        $installedSubscriptions = array($s1);
+
+        $eventManager = $this->getMockBuilder(EventManager::class)
+                             ->disableOriginalConstructor()
+                             ->getMock();
+        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
+
+        $this->game->method('getComposerManager')->willReturn($composerManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
+
+        $r = $this->mm->validate();
+        $this->assertTrue(strpos($r[0], "more installed modules") !== false);
+    }
+
+    public function testValidateFailMoreExpectedModules()
+    {
+        $pattern = '/test\\.foo.*/';
+        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $library = 'lotgd/tests';
+
+        $subscriptions = array(
+            array(
+                'pattern' => $pattern,
+                'class' => $class
+            ),
+        );
+
+        $p1 = $this->getMockBuilder(PackageInterface::class)
+                   ->getMock();
+        $p1->method('getName')->willReturn($library);
+        $p1->method('getExtra')->willReturn(array(
+            'subscriptions' => $subscriptions
+        ));
+
+        $p2 = $this->getMockBuilder(PackageInterface::class)
+                   ->getMock();
+        $p2->method('getName')->willReturn('lotgd/tests-another');
+        $p2->method('getExtra')->willReturn(array(
+            'subscriptions' => $subscriptions
+        ));
+
+        $packages = array($p1, $p2);
+
+        $composerManager = $this->getMockBuilder(ComposerManager::class)
+                                ->disableOriginalConstructor()
+                                ->setMethods(array('getModulePackages'))
+                                ->getMock();
+        $composerManager->method('getModulePackages')->willReturn($packages);
+
+        $s1 = $this->getMockBuilder(EventSubscription::class)
+                   ->disableOriginalConstructor()
+                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
+                   ->getMock();
+        $s1->method('getPattern')->willReturn($pattern);
+        $s1->method('getClass')->willReturn($class);
+        $s1->method('getLibrary')->willReturn($library);
+        $installedSubscriptions = array($s1);
+
+        $eventManager = $this->getMockBuilder(EventManager::class)
+                             ->disableOriginalConstructor()
+                             ->getMock();
+        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
+
+        $this->game->method('getComposerManager')->willReturn($composerManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
+
+        $r = $this->mm->validate();
+        $this->assertTrue(strpos($r[0], "more modules configured") !== false);
+    }
+
+    public function testValidateWarningUnconfiguredSubscriptions()
+    {
+        $pattern = '/test\\.foo.*/';
+        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $library = 'lotgd/tests';
+
+        $subscriptions = array(
+            array(
+                'pattern' => $pattern,
+                'class' => $class
+            ),
+        );
+
+        $p1 = $this->getMockBuilder(PackageInterface::class)
+                   ->getMock();
+        $p1->method('getName')->willReturn($library);
+        $p1->method('getExtra')->willReturn(array(
+            'subscriptions' => $subscriptions
+        ));
+
+        $packages = array($p1);
+
+        $composerManager = $this->getMockBuilder(ComposerManager::class)
+                                ->disableOriginalConstructor()
+                                ->setMethods(array('getModulePackages'))
+                                ->getMock();
+        $composerManager->method('getModulePackages')->willReturn($packages);
+
+        $s1 = $this->getMockBuilder(EventSubscription::class)
+                   ->disableOriginalConstructor()
+                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
+                   ->getMock();
+        $s1->method('getPattern')->willReturn($pattern);
+        $s1->method('getClass')->willReturn($class);
+        $s1->method('getLibrary')->willReturn($library);
+
+        $s2 = $this->getMockBuilder(EventSubscription::class)
+                   ->disableOriginalConstructor()
+                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
+                   ->getMock();
+        $s2->method('getPattern')->willReturn('/some pattern/');
+        $s2->method('getClass')->willReturn('SomeClass');
+        $s2->method('getLibrary')->willReturn($library);
+
+        $installedSubscriptions = array($s1, $s2);
+
+        $eventManager = $this->getMockBuilder(EventManager::class)
+                             ->disableOriginalConstructor()
+                             ->getMock();
+        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
+
+        $this->game->method('getComposerManager')->willReturn($composerManager);
+        $this->game->method('getEventManager')->willReturn($eventManager);
+
+        $r = $this->mm->validate();
+        $this->assertTrue(strpos($r[0], "not present in the configuration") !== false);
+    }
 }
