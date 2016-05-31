@@ -76,9 +76,9 @@ class EventManager
         } catch (\LogicException $e) {
             // Currently we do the same thing on not found as on some other
             // exception. Maybe we should do something different.
-            throw new ClassNotFoundException();
+            throw new ClassNotFoundException("Loading class ${class} failed");
         } catch (\ReflectionException $e) {
-            throw new ClassNotFoundException();
+            throw new ClassNotFoundException("Could not find class ${class}");
         }
 
         // Check if the class implements EventHandler.
