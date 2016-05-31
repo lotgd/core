@@ -10,6 +10,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+
+use LotGD\Core\Exceptions\ClassNotFoundException;
+use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 
 class ModuleRegisterCommand extends Command
 {
@@ -21,27 +25,21 @@ class ModuleRegisterCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // TODO: move these somewhere more generic.
-        $style = new OutputFormatterStyle('yellow');
-        $output->getFormatter()->setStyle('warning', $style);
-
         $g = Bootstrap::createGame();
 
-        $modules = $g->getModuleManager()->getModules();
+        $modules = $g->getComposerManager()->getModulePackages();
 
-        foreach ($modules as $m) {
-            $library = $m->getLibrary();
+        foreach ($modules as $p) {
+            $library = $p->getName();
 
             try {
-                $p = $g->getModuleManager()->getPackageForLibrary($library);
-
                 $g->getModuleManager()->register($library, $p);
 
-                $output->writeln("<info>Registered new module {$library}.</info>");
-            } catch (LibraryDoesNotExistException $e) {
-                $output->writeln("<warning>Module {$library} registered but no longer installed with Composer.</warning>");
+                $output->writeln("<info>Registered new module {$library}</info>");
             } catch (ModuleAlreadyExistsException $e) {
-                $output->writeln("Skipping already registered module {$library}.");
+                $output->writeln("Skipping already registered module {$library}");
+            } catch (ClassNotFoundException $e) {
+                $output->writeln("<error>Error installing module {$library}: " . $e->getMessage() . "</error>");
             }
         }
     }
