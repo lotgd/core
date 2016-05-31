@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core;
 
 use Composer\Composer;
+use LotGD\Core\Exceptions\LibraryDoesNotExistException;
 
 class ComposerManager
 {
@@ -28,6 +29,23 @@ class ComposerManager
             $this->composer = \Composer\Factory::create(new \Composer\IO\NullIO());
         }
         return $this->composer;
+    }
+
+    /**
+     * Return the Composer package for the corresponding library, in vendor/module format.
+     * @return PackageInterface Package corresponding to this library.
+     * @throws LibraryDoesNotExistException
+     */
+    public function getPackageForLibrary(string $library): PackageInterface
+    {
+        // TODO: should probably do something better than O(n) here.
+        $packages = $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages();
+        foreach ($packages as $p) {
+            if ($p->getName() === $library) {
+               return $p;
+            }
+        }
+        throw new LibraryDoesNotExistException();
     }
 
     /**
