@@ -31,6 +31,7 @@ class ModuleValidateCommand extends Command
             }
             return 1;
         } else {
+            $output->writeln("<info>LotGD modules validated</info>");
             return 0;
         }
     }
