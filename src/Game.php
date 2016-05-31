@@ -12,6 +12,7 @@ class Game
     private $entityManager;
     private $eventManager;
     private $composerManager;
+    private $moduleManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -19,6 +20,18 @@ class Game
     {
         $this->entityManager = $entityManager;
         $this->eventManager = $eventManager;
+    }
+
+    /**
+     * Returns the game's module manager.
+     * @return ModuleManager The game's module manager.
+     */
+    public function getModuleManager(): ModuleManager
+    {
+        if ($this->moduleManager === null) {
+            $this->moduleManager = new ModuleManager($this);
+        }
+        return $this->moduleManager;
     }
 
     /**
