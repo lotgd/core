@@ -11,20 +11,27 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ModuleInstallCommand extends Command
+class ModuleValidateCommand extends Command
 {
     protected function configure()
     {
-        $this->setName('module:install')
-             ->setDescription('Install a new LotGD module')
-             ->addArgument(
-                 'names',
-                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-                 'List of module names to install, vendor/module-name format'
-             );
+        $this->setName('module:validate')
+             ->setDescription('Validate installed modules');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $g = Bootstrap::createGame();
+
+        $results = $g->getModuleManager()->validate();
+
+        if (count($results) > 0) {
+            foreach ($results as $r) {
+                $output->writeln($r);
+            }
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
