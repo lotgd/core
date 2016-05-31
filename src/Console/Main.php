@@ -13,7 +13,7 @@ class Main {
         $application = new Application();
 
         $application->setName("daenerys 🐲 ");
-        $application->setVersion("0.0.1");
+        $application->setVersion("0.0.1 (lotgd/core version " . \LotGD\Core\Game::getVersion() . ")");
 
         $application->add(new ModuleValidateCommand());
         $application->add(new ModuleRegisterCommand());
