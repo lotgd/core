@@ -22,6 +22,12 @@ class Game
         $this->eventManager = $eventManager;
     }
 
+    public static function getVersion(): string
+    {
+        // Conforms to semantic versioning.
+        return '0.0.1';
+    }
+
     /**
      * Returns the game's module manager.
      * @return ModuleManager The game's module manager.
