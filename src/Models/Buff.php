@@ -6,6 +6,8 @@ namespace LotGD\Core\Models;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
+use LotGD\Core\Exceptions\ArgumentException;
+
 /**
  * A model representing a buff used to modify the flow of the battle.
  * @Entity
@@ -18,6 +20,8 @@ class Buff
     const ACTIVATE_OFFENSE = 0b0100;
     const ACTIVATE_DEFENSE = 0b1000;
     const ACTIVATE_WHILEROUND = 0b1100;
+    const ACTIVATE_NONE = 0b0000;
+    const ACTIVATE_ANY = 0b1111;
     
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
@@ -88,6 +92,12 @@ class Buff
      * @Column(type="boolean")
      */
     private $survivesNewDay = false;
+    /**
+     * True if the buff should expire if the battle ended.
+     * @var bool
+     * @Column(type="boolean")
+     */
+    private $expiresAfterBattle = false;
     /**
      * The number of rounds this buff lasts.
      * 
@@ -210,6 +220,114 @@ class Buff
      * @Column(type="boolean")
      */
     private $goodguyInvulnurable = false;
+    /**
+     * True if the buff has already been started
+     * @var bool
+     * @Column(type="boolean")
+     */
+    private $hasBeenStarted = false;
+    
+    private $buffArrayTemplate = [
+        "slot" => "string",
+        "name" => "string",
+        "startMessage" => "string",
+        "roundMessage" => "string",
+        "endMessage" => "string",
+        "effectSucceedsMessage" => "string",
+        "effectFailsMessage" => "string",
+        "noEffectMessage" => "string",
+        "newDayMessage" => "string",
+        "activateAt" => "int",
+        "survivesNewDay" => "bool",
+        "expiresAfterBattle" => "bool",
+        "rounds" => "int",
+        "badguyRegeneration" => "int",
+        "goodguyRegeneration" => "int",
+        "badguyLifetap" => "float",
+        "goodguyLifetap" => "float",
+        "badguyDamageReflection" => "float",
+        "goodguyDamageReflection" => "float",
+        "numberOfMinions" => "int",
+        "minionMinBadguyDamage" => "int",
+        "minionMaxBadguyDamage" => "int",
+        "minionMinGoodguyDamage" => "int",
+        "minionMaxGoodguyDamage" => "int",
+        "badguyDamageModifier" => "float",
+        "badguyAttackModifier" => "float",
+        "badguyDefenseModifier" => "float",
+        "badguyInvulnurable" => "bool",
+        "goodguyDamageModifier" => "float",
+        "goodguyAttackModifier" => "float",
+        "goodguyDefenseModifier" => "float",
+        "goodguyInvulnurable" => "bool",
+    ];
+    
+    private $required = [
+        "slot",
+    ];
+    
+    /**
+     * Creates a new buff entity using an array
+     * @param array $buffArray
+     * @throws ArgumentException
+     */
+    public function __construct(array $buffArray) {
+        foreach($buffArray as $attribute => $value) {
+            // Throw exception if an attribute does not exist (to prevent spelling errors)
+            if (!isset($this->buffArrayTemplate[$attribute])) {
+                throw new ArgumentException("{$attribute} is not a valid key for a buff.");
+            }
+            
+            switch($this->buffArrayTemplate[$attribute]) {
+                case "string":
+                    if (is_string($value) === false) {
+                        throw new ArgumentException("{$attribute} needs to be a string.");
+                    }
+                    break;
+                    
+                case "int":
+                    if (is_int($value) === false) {
+                        throw new ArgumentException("{$attribute} needs to be a int.");
+                    }
+                    break;
+                    
+                case "float":
+                    if (is_float($value) === false) {
+                        throw new ArgumentException("{$attribute} needs to be a float.");
+                    }
+                    break;
+                    
+                case "boolean":
+                    if (is_bool($value) === false) {
+                        throw new ArgumentException("{$attribute} needs to be boolean.");
+                    }
+                    break;
+            }
+            
+            $this->{$attribute} = $value;
+            
+            foreach($this->required as $required) {
+                if (is_null($this->$required)) {
+                    throw new ArgumentException("{$required} needs to be inside of the buffArray!");
+                }
+            }
+        }
+    }
+    
+    /**
+     * Creates a new buff entity using another buff as the template.
+     * @param \LotGD\Core\Models\Buff $buff
+     * @return \LotGD\Core\Models\Buff
+     */
+    public static function constructFromTemplate(Buff $buff): Buff {
+        $buffArray = [];
+        
+        foreach($this->buffArrayTemplate as $attribute => $type) {
+            $buffArray[$attribute] = $buff->$attribute;
+        }
+        
+        return new Buff($buffArray);
+    }
     
     /**
      * Returns the id of the buff
@@ -253,7 +371,7 @@ class Buff
      */
     public function getStartMessage(): string
     {
-        return $this->startMessage;
+        return $this->startMessage ?? "";
     }
     
     /**
@@ -262,7 +380,7 @@ class Buff
      */
     public function getRoundMessage(): string
     {
-        return $this->roundMessage;
+        return $this->roundMessage ?? "";
     }
     
     /**
@@ -271,7 +389,7 @@ class Buff
      */
     public function getEndMessage(): string
     {
-        return $this->endMessage;
+        return $this->endMessage ?? "";
     }
     
     /**
@@ -326,7 +444,7 @@ class Buff
      */
     public function getsActivatedAt(int $flag): bool
     {
-        return $this->activateAt & $flag;
+        return ($flag === self::ACTIVATE_NONE ? $this->activateAt === self::ACTIVATE_NONE : $this->activateAt & $flag);
     }
     
     /**
@@ -336,6 +454,15 @@ class Buff
     public function survivesNewDay(): bool
     {
         return $this->survivesNewDay;
+    }
+    
+    /**
+     * Returns true if the buff expires after the battle.
+     * @return bool
+     */
+    public function expiresAfterBattle(): bool
+    {
+        return $this->expiresAfterBattle;
     }
 
     /**
@@ -538,5 +665,23 @@ class Buff
     public function getGoodguyIsInvulnurable(): bool
     {
         return $this->goodguyInvulnurable;
+    }
+    
+    /**
+     * Returns true if the buff has already been started
+     * @return bool
+     */
+    public function hasBeenStarted(): bool
+    {
+        return $this->hasBeenStarted;
+    }
+    
+    /**
+     * Sets if the buff has been started (or not).
+     * @param bool $setTo
+     */
+    public function setHasBeenStarted(bool $setTo = true)
+    {
+        $this->hasBeenStarted = $setTo;
     }
 }

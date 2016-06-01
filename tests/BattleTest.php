@@ -3,12 +3,18 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
+use Doctrine\Common\Collections\Collection;
+
 use LotGD\Core\{
     Battle,
     DiceBag,
     Game,
+    Models\Buff,
     Models\Character,
     Models\Monster
+};
+use LotGD\Core\Models\BattleEvents\{
+    BuffMessageEvent
 };
 
 use LotGD\Core\Tests\ModelTestCase;
@@ -196,4 +202,80 @@ class BattleTest extends ModelTestCase
             $battle->fightNRounds(1);
         }
     }
+    
+    private function provideBuffBattleParticipants(Buff $buff): Battle
+    {
+        $em = $this->getEntityManager();
+        
+        $character = $em->getRepository(Character::class)->find(4);
+        $monster = $em->getRepository(Monster::class)->find(3);
+        
+        $character->addBuff($buff);
+        
+        return new Battle($this->getMockGame($character), $character, $monster);
+    }
+    
+    protected function assertBuffEventMessageExists(
+        Collection $events, 
+        string $battleEventText, 
+        int $timesAtLeast = 1, 
+        int $timesAtMax = null
+    ) {
+        $eventCounter = 0;
+        foreach($events as $event) {
+            if ($event instanceof BuffMessageEvent) {
+                if ($battleEventText === $event->getMessage()) {
+                    $eventCounter++;
+                }
+            }
+        }
+        
+        if ($timesAtMax === null) {
+            $timesAtMax = $timesAtLeast;
+        }
+        
+        $this->assertGreaterThanOrEqual($timesAtLeast, $eventCounter);
+        $this->assertLessThanOrEqual($timesAtMax, $eventCounter);
+    }
+    
+    public function testBattleBuffMessages()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 3,
+            "startMessage" => "And this buff starts!",
+            "roundMessage" => "The buff is still activate",
+            "endMessage" => "The buff is ending.",
+            "activateAt" => Buff::ACTIVATE_ROUNDSTART,
+        ]));
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertBuffEventMessageExists($battle->getEvents(), "And this buff starts!", 1);
+        $this->assertBuffEventMessageExists($battle->getEvents(), "The buff is ending.", 1);
+        $this->assertBuffEventMessageExists($battle->getEvents(), "The buff is still activate", 1, 2);
+        
+        $expectedEvents = [
+            BuffMessageEvent::class, // Activation round
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 1
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+            BuffMessageEvent::class, // message every round
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 2
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+            BuffMessageEvent::class, // message every round
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 3
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+            BuffMessageEvent::class, // message expires
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 4
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 5
+            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($battle->getEvents());
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+            
 }

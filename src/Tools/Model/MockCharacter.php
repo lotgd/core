@@ -4,7 +4,10 @@ declare(strict_types = 1);
 
 namespace LotGD\Core\Tools\Model;
 
-use LotGD\Core\Game;
+use LotGD\Core\{
+    BuffList,
+    Game
+};
 use LotGD\Core\Exceptions\IsNullException;
 use LotGD\Core\Models\CharacterViewpoint;
 
@@ -80,5 +83,14 @@ trait MockCharacter
     public function getProperty(string $name, $default = null)
     {
         return $default;
+    }
+    
+    /**
+     * Returns an empty bufflist
+     * @return BuffList
+     */
+    public function getBuffs(): BuffList
+    {
+        throw new IsNullException();
     }
 }

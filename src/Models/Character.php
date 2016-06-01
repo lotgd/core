@@ -10,7 +10,10 @@ use Doctrine\Common\Collections\{
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
-use LotGD\Core\Game;
+use LotGD\Core\{
+    BuffList,
+    Game
+};
 use LotGD\Core\Tools\Exceptions\BuffSlotOccupiedException;
 use LotGD\Core\Tools\Model\{
     Creator,
@@ -61,6 +64,8 @@ class Character implements CharacterInterface, CreateableInterface
     private $messageThreads;
     /** @OneToMany(targetEntity="Buff", mappedBy="character", cascade={"persist"}) */
     private $buffs;
+    /** @var BuffList */
+    private $buffList;
     
     /** @var array */
     private static $fillable = [
@@ -258,7 +263,7 @@ class Character implements CharacterInterface, CreateableInterface
      */
     public function getBuffs(): BuffList
     {
-        $this->buffList ?? new BuffList($this->buffs);
+        $this->buffList = $this->buffList ?? new BuffList($this->buffs);
         return $this->buffList;
     }
     

@@ -13,6 +13,7 @@ use LotGD\Core\{
     Models\FighterInterface
 };
 use LotGD\Core\Models\BattleEvents\{
+    BuffMessageEvent,
     CriticalHitEvent,
     DamageEvent,
     DeathEvent
@@ -56,6 +57,11 @@ class Battle
     public function selectAction()
     {
         
+    }
+    
+    public function getEvents()
+    {
+        return $this->events;
     }
     
     /**
@@ -130,6 +136,9 @@ class Battle
     {
         $damageHasBeenDone = false;
         
+        $playerBuffStartEvents = $this->player->getBuffs()->activate();
+        $monsterBuffStartEvents = $this->monster->getBuffs()->activate();
+        
         do {
             $offenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_PLAYER ? $this->turn($this->player, $this->monster) : new ArrayCollection();
             $defenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_MONSTER ? $this->turn($this->monster, $this->player) : new ArrayCollection();
@@ -147,13 +156,13 @@ class Battle
                 $eventsToAdd->add($event);
 
                 if ($this->player->getHealth() <= 0) {
-                    $this->events->add(new DeathEvent($this->player));
+                    $deathEvent = new DeathEvent($this->player);
                     $this->result = self::RESULT_PLAYERDEATH;
                     break;
                 }
 
                 if ($this->monster->getHealth() <= 0) {
-                    $this->events->add(new DeathEvent($this->monster));
+                    $deathEvent = new DeathEvent($this->monster);
                     $this->result = self::RESULT_MONSTERDEATH;
                     break;
                 }
@@ -161,7 +170,21 @@ class Battle
         } while($damageHasBeenDone === false);
         
         $this->round++;
-        $this->events = new ArrayCollection(array_merge($this->events->toArray(), $eventsToAdd->toArray()));
+        
+        $playerBuffEndEvents = $this->player->getBuffs()->expireOneRound();
+        $monsterBuffEndEvents = $this->monster->getBuffs()->expireOneRound();
+        
+        $this->events = new ArrayCollection(
+            array_merge(
+                $this->events->toArray(), 
+                $playerBuffStartEvents->toArray(),
+                $monsterBuffStartEvents->toArray(),
+                $eventsToAdd->toArray(),
+                $playerBuffEndEvents->toArray(),
+                $monsterBuffEndEvents->toArray(),
+                isset($deathEvent) ? [$deathEvent] : []
+            )
+        );
     }
     
     /**
@@ -172,6 +195,9 @@ class Battle
     protected function turn(FighterInterface $attacker, FighterInterface $defender): ArrayCollection
     {
         $events = new ArrayCollection();
+        
+        $attackersBuffs = $attacker->getBuffs();
+        $defendersBuffs = $defender->getBuffs();
         
         $attackersAttack = $attacker->getAttack($this->game);
         $defendersDefense = $defender->getDefense($this->game);

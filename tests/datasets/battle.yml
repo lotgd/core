@@ -20,6 +20,13 @@ characters:
         health: 10
         maxhealth: 10
         level: 1
+    -
+        id: 4
+        name: "Low Damage Char"
+        displayName: "Low Damage Char"
+        health: 500
+        maxhealth: 500
+        level: 0
 monsters:
     -
         id: 1

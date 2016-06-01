@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
-use LotGD\Core\Game;
+use LotGD\Core\{
+    BuffList,
+    Game
+};
 
 /**
  * Interface for models that should be able to participate in fights.
@@ -19,4 +22,5 @@ interface FighterInterface
     public function getDefense(Game $game, bool $ignoreBuffs = false): int;
     public function damage(int $damage);
     public function heal(int $heal);
+    public function getBuffs(): BuffList;
 }

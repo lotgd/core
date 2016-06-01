@@ -3,7 +3,12 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tools\Model;
 
-use LotGD\Core\Game;
+use Doctrine\Common\Collections\ArrayCollection;
+
+use LotGD\Core\{
+    BuffList,
+    Game
+};
 
 /**
  * Automatically calculated values based on the fighter's level
@@ -38,5 +43,15 @@ trait AutoScaleFighter
     {
         $level = $this->getlevel();
         return (int)floor($level*1.45);
+    }
+    
+    /**
+     * Returns an empty bufflist
+     * @return BuffList
+     */
+    public function getBuffs(): BuffList
+    {
+        $this->buffList = $this->buffList ?? new BuffList(new ArrayCollection());
+        return $this->buffList;
     }
 }

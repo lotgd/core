@@ -31,6 +31,8 @@ class DamageEvent extends BattleEvent
     
     public function apply()
     {
+        parent::apply();
+        
         if ($this->damage !== 0) {
             // Only damage the victim if there is an actual effect
             $victim = $this->damage > 0 ? $this->defender : $this->attacker;
