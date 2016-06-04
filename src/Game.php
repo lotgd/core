@@ -22,10 +22,13 @@ class Game
         $this->eventManager = $eventManager;
     }
 
+    /**
+     * Return the current version of the core, conforming to Semantic Versioning.
+     * @return string The current version, in x.y.z format.
+     */
     public static function getVersion(): string
     {
-        // Conforms to semantic versioning.
-        return '0.0.1';
+        return '0.1.0';
     }
 
     /**
