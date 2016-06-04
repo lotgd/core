@@ -43,49 +43,49 @@ class Buff
      * @var string
      * @Column(type="text")
      */
-    private $startMessage;
+    private $startMessage = "";
     /**
      * The message given every round
      * @var string
      * @Column(type="text")
      */
-    private $roundMessage;
+    private $roundMessage = "";
     /**
      * The message given if the buff ends
      * @var string
      * @Column(type="text")
      */
-    private $endMessage;
+    private $endMessage = "";
     /**
      * The message given if the effect has success
      * @var string
      * @Column(type="text")
      */
-    private $effectSucceedsMessage;
+    private $effectSucceedsMessage = "";
     /**
      * The message given if the effect fails
      * @var string
      * @Column(type="text")
      */
-    private $effectFailsMessage;
+    private $effectFailsMessage = "";
     /**
      * The message given if the effect has no effect
      * @var string
      * @Column(type="text")
      */
-    private $noEffectMessage;
+    private $noEffectMessage = "";
     /**
      * Message that gets displayed every new day.
      * @var string
      * @Column(type="text")
      */
-    private $newDayMessage;
+    private $newDayMessage = "";
     /**
      * A value determining when the buffs activates
      * @var int
      * @Column(type="integer")
      */
-    private $activateAt;
+    private $activateAt = self::ACTIVATE_NONE;
     /**
      * True if the buff survives a new day
      * @var bool
@@ -293,7 +293,12 @@ class Buff
                     
                 case "float":
                     if (is_float($value) === false) {
-                        throw new ArgumentException("{$attribute} needs to be a float.");
+                        // Convert to float if it is an integer.
+                        if (is_int($value) === false) {
+                            throw new ArgumentException("{$attribute} needs to be a float.");
+                        }
+                        
+                        $value = (float)$value;
                     }
                     break;
                     
@@ -444,7 +449,12 @@ class Buff
      */
     public function getsActivatedAt(int $flag): bool
     {
-        return ($flag === self::ACTIVATE_NONE ? $this->activateAt === self::ACTIVATE_NONE : $this->activateAt & $flag);
+        if ($flag === self::ACTIVATE_NONE) {
+            return $this->activateAt == self::ACTIVATE_NONE ? true : false;
+        }
+        else {
+            return ($this->activateAt & $flag > 0) === 1;
+        }
     }
     
     /**
@@ -662,7 +672,7 @@ class Buff
      * Returns true if the goodguy is invulnurable
      * @return bool
      */
-    public function getGoodguyIsInvulnurable(): bool
+    public function goodguyIsInvulnurable(): bool
     {
         return $this->goodguyInvulnurable;
     }

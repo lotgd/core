@@ -27,6 +27,27 @@ characters:
         health: 500
         maxhealth: 500
         level: 0
+    -
+        id: 10
+        name: "Level 10 Character"
+        displayName: "Level 10 Character"
+        health: 100
+        maxhealth: 100
+        level: 10
+    -
+        id: 11
+        name: "Level 11 Character"
+        displayName: "Level 11 Character"
+        health: 110
+        maxhealth: 110
+        level: 11
+    -
+        id: 13
+        name: "Level 13 Character"
+        displayName: "Level 13 Character"
+        health: 130
+        maxhealth: 130
+        level: 13
 monsters:
     -
         id: 1
@@ -40,3 +61,15 @@ monsters:
         id: 3
         name: "Stone"
         level: 1
+    -
+        id: 10
+        name: "Level 10 Monster"
+        level: 10
+    -
+        id: 11
+        name: "Level 11 Monster"
+        level: 11
+    -
+        id: 13
+        name: "Level 13 Monster"
+        level: 13
