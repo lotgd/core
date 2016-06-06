@@ -24,11 +24,20 @@ class DamageEvent extends BattleEvent
         $this->damage = $damage;
     }
     
+    /**
+     * Returns the damage that is applied in this fight.
+     * 
+     * If the damage is > 0, the damage is applied to the defender. If it's < 0, it's applied to the attacker.
+     * @return int
+     */
     public function getDamage(): int
     {
         return $this->damage;
     }
     
+    /**
+     * Applies the damage.
+     */
     public function apply()
     {
         parent::apply();
@@ -40,8 +49,15 @@ class DamageEvent extends BattleEvent
         }
     }
     
+    /**
+     * Returns a string describing the event.
+     * @param \LotGD\Core\Models\BattleEvents\Game $game
+     * @return string
+     */
     public function decorate(Game $game): string
     {
+        parent::decorate($game);
+        
         $attackersName = $this->attacker->getDisplayName();
         $defendersName = $this->defender->getDisplayName();
             

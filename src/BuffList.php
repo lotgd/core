@@ -17,6 +17,8 @@ use LotGD\Core\Models\{
     Character,
     FighterInterface,
     BattleEvents\BuffMessageEvent,
+    BattleEvents\DamageLifetapEvent,
+    BattleEvents\DamageReflectionEvent,
     BattleEvents\RegenerationBuffEvent,
     BattleEvents\MinionDamageEvent
 };
@@ -386,6 +388,14 @@ class BuffList
         return $this->goodguyInvulnurable;
     }
     
+    /**
+     * Processes buffs that do direct damage or regeneration
+     * @param int $activation
+     * @param \LotGD\Core\Game $game
+     * @param FighterInterface $goodguy
+     * @param FighterInterface $badguy
+     * @return Collection
+     */
     public function processDirectBuffs(
         int $activation,
         Game $game,
@@ -483,5 +493,136 @@ class BuffList
         return new ArrayCollection(
             $events
         );
+    }
+    
+    /**
+     * Processes buffs that are dependant on the damage done in one round
+     * @param int $activation
+     * @param int $damage Positive damage is applied to the badguy, negative damage is applied to the goodguy
+     * @param \LotGD\Core\Game $game
+     * @param FighterInterface $goodguy
+     * @param FighterInterface $badguy
+     * @return Collection
+     */
+    public function processDamageDependentBuffs(
+        int $activation,
+        int $damage,
+        Game $game,
+        FighterInterface $goodguy,
+        FighterInterface $badguy
+    ): Collection {
+        $events = [];
+        
+        foreach($this->activeBuffs[$activation] as $buff) {
+            if ($buff->getGoodguyDamageReflection() !== 0.) {
+                if ($damage > 0) {
+                    // Damage is > 0, so badguy takes damage. We cannot reflect anything, since this buff
+                    // reflects only damage applied to the goodguy.
+                    $reflectedDamage = 0;
+                    $message = $buff->getEffectFailsMessage();
+                } elseif ($damage == 0) {
+                    $reflectedDamage = 0;
+                    $message = $buff->getNoEffectMessage();
+                } else {
+                    $reflectedDamage = (int)round($buff->getGoodguyDamageReflection() * $damage * -1, 0);
+                    if ($reflectedDamage === 0) {
+                        $message = $buff->getNoEffectMessage();
+                    }
+                    else {
+                        $message = $buff->getEffectSucceedsMessage();
+                    }
+                }
+                
+                $events[] = new DamageReflectionEvent(
+                    $badguy, 
+                    $reflectedDamage,
+                    $message
+                );
+            }
+            
+            if ($buff->getBadguyDamageReflection() !== 0.) {
+                if ($damage > 0) {
+                    // Damage is > 0, so badguy takes damage, we can normally reflect
+                    $reflectedDamage = (int)round($buff->getGoodguyDamageReflection() * $damage, 0);
+                    if ($reflectedDamage === 0) {
+                        $message = $buff->getNoEffectMessage();
+                    }
+                    else {
+                        $message = $buff->getEffectSucceedsMessage();
+                    }
+                } elseif ($damage == 0) {
+                    $reflectedDamage = 0;
+                    $message = $buff->getNoEffectMessage();
+                } else {
+                    // Damage is < 0, so goodguy takes damage. This buff cannot reflect.
+                    $reflectedDamage = 0;
+                    $message = $buff->getEffectFailsMessage();
+                }
+                
+                $events[] = new DamageReflectionEvent(
+                    $goodguy, 
+                    $reflectedDamage,
+                    $message
+                );
+            }
+            
+            if ($buff->getGoodguyLifetap() !== 0.) {
+                if ($damage > 0) {
+                    // Damage is > 0, badguy takes damage. Goodguy lifetap works only upon damage to the goodguy.
+                    $healAmount = 0;
+                    $message = $buff->getEffectFailsMessage();
+                }
+                elseif ($damage < 0) {
+                    // Damage is < 0, goodguy takes damage. We act upon this.
+                    $healAmount = (int)round($damage * -$buff->getBadguyLifetap(), 0);
+                    if ($healAmount === 0) {
+                        $message = $buff->getNoEffectMessage();
+                    }
+                    else {
+                        $message = $buff->getEffectSucceedsMessage();
+                    }
+                }
+                else {
+                    $healAmount = 0;
+                    $message = $buff->getNoEffectMessage();
+                }
+                
+                $events[] = new DamageLifetapEvent(
+                    $badguy,
+                    $healAmount,
+                    $message
+                );
+            }
+            
+            if ($buff->getBadguyLifetap() !== 0.) {
+                if ($damage > 0) {
+                    // Damage is > 0, badguy takes damage. We act upon this to heal goodguy.
+                    $healAmount = (int)round($damage * $buff->getBadguyLifetap(), 0);
+                    if ($healAmount === 0) {
+                        $message = $buff->getNoEffectMessage();
+                    }
+                    else {
+                        $message = $buff->getEffectSucceedsMessage();
+                    }
+                }
+                elseif ($damage < 0) {
+                    // Damage is < 0, goodguy takes damage. Badguy lifetap works only upon damage to the goodguy.
+                    $healAmount = 0;
+                    $message = $buff->getEffectFailsMessage();
+                }
+                else {
+                    $healAmount = 0;
+                    $message = $buff->getNoEffectMessage();
+                }
+                
+                $events[] = new DamageLifetapEvent(
+                    $goodguy,
+                    $healAmount,
+                    $message
+                );
+            }
+        }
+        
+        return new ArrayCollection($events);
     }
 }

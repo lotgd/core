@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\{
+    ArrayCollection,
+    Collection
+};
 
 use LotGD\Core\{
     DiceBag,
@@ -49,8 +52,15 @@ class Battle
     protected $configuration = [
         "riposteEnabled" => true,
         "levelAdjustementEnabled" => true,
+        "criticalHitEnabled" => true,
     ];
     
+    /**
+     * Takes a game object and two participants (Player and Monster) to fight a battle.
+     * @param \LotGD\Core\Game $game
+     * @param FighterInterface $player
+     * @param FighterInterface $monster
+     */
     public function __construct(Game $game, FighterInterface $player, FighterInterface $monster)
     {
         $this->game = $game;
@@ -59,17 +69,27 @@ class Battle
         $this->events = new ArrayCollection();
     }
     
+    /**
+     * @ToDo Returns at some point battle actions
+     */
     public function getActions()
     {
         
     }
     
+    /**
+     * @ToDo Do some action
+     */
     public function selectAction()
     {
         
     }
     
-    public function getEvents()
+    /**
+     * Returns a list of all battle events
+     * @return \LotGD\Core\Collection
+     */
+    public function getEvents(): Collection
     {
         return $this->events;
     }
@@ -99,19 +119,54 @@ class Battle
         return $this->configuration["riposteEnabled"];
     }
     
+    /**
+     * Enables level adjustement
+     */
     public function enableLevelAdjustement()
     {
         $this->configuration["levelAdjustementEnabled"] = true;
     }
     
+    /**
+     * Disables level adjustement
+     */
     public function disableLevelAdjustement()
     {
         $this->configuration["levelAdjustementEnabled"] = false;
     }
     
+    /**
+     * Returns true if level adjustements are enabled
+     * @return bool
+     */
     public function isLevelAdjustementEnabled(): bool
     {
         return $this->configuration["levelAdjustementEnabled"];
+    }
+    
+    /**
+     * Returns true if critical hit events are enabled
+     * @return bool
+     */
+    public function isCriticalHitEnabled(): bool
+    {
+        return $this->configuration["criticalHitEnabled"];
+    }
+    
+    /**
+     * Disable critical hits
+     */
+    public function disableCriticalHit()
+    {
+        $this->configuration["criticalHitEnabled"] = false;
+    }
+    
+    /**
+     * enables critical hits
+     */
+    public function enableCriticalHit()
+    {
+        $this->configuration["criticalHitEnabled"] = true;
     }
     
     /**
@@ -236,8 +291,11 @@ class Battle
 
         $this->round++;
         
-        $playerBuffEndEvents = $this->player->getBuffs()->expireOneRound();
-        $monsterBuffEndEvents = $this->monster->getBuffs()->expireOneRound();
+        $playerBuffEndEvents = $this->player->getBuffs()->activate(Buff::ACTIVATE_ROUNDEND);
+        $monsterBuffEndEvents = $this->monster->getBuffs()->activate(Buff::ACTIVATE_ROUNDEND);
+        
+        $playerBuffExpiringEvents = $this->player->getBuffs()->expireOneRound();
+        $monsterBuffExpiringEvents = $this->monster->getBuffs()->expireOneRound();
         
         $this->events = new ArrayCollection(
             array_merge(
@@ -247,6 +305,8 @@ class Battle
                 $eventsToAdd->toArray(),
                 $playerBuffEndEvents->toArray(),
                 $monsterBuffEndEvents->toArray(),
+                $playerBuffExpiringEvents->toArray(),
+                $monsterBuffExpiringEvents->toArray(),
                 isset($deathEvent) ? [$deathEvent] : []
             )
         );
@@ -302,7 +362,7 @@ class Battle
         // If the player is the attacker, we enable critical hits with a chance of 25%.
         if ($attacker === $this->game->getCharacter()) {
             // Players can land critical hits
-            if ($this->game->getDiceBag()->chance(0.25)) {
+            if ($this->game->getDiceBag()->chance(0.25) && $this->isCriticalHitEnabled()) {
                 $attackersAttack *= 3;
             }
         }
@@ -318,7 +378,7 @@ class Battle
         
         // If the attacker's attack after modification is bigger than before, 
         // we call it a critical hit and apply the CriticalHitEvent.
-        if ($attackersAttack > $attacker->getAttack($this->game)) {
+        if ($attackersAttack > $attacker->getAttack($this->game) && $this->isCriticalHitEnabled()) {
             $events->add(new CriticalHitEvent($attacker, $attackersAttack));
         }
         
@@ -376,8 +436,9 @@ class Battle
         
         $attackersDirectBuffEvents = $attackersBuffs->processDirectBuffs(Buff::ACTIVATE_OFFENSE, $this->game, $attacker, $defender);
         $defendersDirectBuffEvents = $defendersBuffs->processDirectBuffs(Buff::ACTIVATE_DEFENSE, $this->game, $defender, $attacker);
-        //$attackersDamageDependentBuffEvents = $attackersBuffs->processDamageDependentBuffs(Buff::ACTIVATE_OFFENSE);
-        //$defendersDamageDependentBuffEvents = $defendersBuffs->processDamageDependentBuffs(Buff::ACTIVATE_DEFENSE);
+        
+        $attackersDamageDependentBuffEvents = $attackersBuffs->processDamageDependentBuffs(Buff::ACTIVATE_OFFENSE, $damage, $this->game, $attacker, $defender);
+        $defendersDamageDependentBuffEvents = $defendersBuffs->processDamageDependentBuffs(Buff::ACTIVATE_DEFENSE, -$damage, $this->game, $defender, $attacker);
         
         return new ArrayCollection(
             array_merge(
@@ -385,7 +446,9 @@ class Battle
                 $attackersDirectBuffEvents->toArray(),
                 $defendersBuffStartEvents->toArray(),
                 $defendersDirectBuffEvents->toArray(),
-                $events->toArray()
+                $events->toArray(),
+                $attackersDamageDependentBuffEvents->toArray(),
+                $defendersDamageDependentBuffEvents->toArray()
             )
         );
     }

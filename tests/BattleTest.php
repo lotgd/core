@@ -17,6 +17,8 @@ use LotGD\Core\Models\BattleEvents\{
     BuffMessageEvent,
     CriticalHitEvent,
     DamageEvent,
+    DamageLifetapEvent,
+    DamageReflectionEvent,
     DeathEvent,
     MinionDamageEvent,
     RegenerationBuffEvent
@@ -681,6 +683,450 @@ class BattleTest extends ModelTestCase
             // Round 3
             DamageEvent::class,
             DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleGoodguyDamageReflectionBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 5,
+            "goodguyDamageReflection" => 10,
+            "effectSucceedsMessage" => "Damage is reflected to you! You take {damage} damage!",
+            "effectFailsMessage" => "The damage reflection fails since you RIPOSE!",
+            "noEffectMessage" => "There is no damage to reflect.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        $battle->disableCriticalHit();
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
+        $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 2
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 4
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 5
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleGoodguyDamageReflectionBuffNegative()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 5,
+            "goodguyDamageReflection" => -100,
+            "effectSucceedsMessage" => "Damage is reflected to you! You heal {damage} damage!",
+            "effectFailsMessage" => "The damage reflection fails since you RIPOSE!",
+            "noEffectMessage" => "There is no damage to reflect.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 3);
+        
+        $battle->disableCriticalHit();
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
+        $this->assertGreaterThanOrEqual(10000, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 2
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 4
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 5
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleBadguyDamageReflectionBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 5,
+            "badguyDamageReflection" => 10,
+            "effectSucceedsMessage" => "Damage is reflected to you! You take {damage} damage!",
+            "effectFailsMessage" => "The damage reflection fails since you RIPOSE!",
+            "noEffectMessage" => "There is no damage to reflect.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        $battle->disableCriticalHit();
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
+        $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 2
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 4
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 5
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleBadguyDamageReflectionBuffNegative()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 5,
+            "badguyDamageReflection" => -100,
+            "effectSucceedsMessage" => "Damage is reflected to you! You heal {damage} damage!",
+            "effectFailsMessage" => "The damage reflection fails since you RIPOSE!",
+            "noEffectMessage" => "There is no damage to reflect.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 4);
+        
+        $battle->disableCriticalHit();
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
+        $this->assertGreaterThanOrEqual(10000, $battle->getPlayer()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 2
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 4
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            // Round 5
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+            DamageEvent::class,
+            DamageReflectionEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleGoodguyDamageLifetapBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 5,
+            "goodguyLifetap" => 100,
+            "effectSucceedsMessage" => "{target} absorbs {amount} done to you!",
+            "effectFailsMessage" => "The damage reflection fails since you RIPOSED!",
+            "noEffectMessage" => "There is no damage to reflect.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 3);
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        $battle->disableCriticalHit();
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
+        $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 2
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 4
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 5
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleGoodguyDamageLifetapBuffNegative()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 5,
+            "badguyLifetap" => -10,
+            "effectSucceedsMessage" => "Damage is reflected to you! You heal {damage} damage!",
+            "effectFailsMessage" => "The damage reflection fails since you RIPOSE!",
+            "noEffectMessage" => "There is no damage to reflect.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->disableCriticalHit();
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
+        $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 2
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 4
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 5
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleBadguyDamageLifetapBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 5,
+            "badguyLifetap" => 100,
+            "effectSucceedsMessage" => "Damage is reflected to you! You take {damage} damage!",
+            "effectFailsMessage" => "The damage reflection fails since you RIPOSE!",
+            "noEffectMessage" => "There is no damage to reflect.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 4);
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        $battle->disableCriticalHit();
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertGreaterThanOrEqual(10000, $battle->getPlayer()->getHealth());
+        $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 2
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 4
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 5
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleBadguyDamageLifetapBuffNegative()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 5,
+            "badguyLifetap" => -10,
+            "effectSucceedsMessage" => "Damage is reflected to you! You heal {damage} damage!",
+            "effectFailsMessage" => "The damage reflection fails since you RIPOSE!",
+            "noEffectMessage" => "There is no damage to reflect.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->disableCriticalHit();
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        
+        $battle->fightNRounds(5);
+        
+        $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
+        $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 2
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 4
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            // Round 5
+            DamageEvent::class,
+            DamageLifetapEvent::class,
+            DamageEvent::class,
+            DamageLifetapEvent::class,
         ];
         
         $numOfEvents = count($expectedEvents);

@@ -119,13 +119,13 @@ class Buff
      */
     private $goodguyRegeneration = 0;
     /**
-     * Fraction of damage applied to the badguy that gets converted to health ("absorb")
+     * Fraction of damage applied to the badguy that gets converted to health ("absorb") for the goodguy
      * @var float
      * @Column(type="float")
      */
     private $badguyLifetap = 0;
     /**
-     * Fraction of damage applied to the goodguy that gets converted to health
+     * Fraction of damage applied to the goodguy that gets converted to health for the badguy
      * @var float
      * @Column(type="float")
      */
@@ -227,6 +227,10 @@ class Buff
      */
     private $hasBeenStarted = false;
     
+    /**
+     * Allowed buff values and their type
+     * @var array 
+     */
     private $buffArrayTemplate = [
         "slot" => "string",
         "name" => "string",
@@ -262,6 +266,10 @@ class Buff
         "goodguyInvulnurable" => "bool",
     ];
     
+    /**
+     * Requried buff values.
+     * @var type 
+     */
     private $required = [
         "slot",
         "activateAt",

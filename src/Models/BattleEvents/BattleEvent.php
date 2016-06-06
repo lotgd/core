@@ -12,6 +12,10 @@ class BattleEvent
 {   
     private $applied = false;
     
+    /**
+     * Applies the event.
+     * @throws BattleEventException
+     */
     public function apply()
     {
         if ($this->applied === true) {
@@ -21,6 +25,12 @@ class BattleEvent
         $this->applied = true;
     }
     
+    /**
+     * Returns a string describing the event.
+     * @param \LotGD\Core\Models\BattleEvents\Game $game
+     * @return string
+     * @throws BattleEventException
+     */
     public function decorate(Game $game): string
     {
         if ($this->applied === false) {
