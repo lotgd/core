@@ -69,6 +69,19 @@ abstract class BasicEnemy implements FighterInterface
     }
     
     /**
+     * Sets the enemy's current health
+     * @param int $health
+     */
+    public function setHealth(int $health)
+    {
+        $this->health = $health;
+        
+        if ($this->health < 0) {
+            $this->health = 0;
+        }
+    }
+    
+    /**
      * Does damage to the entity.
      * @param int $damage
      */

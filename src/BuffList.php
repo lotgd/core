@@ -9,12 +9,16 @@ use Doctrine\Common\Collections\{
 };
 
 use LotGD\Core\Exceptions\{
-    ArgumentException
+    ArgumentException,
+    BuffListAlreadyActivatedException
 };
 use LotGD\Core\Models\{
     Buff,
     Character,
-    BattleEvents\BuffMessageEvent
+    FighterInterface,
+    BattleEvents\BuffMessageEvent,
+    BattleEvents\RegenerationBuffEvent,
+    BattleEvents\MinionDamageEvent
 };
 
 
@@ -380,5 +384,104 @@ class BuffList
     {
         $this->calculateModifiers();
         return $this->goodguyInvulnurable;
+    }
+    
+    public function processDirectBuffs(
+        int $activation,
+        Game $game,
+        FighterInterface $goodguy,
+        FighterInterface $badguy
+    ): Collection {
+        $events = [];
+        
+        foreach ($this->activeBuffs[$activation] as $buff) {
+            // Add good guy regeneration
+            if ($buff->getGoodguyRegeneration() !== 0) {
+                $events[] = new RegenerationBuffEvent(
+                    $goodguy,
+                    $buff->getGoodguyRegeneration(),
+                    $buff->getEffectSucceedsMessage(),
+                    $buff->getNoEffectMessage()
+                );
+            }
+            
+            // Add bad guy regeneration
+            if ($buff->getBadguyRegeneration() !== 0) {
+                $events[] = new RegenerationBuffEvent(
+                    $badguy,
+                    $buff->getGoodguyRegeneration(),
+                    $buff->getEffectSucceedsMessage(),
+                    $buff->getNoEffectMessage()
+                );
+            }
+            
+            // Minion buff
+            if ($buff->getNumberOfMinions() > 0) {
+                /* @var $n int */
+                $n = $buff->getNumberOfMinions();
+                /* @var $attacksOne bool */
+                $attacksOne = ($buff->getMinionMinGoodguyDamage() || $buff->getMinionMaxGoodguyDamage() !== 0) 
+                    || ($buff->getMinionMinBadguyDamage() || $buff->getMinionMaxBadguyDamage() !== 0);
+                /* @var $attacksBoth bool */
+                $attacksBoth = ($buff->getMinionMinGoodguyDamage() || $buff->getMinionMaxGoodguyDamage() !== 0) 
+                    && ($buff->getMinionMinBadguyDamage() || $buff->getMinionMaxBadguyDamage() !== 0);
+                
+                // Faulty buff - if minions attack no one, it's better to have no minions at all. Or they will just do... nothing.
+                if ($attacksOne === false) {
+                    $n = 0;
+                }
+                
+                // Add a minion event for every single minion
+                for ($i = 0; $i < $n; $i++) {
+                    // If the buff is setup to attack both good and badguy, we throw a dice to decide who the minion attacks
+                    /* @var $who int Who the minion attacks. 1: Goodguy, 2: Badguy */
+                    if ($attacksBoth === true) {
+                        if ($game->getDiceBag()->chance(0.5)) {
+                            $who = 1;
+                        }
+                        else {
+                            $who = -1;
+                        }
+                    }
+                    elseif ($buff->getMinionMaxGoodguyDamage() !== 0 || $buff->getMinionMinGoodguyDamage() !== 0) {
+                        $who = 1;
+                    }
+                    else {
+                        $who = -1;
+                    }
+                    
+                    if ($who === 1) {
+                        // Minion does damage to the goodguy
+                        $damage = $game->getDiceBag()->normal($buff->getMinionMinGoodguyDamage(), $buff->getMinionMaxGoodguyDamage());
+                        $target = $goodguy;
+                    }
+                    else {
+                        // Minion does damage to the badguy
+                        $damage = $game->getDiceBag()->normal($buff->getMinionMinBadguyDamage(), $buff->getMinionMaxBadguyDamage());
+                        $target = $badguy;
+                    }
+                        
+                    if ($damage < 0) {
+                        $message = $buff->getEffectFailsMessage();
+                    }
+                    elseif ($damage > 0) {
+                        $message = $buff->getEffectSucceedsMessage();
+                    }
+                    else {
+                        $message = $buff->getNoEffectMessage();
+                    }
+
+                    $events[] = new MinionDamageEvent(
+                        $target,
+                        (int)round($damage, 0),
+                        $message
+                    );
+                }
+            }
+        }
+        
+        return new ArrayCollection(
+            $events
+        );
     }
 }

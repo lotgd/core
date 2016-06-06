@@ -14,7 +14,12 @@ use LotGD\Core\{
     Models\Monster
 };
 use LotGD\Core\Models\BattleEvents\{
-    BuffMessageEvent
+    BuffMessageEvent,
+    CriticalHitEvent,
+    DamageEvent,
+    DeathEvent,
+    MinionDamageEvent,
+    RegenerationBuffEvent
 };
 
 use LotGD\Core\Tests\ModelTestCase;
@@ -291,22 +296,429 @@ class BattleTest extends ModelTestCase
         
         $expectedEvents = [
             BuffMessageEvent::class, // Activation round
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 1
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+            DamageEvent::class, // Round 1
+            DamageEvent::class,
             BuffMessageEvent::class, // message every round
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 2
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+            DamageEvent::class, // Round 2
+            DamageEvent::class,
             BuffMessageEvent::class, // message every round
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 3
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+            DamageEvent::class, // Round 3
+            DamageEvent::class,
             BuffMessageEvent::class, // message expires
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 4
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class, // Round 5
-            \LotGD\Core\Models\BattleEvents\DamageEvent::class,
+            DamageEvent::class, // Round 4
+            DamageEvent::class,
+            DamageEvent::class, // Round 5
+            DamageEvent::class,
         ];
         
         $numOfEvents = count($battle->getEvents());
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleRegenerationBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 2,
+            "goodguyRegeneration" => 100,
+            "badguyRegeneration" => 100,
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(1);
+        $battle->getMonster()->setHealth(1);
+        
+        $battle->fightNRounds(3);
+        
+        $this->assertGreaterThan(1, $battle->getPlayer()->getHealth());
+        $this->assertGreaterThan(1, $battle->getPlayer()->getHealth());
+        
+        $expectedEvents = [
+            RegenerationBuffEvent::class, // Round 1, offense
+            RegenerationBuffEvent::class,
+            DamageEvent::class,
+            RegenerationBuffEvent::class, // Round 1, defense
+            RegenerationBuffEvent::class,
+            DamageEvent::class,
+            RegenerationBuffEvent::class, // Round 2, offense
+            RegenerationBuffEvent::class,
+            DamageEvent::class,
+            RegenerationBuffEvent::class, // Round 2, defense
+            RegenerationBuffEvent::class,
+            DamageEvent::class,
+            DamageEvent::class, // Round 3, offense
+            DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleDegenerationBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 2,
+            "goodguyRegeneration" => -250,
+            "badguyRegeneration" => -250,
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(2000);
+        $battle->getMonster()->setHealth(2000);
+        
+        $battle->fightNRounds(3);
+        
+        // Test that the difference is, indeed, -250 per turn, resulting in 1000 lost.
+        $this->assertLessThanOrEqual(1000, $battle->getPlayer()->getHealth());
+        $this->assertLessThanOrEqual(1000, $battle->getPlayer()->getHealth());
+        
+        $expectedEvents = [
+            RegenerationBuffEvent::class, // Round 1, offense
+            RegenerationBuffEvent::class,
+            DamageEvent::class,
+            RegenerationBuffEvent::class, // Round 1, defense
+            RegenerationBuffEvent::class,
+            DamageEvent::class,
+            RegenerationBuffEvent::class, // Round 2, offense
+            RegenerationBuffEvent::class,
+            DamageEvent::class,
+            RegenerationBuffEvent::class, // Round 2, defense
+            RegenerationBuffEvent::class,
+            DamageEvent::class,
+            DamageEvent::class, // Round 3, offense
+            DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleDegenerationBuffDoubleKO()
+    {
+        
+        // What happens at a tie?
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 2,
+            "goodguyRegeneration" => -250,
+            "badguyRegeneration" => -250,
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(1000);
+        $battle->getMonster()->setHealth(1000);
+        
+        $numOfRounds = $battle->fightNRounds(3);
+        
+        $this->assertSame(2, $numOfRounds);
+        $this->assertSame($battle->getPlayer(), $battle->getLoser());
+        $this->assertSame($battle->getMonster(), $battle->getWinner());
+        $this->assertTrue($battle->isOver());
+    }
+    
+    public function testBattleMinionGoodguyDamageBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 2,
+            "numberOfMinions" => 2,
+            "minionMinGoodguyDamage" => 100,
+            "minionMaxGoodguyDamage" => 100,
+            "effectSucceedsMessage" => "The Minion hits you for {damage}.",
+            "effectFailsMessage" => "The Minion heals you for {damage}.",
+            "noEffectMessage" => "The Minion does nothing.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(2000);
+        $battle->getMonster()->setHealth(2000);
+        
+        $battle->fightNRounds(3);
+        
+        $this->assertLessThanOrEqual(2000 - 800, $battle->getPlayer()->getHealth());
+        $this->assertGreaterThan(2000 - 800, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 1, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleMinionGoodguyHealBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 2,
+            "numberOfMinions" => 2,
+            "minionMinGoodguyDamage" => -100,
+            "minionMaxGoodguyDamage" => -100,
+            "effectSucceedsMessage" => "The Minion hits you for {damage}.",
+            "effectFailsMessage" => "The Minion heals you for {damage}.",
+            "noEffectMessage" => "The Minion does nothing.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(2000);
+        $battle->getMonster()->setHealth(2000);
+        
+        $battle->fightNRounds(3);
+        
+        $this->assertGreaterThanOrEqual(2000, $battle->getPlayer()->getHealth());
+        $this->assertLessThanOrEqual(2000, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 1, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleMinionBadguyDamageBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 2,
+            "numberOfMinions" => 2,
+            "minionMinBadguyDamage" => 100,
+            "minionMaxBadguyDamage" => 100,
+            "effectSucceedsMessage" => "The Minion hits you for {damage}.",
+            "effectFailsMessage" => "The Minion heals you for {damage}.",
+            "noEffectMessage" => "The Minion does nothing.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(2000);
+        $battle->getMonster()->setHealth(2000);
+        
+        $battle->fightNRounds(3);
+        
+        $this->assertLessThanOrEqual(2000 - 800, $battle->getMonster()->getHealth());
+        $this->assertGreaterThan(2000 - 800, $battle->getPlayer()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 1, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleMinionBadguyHealBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 2,
+            "numberOfMinions" => 2,
+            "minionMinBadguyDamage" => -100,
+            "minionMaxBadguyDamage" => -100,
+            "effectSucceedsMessage" => "The Minion hits you for {damage}.",
+            "effectFailsMessage" => "The Minion heals you for {damage}.",
+            "noEffectMessage" => "The Minion does nothing.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(2000);
+        $battle->getMonster()->setHealth(2000);
+        
+        $battle->fightNRounds(3);
+        
+        $this->assertGreaterThanOrEqual(2000, $battle->getMonster()->getHealth());
+        $this->assertLessThanOrEqual(2000, $battle->getPlayer()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 1, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleMinionBothAndBoth()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => 1,
+            "numberOfMinions" => 10,
+            "minionMinBadguyDamage" => -100,
+            "minionMaxBadguyDamage" => 100,
+            "minionMinGoodguyDamage" => -100,
+            "minionMaxGoodguyDamage" => 100,
+            "effectSucceedsMessage" => "The Minion hits you for {damage}.",
+            "effectFailsMessage" => "The Minion heals you for {damage}.",
+            "noEffectMessage" => "The Minion does nothing.",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]), 1);
+        
+        $battle->getPlayer()->setHealth(10000);
+        $battle->getMonster()->setHealth(10000);
+        
+        $battle->fightNRounds(3);
+        
+        $this->assertGreaterThanOrEqual(10000 - 100*20, $battle->getPlayer()->getHealth());
+        $this->assertGreaterThanOrEqual(10000 - 100*20, $battle->getMonster()->getHealth());
+        $this->assertLessThanOrEqual(10000 + 100*20, $battle->getPlayer()->getHealth());
+        $this->assertLessThanOrEqual(10000 + 100*20, $battle->getMonster()->getHealth());
+        
+        $expectedEvents = [
+            // Round 1, offense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 1, defense
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            MinionDamageEvent::class,
+            DamageEvent::class,
+            // Round 2, offense
+            DamageEvent::class,
+            // Round 2, defense
+            DamageEvent::class,
+            // Round 3
+            DamageEvent::class,
+            DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
+        for ($i = 0; $i < $numOfEvents; $i++) {
+            $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
+        }
+    }
+    
+    public function testBattleInfiniteBuff()
+    {
+        $battle = $this->provideBuffBattleParticipants(new Buff([
+            "slot" => "test",
+            "rounds" => -1,
+            "startMessage" => "Infinite Buff starts",
+            "roundMessage" => "Infinite Buff is still active",
+            "endMessage" => "Infinite Buff should never end",
+            "activateAt" => Buff::ACTIVATE_ROUNDSTART,
+        ]), 1);
+        
+        $battle->fightNRounds(3);
+        
+        $this->assertBuffEventMessageExists($battle->getEvents(), "Infinite Buff starts", 1);
+        $this->assertBuffEventMessageExists($battle->getEvents(), "Infinite Buff is still active", 2);
+        $this->assertBuffEventMessageExists($battle->getEvents(), "Infinite Buff should never end", 0, 0);
+        
+        $expectedEvents = [
+            BuffMessageEvent::class, // Activation round
+            DamageEvent::class, // Round 1
+            DamageEvent::class,
+            BuffMessageEvent::class, // message every round
+            DamageEvent::class, // Round 2
+            DamageEvent::class,
+            BuffMessageEvent::class, // message every round
+            DamageEvent::class, // Round 3
+            DamageEvent::class,
+        ];
+        
+        $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
@@ -454,6 +866,7 @@ class BattleTest extends ModelTestCase
             "slot" => "test3",
             "rounds" => 1,
             "goodguyAttackModifier" => 13.4,
+            "activateAt" => BUFF::ACTIVATE_NONE,
         ]));
 
         $modifier = $player->getBuffs()->getGoodguyAttackModifier();
@@ -482,6 +895,7 @@ class BattleTest extends ModelTestCase
             "slot" => "test3",
             "rounds" => 1,
             "goodguyDefenseModifier" => 0,
+            "activateAt" => BUFF::ACTIVATE_NONE,
         ]));
 
         $modifier = $player->getBuffs()->getGoodguyDefenseModifier();
@@ -510,6 +924,7 @@ class BattleTest extends ModelTestCase
             "slot" => "test3",
             "rounds" => 1,
             "goodguyDamageModifier" => 3.5,
+            "activateAt" => BUFF::ACTIVATE_NONE,
         ]));
 
         $modifier = $player->getBuffs()->getGoodguyDamageModifier();
@@ -538,6 +953,7 @@ class BattleTest extends ModelTestCase
             "slot" => "test3",
             "rounds" => 1,
             "badguyAttackModifier" => 13.4,
+            "activateAt" => BUFF::ACTIVATE_NONE,
         ]));
 
         $modifier = $player->getBuffs()->getBadguyAttackModifier();
@@ -566,6 +982,7 @@ class BattleTest extends ModelTestCase
             "slot" => "test3",
             "rounds" => 1,
             "badguyDefenseModifier" => 0,
+            "activateAt" => BUFF::ACTIVATE_NONE,
         ]));
 
         $modifier = $player->getBuffs()->getBadguyDefenseModifier();
@@ -594,9 +1011,91 @@ class BattleTest extends ModelTestCase
             "slot" => "test3",
             "rounds" => 1,
             "badguyDamageModifier" => 3.5,
+            "activateAt" => BUFF::ACTIVATE_NONE,
         ]));
 
         $modifier = $player->getBuffs()->getBadguyDamageModifier();
         $this->assertEquals(2.5, $modifier, '', 0.001);
+    }
+    
+    public function testBuffActivatedAt()
+    {
+        $buff = new Buff([
+            "slot" => "test",
+            "activateAt" => Buff::ACTIVATE_ROUNDSTART,
+        ]);
+        
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_DEFENSE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
+        
+        $buff = new Buff([
+            "slot" => "test",
+            "activateAt" => Buff::ACTIVATE_OFFENSE,
+        ]);
+        
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_DEFENSE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
+        
+        $buff = new Buff([
+            "slot" => "test",
+            "activateAt" => Buff::ACTIVATE_DEFENSE,
+        ]);
+        
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_DEFENSE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
+        
+        $buff = new Buff([
+            "slot" => "test",
+            "activateAt" => Buff::ACTIVATE_ROUNDEND,
+        ]);
+        
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_DEFENSE));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
+        
+        $buff = new Buff([
+            "slot" => "test",
+            "activateAt" => Buff::ACTIVATE_WHILEROUND,
+        ]);
+        
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_DEFENSE));
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
+        
+        $buff = new Buff([
+            "slot" => "test",
+            "activateAt" => Buff::ACTIVATE_ANY,
+        ]);
+        
+        $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_DEFENSE));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
+        $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
     }
 }

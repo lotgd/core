@@ -193,7 +193,7 @@ class Battle
             }
         }
         
-        return $count;
+        return $count+1;
     }
     
     /**
@@ -210,41 +210,30 @@ class Battle
         $playerBuffStartEvents = $this->player->getBuffs()->activate(Buff::ACTIVATE_ROUNDSTART);
         $monsterBuffStartEvents = $this->monster->getBuffs()->activate(Buff::ACTIVATE_ROUNDSTART);
         
-        do {
-            $offenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_PLAYER ? $this->turn($this->player, $this->monster) : new ArrayCollection();
-            $defenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_MONSTER ? $this->turn($this->monster, $this->player) : new ArrayCollection();
-            
-            $events = new ArrayCollection(array_merge($offenseTurnEvents->toArray(), $defenseTurnEvents->toArray()));
-            $eventsToAdd = new ArrayCollection();
-            
-            if ($this->player->getBuffs()->hasBuffsInUse() || $this->monster->getBuffs()->hasBuffsInUse()) {
-                // If there are active buffs, we still need to count the round even if there has not been any damage done.
-                $damageHasBeenDone = true;
+        $offenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_PLAYER ? $this->turn($this->player, $this->monster) : new ArrayCollection();
+        $defenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_MONSTER ? $this->turn($this->monster, $this->player) : new ArrayCollection();
+
+        $events = new ArrayCollection(array_merge($offenseTurnEvents->toArray(), $defenseTurnEvents->toArray()));
+        $eventsToAdd = new ArrayCollection();
+
+        foreach($events as $event) {
+            $event->apply();
+
+            $eventsToAdd->add($event);
+
+            if ($this->player->getHealth() <= 0) {
+                $deathEvent = new DeathEvent($this->player);
+                $this->result = self::RESULT_PLAYERDEATH;
+                break;
             }
 
-            foreach($events as $event) {
-                $event->apply();
-                
-                if ($event instanceof DamageEvent && $event->getDamage() !== 0) {
-                    $damageHasBeenDone = true;
-                }
-
-                $eventsToAdd->add($event);
-
-                if ($this->player->getHealth() <= 0) {
-                    $deathEvent = new DeathEvent($this->player);
-                    $this->result = self::RESULT_PLAYERDEATH;
-                    break;
-                }
-
-                if ($this->monster->getHealth() <= 0) {
-                    $deathEvent = new DeathEvent($this->monster);
-                    $this->result = self::RESULT_MONSTERDEATH;
-                    break;
-                }
+            if ($this->monster->getHealth() <= 0) {
+                $deathEvent = new DeathEvent($this->monster);
+                $this->result = self::RESULT_MONSTERDEATH;
+                break;
             }
-        } while($damageHasBeenDone === false);
-        
+        }
+
         $this->round++;
         
         $playerBuffEndEvents = $this->player->getBuffs()->expireOneRound();
@@ -381,6 +370,23 @@ class Battle
         // Add the damage event
         $events->add(new DamageEvent($attacker, $defender, $damage));
         
-        return $events;
+        // Do all the other buff effects. Modifiers are calculated separatly and do not need activation
+        $attackersBuffStartEvents = $attackersBuffs->activate(Buff::ACTIVATE_OFFENSE);
+        $defendersBuffStartEvents = $defendersBuffs->activate(Buff::ACTIVATE_DEFENSE);
+        
+        $attackersDirectBuffEvents = $attackersBuffs->processDirectBuffs(Buff::ACTIVATE_OFFENSE, $this->game, $attacker, $defender);
+        $defendersDirectBuffEvents = $defendersBuffs->processDirectBuffs(Buff::ACTIVATE_DEFENSE, $this->game, $defender, $attacker);
+        //$attackersDamageDependentBuffEvents = $attackersBuffs->processDamageDependentBuffs(Buff::ACTIVATE_OFFENSE);
+        //$defendersDamageDependentBuffEvents = $defendersBuffs->processDamageDependentBuffs(Buff::ACTIVATE_DEFENSE);
+        
+        return new ArrayCollection(
+            array_merge(
+                $attackersBuffStartEvents->toArray(),
+                $attackersDirectBuffEvents->toArray(),
+                $defendersBuffStartEvents->toArray(),
+                $defendersDirectBuffEvents->toArray(),
+                $events->toArray()
+            )
+        );
     }
 }

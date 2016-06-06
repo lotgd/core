@@ -22,5 +22,6 @@ interface FighterInterface
     public function getDefense(Game $game, bool $ignoreBuffs = false): int;
     public function damage(int $damage);
     public function heal(int $heal);
+    public function setHealth(int $amount);
     public function getBuffs(): BuffList;
 }

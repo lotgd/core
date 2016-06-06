@@ -23,6 +23,10 @@ class BattleEvent
     
     public function decorate(Game $game): string
     {
+        if ($this->applied === false) {
+            throw new BattleEventException("Buff needs to get applied before decoration.");
+        }
+        
         return "";
     }
 }

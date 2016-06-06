@@ -85,7 +85,7 @@ class Buff
      * @var int
      * @Column(type="integer")
      */
-    private $activateAt = self::ACTIVATE_NONE;
+    private $activateAt;
     /**
      * True if the buff survives a new day
      * @var bool
@@ -264,6 +264,7 @@ class Buff
     
     private $required = [
         "slot",
+        "activateAt",
     ];
     
     /**
@@ -310,11 +311,11 @@ class Buff
             }
             
             $this->{$attribute} = $value;
-            
-            foreach($this->required as $required) {
-                if (is_null($this->$required)) {
-                    throw new ArgumentException("{$required} needs to be inside of the buffArray!");
-                }
+        }
+        
+        foreach($this->required as $required) {
+            if (is_null($this->$required)) {
+                throw new ArgumentException("{$required} needs to be inside of the buffArray!");
             }
         }
     }
@@ -453,7 +454,7 @@ class Buff
             return $this->activateAt == self::ACTIVATE_NONE ? true : false;
         }
         else {
-            return ($this->activateAt & $flag > 0) === 1;
+            return ($this->activateAt & $flag) == true;
         }
     }
     

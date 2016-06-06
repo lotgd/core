@@ -40,6 +40,11 @@ trait MockCharacter
         throw new IsNullException();
     }
     
+    public function setHealth(int $amount)
+    {
+        throw new IsNullException();
+    }
+    
     public function damage(int $damage)
     {
         throw new IsNullException();
