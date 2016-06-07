@@ -12,10 +12,11 @@
         "bin/daenerys"
     ],
     "require": {
+        "php": ">7.0.0",
         "composer/composer": "*",
         "gedmo/doctrine-extensions": "*",
-        "doctrine/orm": "2.5.*",
-        "monolog/monolog": "1.16.0",
+        "doctrine/orm": "^2.5",
+        "monolog/monolog": "^1.12",
         "symfony/console": "^3.0"
     },
     "require-dev": {
