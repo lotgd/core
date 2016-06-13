@@ -3,16 +3,28 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
-use LotGD\Core\Exceptions\InvalidConfigurationException;
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\AnsiQuoteStrategy;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
 
+use LotGD\Core\Exceptions\ArgumentException;
+use LotGD\Core\Exceptions\InvalidConfigurationException;
+
 class Bootstrap
 {
+    private static $annotationMetaDataDirectories = [];
+    
+    public static function registerAnnotationMetaDataDirectory(string $directory)
+    {
+        if (is_dir($directory) === false) {
+            throw new ArgumentException("{$directory} needs to be a valdid directory");
+        }
+        
+        self::$annotationMetaDataDirectories[] = $directory;
+    }
+    
     /**
      * Create a new Game object, with all the necessary configuration.
      * @throws InvalidConfigurationException
@@ -25,19 +37,25 @@ class Bootstrap
         $passwd = getenv('DB_PASSWORD');
 
         if ($dsn === false || strlen($dsn) == 0) {
-          throw new InvalidConfigurationException("Invalid or missing data source name: '{$dsn}'");
+            throw new InvalidConfigurationException("Invalid or missing data source name: '{$dsn}'");
         }
         if ($user === false || strlen($user) == 0) {
-          throw new InvalidConfigurationException("Invalid or missing database user: '{$user}'");
+            throw new InvalidConfigurationException("Invalid or missing database user: '{$user}'");
         }
         if ($passwd === false) {
-          throw new InvalidConfigurationException("Invalid or missing database password: '{$passwd}'");
+            throw new InvalidConfigurationException("Invalid or missing database password: '{$passwd}'");
         }
 
         $pdo = new \PDO($dsn, $user, $passwd);
 
         // Read db annotations from model files
-        $configuration = Setup::createAnnotationMetadataConfiguration([__DIR__ . '/Models'], true);
+        $annotationMetaDataDirectories = array_merge(
+            [__DIR__ . '/Models'],
+            self::$annotationMetaDataDirectories
+        );
+        $configuration = Setup::createAnnotationMetadataConfiguration($annotationMetaDataDirectories, true);
+        
+        // Set a quote
         $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
 
         $entityManager = EntityManager::create(["pdo" => $pdo], $configuration);
