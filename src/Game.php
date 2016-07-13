@@ -13,13 +13,16 @@ class Game
     private $eventManager;
     private $composerManager;
     private $moduleManager;
+    private $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        EventManager $eventManager)
+        EventManager $eventManager,
+        \Monolog\Logger $logger)
     {
         $this->entityManager = $entityManager;
         $this->eventManager = $eventManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -89,5 +92,14 @@ class Game
     public function getCharacter(): Character
     {
         return $this->character;
+    }
+
+    /**
+     * Returns the logger instance to write logs.
+     * @return \Monolog\Logger
+     */
+    public function getLogger(): \Monolog\Logger
+    {
+        return $this->logger;
     }
 }

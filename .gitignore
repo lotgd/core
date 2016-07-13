@@ -1,6 +1,8 @@
 ### Project related
 vendor/
 
+logs/*
+
 dbtest.sqlite
 .sqlite
 

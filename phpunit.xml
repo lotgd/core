@@ -4,6 +4,7 @@
         <env name="DB_USER" value="root" />
         <env name="DB_PASSWORD" value="" />
         <env name="DB_NAME" value="daenerys" />
+        <env name="LOG_PATH" value="./logs" />
     </php>
     <testsuites>
         <testsuite name="All">
