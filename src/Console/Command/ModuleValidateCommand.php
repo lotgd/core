@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command;
 
-use LotGD\Core\Bootstrap;
-
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use LotGD\Core\Console\Main;
 
 class ModuleValidateCommand extends Command
 {
@@ -21,7 +21,7 @@ class ModuleValidateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $g = Bootstrap::createGame();
+        $g = Main::createGame();
 
         $results = $g->getModuleManager()->validate();
 

@@ -1,5 +1,8 @@
 #!/usr/bin/env php
 <?php
+
+use LotGD\Core\Bootstrap;
+
 function includeIfExists($file) 
 {
     if (file_exists($file)) {
@@ -13,4 +16,8 @@ includeIfExists(getcwd() . '/vendor/autoload.php') ||
 includeIfExists(__DIR__ . '/../vendor/autoload.php') ||
 includeIfExists(__DIR__ . '/../autoload.php');
 
-LotGD\Core\Console\Main::main();
+$loader = function () {
+    return Bootstrap::createGame();
+};
+
+LotGD\Core\Console\Main::main($loader);

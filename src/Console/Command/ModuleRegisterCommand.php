@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use LotGD\Core\Bootstrap;
+use LotGD\Core\Console\Main;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 
@@ -24,7 +24,7 @@ class ModuleRegisterCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $g = Bootstrap::createGame();
+        $g = Main::createGame();
 
         $modules = $g->getComposerManager()->getModulePackages();
 
