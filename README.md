@@ -187,11 +187,16 @@ sudo apt-get -y install zip unzip
 # Install php7:
 sudo LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php
 sudo apt-get update
-sudo apt-get -y install php7.0 php7.0-fpm php7.0-mysql php7.0-mbstring php-xml
+sudo apt-get -y install php7.0 php7.0-fpm php7.0-mysql php7.0-mbstring php7.0-sqlite php-xml
 
 # Install composer:
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
+
+# Install phpunit:
+wget https://phar.phpunit.de/phpunit.phar
+chmod +x phpunit.phar
+sudo mv phpunit.phar /usr/local/bin/phpunit
 ```
 
 ### Clone the repo and test
