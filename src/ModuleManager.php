@@ -3,12 +3,13 @@ declare (strict_types=1);
 
 namespace LotGD\Core;
 
+use Composer\Package\PackageInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-use LotGD\Core\Models\Module;
+use LotGD\Core\Exceptions\KeyNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
-use Composer\Package\PackageInterface;
+use LotGD\Core\Models\Module as ModuleModel;
 
 /**
  * Handles the adding and removing of modules to the game.
@@ -27,18 +28,16 @@ class ModuleManager
 
     private static function getPackageSubscriptions(PackageInterface $package): array
     {
+        $name = $package->getName();
         $extra = $package->getExtra();
         if (!empty($extra['subscriptions'])) {
             $subscriptions = array();
 
             // Minimal scrub to the subscriptions list.
             foreach ($extra['subscriptions'] as $s) {
-                if (!isset($s['pattern']) ||
-                    !isset($s['class']) ||
-                    !is_string($s['pattern']) ||
-                    !is_string($s['class']))
+                if (!is_string($s))
                 {
-                    // TODO: log this but continue on.
+                    $this->g->getLogger()->error("Module {$name} has invalid event subscription: {$s}.");
                     continue;
                 }
                 array_push($subscriptions, $s);
@@ -57,27 +56,49 @@ class ModuleManager
      * @param PackageInterface $package Composer package containing this module.
      * @throws ModuleAlreadyExistsException if the module is already installed.
      * @throws ClassNotFoundException if an event subscription class cannot be resolved.
-     * @throws WrongTypeException if an event subscription class does not implement the EventHandler
+     * @throws WrongTypeException if an event subscription class does not implement the Module
      * interface or the pattern is not a valid regular expression.
      */
     public function register(string $library, PackageInterface $package)
     {
-        $m = $this->g->getEntityManager()->getRepository(Module::class)->find($library);
+        $m = $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($library);
         if ($m) {
             throw new ModuleAlreadyExistsException($library);
         } else {
             // TODO: handle error cases here.
-            $m = new Module($library);
+            $m = new ModuleModel($library);
             $m->save($this->g->getEntityManager());
+
+            $name = $package->getName();
+
+            $class = $package->getExtra()['class'];
+            if (!isset($package->getExtra()['class']) ||
+                !is_string($class))
+            {
+                throw new KeyNotFoundException("Module {$name} is missing a valid 'class' entry in its extra field.");
+            }
+            try {
+                $klass = new \ReflectionClass($class);
+            } catch (\LogicException $e) {
+                throw new ClassNotFoundException("Could not load class ${class} while registering module {$name}.");
+            } catch (\ReflectionException $e) {
+                throw new ClassNotFoundException("Could not find class ${class} while registering module {$name}.");
+            }
+
+            // Verify that the class is a module class.
+            $interface = Module::class;
+            if (!$klass->implementsInterface($interface)) {
+                throw new WrongTypeException("Class {$class} does not implement {$interface} while registering module {$name}.");
+            }
 
             // Subscribe to the module's events.
             $subscriptions = ModuleManager::getPackageSubscriptions($package);
             foreach ($subscriptions as $s) {
-                $pattern = $s['pattern'];
-                $class = $s['class'];
-
-                $this->g->getEventManager()->subscribe($pattern, $class, $library);
+                $this->g->getEventManager()->subscribe($s, $class, $library);
             }
+
+            // Run the module's onRegister handler.
+            $class::onRegister($this->g);
         }
     }
 
@@ -91,25 +112,27 @@ class ModuleManager
      */
     public function unregister(string $library, PackageInterface $package)
     {
-        $m = $this->g->getEntityManager()->getRepository(Module::class)->find($library);
+        $m = $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($library);
         if (!$m) {
             throw new ModuleDoesNotExistException($library);
         } else {
             // TODO: handle error cases here.
             $m->delete($this->g->getEntityManager());
 
+            $class = $package->getExtra()['class'];
+
             // Unsubscribe the module's events.
             $subscriptions = ModuleManager::getPackageSubscriptions($package);
             foreach ($subscriptions as $s) {
-                $pattern = $s['pattern'];
-                $class = $s['class'];
-
                 try {
-                    $this->g->getEventManager()->unsubscribe($pattern, $class, $library);
+                    $this->g->getEventManager()->unsubscribe($s, $class, $library);
                 } catch (SubscriptionNotFoundException $e) {
                     // TODO: log this but continue on.
                 }
             }
+
+            // Run the module's onUnregister handler.
+            $class::onUnregister($this->g);
         }
     }
 
@@ -118,7 +141,7 @@ class ModuleManager
      * @return array<Module> Array of modules.
      */
     public function getModules(): array {
-        return $this->g->getEntityManager()->getRepository(Module::class)->findAll();
+        return $this->g->getEntityManager()->getRepository(ModuleModel::class)->findAll();
     }
 
     /**
@@ -149,6 +172,7 @@ class ModuleManager
         $currentSubscriptions = $this->g->getEventManager()->getSubscriptions();
         foreach ($packages as $p) {
             $name = $p->getName();
+            $class = $p->getExtra()['class'];
 
             $expectedSubscriptions = ModuleManager::getPackageSubscriptions($p);
             $currentSubscriptionsForThisPackage = array_filter($currentSubscriptions, function($s) use ($name) {
@@ -162,8 +186,8 @@ class ModuleManager
                 $found = false;
                 foreach ($currentSubscriptionsForThisPackage as $c) {
                     // Count the subscriptions for this
-                    if ($c->getPattern() === $e['pattern'] &&
-                        $c->getClass() === $e['class'] &&
+                    if ($c->getPattern() === $e &&
+                        $c->getClass() === $class &&
                         $c->getLibrary() === $p->getName())
                     {
                         $found = true;
@@ -171,8 +195,8 @@ class ModuleManager
                     }
                 }
                 if (!$found) {
-                    $pattern = $e['pattern'];
-                    $class = $e['class'];
+                    $pattern = $e;
+                    $class = $class;
                     array_push($result, "Error: Couldn't find subscription ({$pattern} => ${class}) for module {$name}.");
                 }
             }
