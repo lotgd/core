@@ -132,25 +132,45 @@ be visible to the publisher. This is how hooks will communicate their input to
 the publisher.
 
 ### Modules
-Modules extend the core or provide some additional functionality. Modules do
-this work by either adding/modifying database tables and/or subscribing to events.
+Modules extend the core or provide some additional functionality. Currently, supported
+functionality includes adding/modifying database tables and/or subscribing to events.
 
 Scenes are modules, providing `Scene` models to the database. You can also
 imagine any number of utility modules, like analytic event aggregators or whole
 new permission systems.
 
+#### Installing a Module
+
 Modules are installed via [Composer](http://getcomposer.org) packages. Composer
 is a common dependency manager for PHP, providing centralized storage and easy
 installation of code. We are hosting our own repository of packages at http://code.lot.gd.
 
-Check out the [installation instructions](https://github.com/lotgd/code.lot.gd) in
-the code.lot.gd repo to learn more.
+1. To install a new module, add it as a Composer dependency. See
+the example of specifying the HelloWorld module in the
+[crate-sample](https://github.com/lotgd/crate-sample) repo.
+1. Run `composer update` to install the module's code.
+1. Finally, register any newly added modules with the core by using the `daenerys` tool:
+```
+vendor/bin/daenerys module:register
+```
 
-[PLANNED] Modules will need to be registered with the core before they can be
-used, so event subscriptions can be established and any database changes can be made.
-The `ModuleManager` class takes care of this. We expect crate admins to run a
-tool after installing a Composer package (with the module code) that will do this
-registration. See https://github.com/lotgd/core/issues/29 for more about this tool.
+Note: modules are added to crates, so these instructions are to be run from a crate
+directory.
+
+#### Making a Module
+
+1. Make a module by starting with the code in the `module-project` repo:
+```
+# --no-secure-http is temporarily required while we setup HTTPS on code.lot.gd
+composer create-project --no-secure-http --repository http://code.lot.gd -s dev lotgd/module-project fancymodule
+```
+This creates a new directory, `fancymodule`, with some boilerplate code.
+
+1. Inside your module's directory, modify the `composer.json` file to include information specific to your module.
+
+1. Change the namespace, name of the file and classname of `src/MyModule.php` and put your code there.
+
+1. Finally, either push your module to GitHub and add it to our module repository at [code.lot.gd](https://github.com/lotgd/code.lot.gd) or put it somewhere `composer` can find it for your crate. See [Composer Repositories](https://getcomposer.org/doc/05-repositories.md) for more about how `composer` finds dependencies.
 
 ## Development Environment
 
