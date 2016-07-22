@@ -119,4 +119,19 @@ class Configuration
     {
         return $this->logPath;
     }
+
+    public function __toString(): string
+    {
+        $s = "";
+
+        $s .= "database:\n";
+        $s .= "  dsn: " . $this->getDatabaseDSN() . "\n";
+        $s .= "  name: " . $this->getDatabaseName() . "\n";
+        $s .= "  user: " . $this->getDatabaseUser() . "\n";
+        $s .= "  password: " . $this->getDatabasePassword() . "\n";
+        $s .= "logs:\n";
+        $s .= "  path: " . $this->getLogPath() . "\n";
+
+        return $s;
+    }
 }
