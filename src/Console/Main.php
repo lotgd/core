@@ -10,12 +10,13 @@ use LotGD\Core\Game;
 use LotGD\Core\Console\Command\{
     DatabaseInitCommand,
     ModuleValidateCommand,
-    ModuleRegisterCommand
+    ModuleRegisterCommand,
+    ConsoleCommand
 };
 
 class Main {
     protected static $loader = null;
-    
+
     /**
      * Saves a closure used as bootstrap loader
      * @param \Closure $loader
@@ -24,7 +25,7 @@ class Main {
     {
         self::$loader = $loader;
     }
-    
+
     /**
      * Creates the game using the previously stored bootstrap loader or
      * uses the default one
@@ -35,10 +36,10 @@ class Main {
         if (is_null(self::$loader)) {
             return Bootstrap::createGame();
         }
-        
+
         return $loader();
     }
-            
+
     public static function main()
     {
         $application = new Application();
@@ -49,7 +50,8 @@ class Main {
         $application->add(new ModuleValidateCommand());
         $application->add(new ModuleRegisterCommand());
         $application->add(new DatabaseInitCommand());
-        
+        $application->add(new ConsoleCommand());
+
         $application->run();
     }
 }
