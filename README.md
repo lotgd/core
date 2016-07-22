@@ -57,13 +57,22 @@ Some technical notes:
 
 ### Configuration
 The crate is responsible for configuring the game, which is done through
-environment variables. Here's a list of environment variables currently in use:
+a configuration file, in the YAML format. The path to the configuration file is
+specified by the environment variable `LOTGD_CONFIG`.
 
-* `DB_DSN`: [Data Source Name](https://en.wikipedia.org/wiki/Data_source_name),
-a way to describe where the database is.
-* `DB_USER`: user name that has access to the database.
-* `DB_PASSWORD`: password for the `DB_USER`.
-* `DB_NAME`: name of the database to access inside the specified DSN.
+Here's the format of the config file:
+
+```
+database:
+    dsn: # [Data Source Name](https://en.wikipedia.org/wiki/Data_source_name), a way to describe where the database is.
+    name: # name of the database to access inside the specified DSN.
+    user: # user name that has access to the database.
+    password: # password for the database user.
+logs:
+    path: # the path to the directory to store log files, relative to this config file.
+```
+
+See the [`config.yml`](https://github.com/lotgd/core/blob/master/config/test.yml) we use for testing.
 
 ### Initialization/Installation [PLANNED]
 Check out the [Sample Crate's README](https://github.com/lotgd/crate-sample/blob/master/README.md)
