@@ -8,6 +8,10 @@ use Symfony\Component\Yaml\Yaml;
 
 use LotGD\Core\Exceptions\InvalidConfigurationException;
 
+/**
+ * The configuration information for a LotGD game. Configuration is read from
+ * a YAML file, who's path is specified when you construct the object.
+ */
 class Configuration
 {
     private $databaseDSN;
@@ -16,6 +20,11 @@ class Configuration
     private $databasePassword;
     private $logPath;
 
+    /**
+     * Create the configuration object, reading from the specified path.
+     * @param string $configFilePath Path to a configuration YAML, relative to
+     * the current working directory.
+     */
     public function __construct(string $configFilePath)
     {
         try {
@@ -65,26 +74,47 @@ class Configuration
         $this->databaseName = $name;
     }
 
+    /**
+     * Return the data source name, a way to describe where the database is. See
+     * https://en.wikipedia.org/wiki/Data_source_name.
+     * @return string The configured data source name.
+     */
     public function getDatabaseDSN(): string
     {
         return $this->databaseDSN;
     }
 
+    /**
+     * Return the database name.
+     * @return string The configured database name.
+     */
     public function getDatabaseName(): string
     {
         return $this->databaseName;
     }
 
+    /**
+     * Return the database user.
+     * @return string The configured database user.
+     */
     public function getDatabaseUser(): string
     {
         return $this->databaseUser;
     }
 
+    /**
+     * Return the database password.
+     * @return string The configured database password.
+     */
     public function getDatabasePassword(): string
     {
         return $this->databasePassword;
     }
 
+    /**
+     * Return the path to the directory to store log files.
+     * @return string The configured log directory path.
+     */
     public function getLogPath(): string
     {
         return $this->logPath;
