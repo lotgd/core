@@ -14,12 +14,15 @@ class Game
     private $composerManager;
     private $moduleManager;
     private $logger;
+    private $configuration;
 
     public function __construct(
+        Configuration $configuration,
         EntityManagerInterface $entityManager,
         EventManager $eventManager,
         \Monolog\Logger $logger)
     {
+        $this->configuration = $configuration;
         $this->entityManager = $entityManager;
         $this->eventManager = $eventManager;
         $this->logger = $logger;
@@ -32,6 +35,15 @@ class Game
     public static function getVersion(): string
     {
         return '0.1.0';
+    }
+
+    /**
+     * Returns the game's configuration.
+     * @return Configuration The game's configuration.
+     */
+    public function getConfiguration(): Configuration
+    {
+        return $this->configuration;
     }
 
     /**

@@ -1,10 +1,6 @@
 <phpunit bootstrap="bootstrap/bootstrap.php">
     <php>
-        <env name="DB_DSN" value="sqlite::memory:" />
-        <env name="DB_USER" value="root" />
-        <env name="DB_PASSWORD" value="" />
-        <env name="DB_NAME" value="daenerys" />
-        <env name="LOG_PATH" value="./logs" />
+        <env name="LOTGD_CONFIG" value="./config/test.yml" />
     </php>
     <testsuites>
         <testsuite name="All">

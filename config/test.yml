@@ -1,0 +1,7 @@
+database:
+    dsn: sqlite::memory:
+    name: daenerys
+    user: root
+    password:
+logs:
+    path: ../logs

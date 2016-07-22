@@ -32,39 +32,20 @@ class Bootstrap
      */
     public static function createGame(): Game
     {
-        $logPath = getenv('LOG_PATH');
-        if ($logPath === false || strlen($logPath) == 0 || is_dir($logPath) === false) {
-            throw new InvalidConfigurationException("Invalid or missing log directory: '{$logPath}'");
+        $configFilePath = getenv('LOTGD_CONFIG');
+        if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
+            throw new InvalidConfigurationException("Invalid or missing configuration file: '{$configFilePath}'.");
         }
-        $cleanedLogPath = realpath($logPath);
+        $config = new Configuration($configFilePath);
+
         $logger = new \Monolog\Logger('lotgd');
         // Add lotgd as the prefix for the log filenames.
-        $logger->pushHandler(new \Monolog\Handler\RotatingFileHandler($cleanedLogPath . DIRECTORY_SEPARATOR . 'lotgd', 14));
+        $logger->pushHandler(new \Monolog\Handler\RotatingFileHandler($config->getLogPath() . DIRECTORY_SEPARATOR . 'lotgd', 14));
 
         $v = Game::getVersion();
-        $logger->info("Bootstrap constructing game (Daenerys 🐲 {$v}).");
+        $logger->info("Bootstrap constructing game (Daenerys 🐲{$v}).");
 
-        $dsn = getenv('DB_DSN');
-        $user = getenv('DB_USER');
-        $passwd = getenv('DB_PASSWORD');
-
-        if ($dsn === false || strlen($dsn) == 0) {
-            $m = "Invalid or missing data source name: '{$dsn}'";
-            $logger->critical($m);
-            throw new InvalidConfigurationException($m);
-        }
-        if ($user === false || strlen($user) == 0) {
-            $m = "Invalid or missing database user: '{$user}'";
-            $logger->critical($m);
-            throw new InvalidConfigurationException("Invalid or missing database user: '{$user}'");
-        }
-        if ($passwd === false) {
-            $m = "Invalid or missing database password: '{$passwd}'";
-            $logger->critical($m);
-            throw new InvalidConfigurationException("Invalid or missing database password: '{$passwd}'");
-        }
-
-        $pdo = new \PDO($dsn, $user, $passwd);
+        $pdo = new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
 
         // Read db annotations from model files
         $annotationMetaDataDirectories = array_merge(
@@ -85,6 +66,6 @@ class Bootstrap
 
         $eventManager = new EventManager($entityManager);
 
-        return new Game($entityManager, $eventManager, $logger);
+        return new Game($config, $entityManager, $eventManager, $logger);
     }
 }

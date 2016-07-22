@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping\AnsiQuoteStrategy;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
 
+use LotGD\Core\Configuration;
+
 /**
  * Description of ModelTestCase
  */
@@ -28,8 +30,14 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
     final public function getConnection(): \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
     {
         if ($this->connection === null) {
+            $configFilePath = getenv('LOTGD_CONFIG');
+            if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
+                throw new InvalidConfigurationException("Invalid or missing configuration file: '{$configFilePath}'.");
+            }
+            $config = new Configuration($configFilePath);
+
             if (self::$pdo === null) {
-                self::$pdo = new \PDO(getenv('DB_DSN'), getenv('DB_USER'), getenv('DB_PASSWORD'));
+                self::$pdo = new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
 
                 // Read db annotations from model files
                 $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
@@ -43,7 +51,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
                 $schemaTool->updateSchema($metaData);
             }
 
-            $this->connection = $this->createDefaultDBConnection(self::$pdo, getenv('DB_NAME'));
+            $this->connection = $this->createDefaultDBConnection(self::$pdo, $config->getDatabaseName());
         }
 
         return $this->connection;
