@@ -22,7 +22,15 @@ class ConsoleCommand extends Command
     {
         $g = Main::createGame();
 
-        $boris = new \Boris\Boris('🐲> ');
+        print("Daenerys console, the dragon prompt. lotgd/core " . \LotGD\Core\Game::getVersion() . ".\n");
+        print("Enter some PHP, but be careful, this is live and attached to your currently configured setup:\n\n");
+        print($g->getConfiguration());
+
+        print("\n");
+        print("Try things like `\$g::getVersion()`. To quit, ^D or `exit();`.\n");
+        print("\n");
+
+        $boris = new \Boris\Boris('🐲  > '); // For some reason we need the extra spaces.
         $boris->setLocal(array(
             'g' => $g
         ));
