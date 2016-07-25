@@ -4,19 +4,25 @@ declare(strict_types=1);
 namespace LotGD\Core;
 
 use Composer\Composer;
+use Monolog\Logger;
+
 use LotGD\Core\Exceptions\LibraryDoesNotExistException;
 
+/**
+ * Helps perform tasks with the composer configuration.
+ */
 class ComposerManager
 {
-    private $g;
+    private $logger;
     private $composer;
 
     /**
-     * @param $g The game.
+     * Creates a new ComposerManager.
+     * @param Monlog\Logger $logger A logger instance for messaging.
      */
-    public function __construct(Game $g)
+    public function __construct(Logger $logger)
     {
-        $this->g = $g;
+        $this->logger = $logger;
     }
 
     /**

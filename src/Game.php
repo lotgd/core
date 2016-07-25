@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace LotGD\Core;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\Logger;
 
 use LotGD\Core\Models\Character;
 
@@ -20,7 +21,7 @@ class Game
         Configuration $configuration,
         EntityManagerInterface $entityManager,
         EventManager $eventManager,
-        \Monolog\Logger $logger)
+        Logger $logger)
     {
         $this->configuration = $configuration;
         $this->entityManager = $entityManager;
@@ -65,7 +66,7 @@ class Game
     public function getComposerManager(): ComposerManager
     {
         if ($this->composerManager === null) {
-            $this->composerManager = new ComposerManager($this);
+            $this->composerManager = new ComposerManager($this->getLogger());
         }
         return $this->composerManager;
     }
