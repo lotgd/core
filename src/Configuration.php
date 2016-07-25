@@ -128,7 +128,7 @@ class Configuration
         $s .= "  dsn: " . $this->getDatabaseDSN() . "\n";
         $s .= "  name: " . $this->getDatabaseName() . "\n";
         $s .= "  user: " . $this->getDatabaseUser() . "\n";
-        $s .= "  password: " . $this->getDatabasePassword() . "\n";
+        $s .= "  password: <hidden>\n";
         $s .= "logs:\n";
         $s .= "  path: " . $this->getLogPath() . "\n";
 
