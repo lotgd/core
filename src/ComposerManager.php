@@ -70,4 +70,25 @@ class ComposerManager
 
         return $result;
     }
+
+    /**
+     * Returns a path (could be relative) to the proper autoload.php file in
+     * the current setup.
+     */
+    public static function findAutoloader(): string
+    {
+        // Dance to find the autoloader.
+        // TOOD: change this to open up the Composer config and use $c['config']['vendor-dir'] instead of "vendor"
+        $order = [
+            getcwd() . '/vendor/autoload.php',
+            __DIR__ . '/../vendor/autoload.php',
+            __DIR__ . '/../autoload.php',
+        ];
+        foreach ($order as $path) {
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+        throw new Exception("Cannot find autoload.php in any of its usual locations.");
+    }
 }
