@@ -36,11 +36,16 @@ class Main {
         if (is_null(self::$loader)) {
             return Bootstrap::createGame();
         }
+        
+        $closure = self::$loader;
 
-        return $loader();
+        return $closure();
     }
 
-    public static function main()
+    /**
+     * Runs the console function
+     */
+    public function run()
     {
         $application = new Application();
 
