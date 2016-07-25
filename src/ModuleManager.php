@@ -30,11 +30,11 @@ class ModuleManager
     {
         $name = $package->getName();
         $extra = $package->getExtra();
-        if (!empty($extra['subscriptions'])) {
+        if (!empty($extra['lotgd-subscriptions'])) {
             $subscriptions = array();
 
             // Minimal scrub to the subscriptions list.
-            foreach ($extra['subscriptions'] as $s) {
+            foreach ($extra['lotgd-subscriptions'] as $s) {
                 if (!is_string($s))
                 {
                     $this->g->getLogger()->error("Module {$name} has invalid event subscription: {$s}.");
@@ -71,12 +71,13 @@ class ModuleManager
 
             $name = $package->getName();
 
-            $class = $package->getExtra()['class'];
-            if (!isset($package->getExtra()['class']) ||
-                !is_string($class))
+            if (!isset($package->getExtra()['lotgd-namespace']) ||
+                !is_string($package->getExtra()['lotgd-namespace']))
             {
-                throw new KeyNotFoundException("Module {$name} is missing a valid 'class' entry in its extra field.");
+                throw new KeyNotFoundException("Module {$name} is missing a valid 'lotgd-namespace' entry in its extra field.");
             }
+
+            $class = $package->getExtra()['lotgd-namespace'] . 'Module';
             try {
                 $klass = new \ReflectionClass($class);
             } catch (\LogicException $e) {
@@ -119,7 +120,7 @@ class ModuleManager
             // TODO: handle error cases here.
             $m->delete($this->g->getEntityManager());
 
-            $class = $package->getExtra()['class'];
+            $class = $package->getExtra()['lotgd-namespace'] . 'Module';
 
             // Unsubscribe the module's events.
             $subscriptions = ModuleManager::getPackageSubscriptions($package);
@@ -172,7 +173,7 @@ class ModuleManager
         $currentSubscriptions = $this->g->getEventManager()->getSubscriptions();
         foreach ($packages as $p) {
             $name = $p->getName();
-            $class = $p->getExtra()['class'];
+            $class = $p->getExtra()['lotgd-namespace'] . 'Module';
 
             $expectedSubscriptions = ModuleManager::getPackageSubscriptions($p);
             $currentSubscriptionsForThisPackage = array_filter($currentSubscriptions, function($s) use ($name) {

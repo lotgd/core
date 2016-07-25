@@ -10,6 +10,7 @@ use LotGD\Core\Exceptions\WrongTypeException;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\SubscriptionNotFoundException;
 use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\FakeModule\Module as FakeModule;
 
 class EventManagerTestInvalidSubscriber
 {
@@ -19,14 +20,6 @@ class EventManagerTestInvalidSubscriber
 class EventManagerTestSubscriber implements EventHandler
 {
     public static function handleEvent(string $event, array $context) {}
-}
-
-class EventManagerTestInstalledSubscriber implements EventHandler
-{
-    public static function handleEvent(string $event, array $context) {
-        $context['foo'] = 'baz';
-        return $context;
-    }
 }
 
 class EventManagerTest extends ModelTestCase
@@ -55,7 +48,7 @@ class EventManagerTest extends ModelTestCase
         $em = new EventManager($this->getEntityManager());
 
         $this->expectException(WrongTypeException::class);
-        $em->subscribe("/test.event", 'LotGD\Core\Tests\EventManagerTestSubscriber', 'lotgd/tests');
+        $em->subscribe("/test.event", FakeModule::class, 'lotgd/tests');
     }
 
     public function testGetSubscriptions()
@@ -63,7 +56,7 @@ class EventManagerTest extends ModelTestCase
       $em = new EventManager($this->getEntityManager());
 
       $pattern = "/test\\.foo.*/";
-      $class = 'LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber';
+      $class = FakeModule::class;
       $library = 'lotgd/tests';
 
       $sub = EventSubscription::create([
@@ -84,7 +77,7 @@ class EventManagerTest extends ModelTestCase
         $em = new EventManager($this->getEntityManager());
 
         $pattern = "/test.event/";
-        $class = 'LotGD\Core\Tests\EventManagerTestSubscriber';
+        $class = FakeModule::class;
         $library = 'lotgd/tests';
 
         $em->subscribe($pattern, $class, $library);
@@ -106,7 +99,7 @@ class EventManagerTest extends ModelTestCase
     {
         $em = new EventManager($this->getEntityManager());
 
-        $em->unsubscribe("/test\\.foo.*/", 'LotGD\Core\Tests\EventManagerTestInstalledSubscriber', 'lotgd/tests');
+        $em->unsubscribe("/test\\.foo.*/", FakeModule::class, 'lotgd/tests');
 
         $subscriptions = $em->getSubscriptions();
         $this->assertEmpty($subscriptions);
@@ -117,7 +110,7 @@ class EventManagerTest extends ModelTestCase
         $em = new EventManager($this->getEntityManager());
 
         $this->expectException(SubscriptionNotFoundException::class);
-        $em->unsubscribe("/notfound/", 'LotGD\Core\Tests\EventManagerTestInstalledSubscriber', 'lotgd/tests');
+        $em->unsubscribe("/notfound/", FakeModule::class, 'lotgd/tests');
     }
 
     public function testPublish()

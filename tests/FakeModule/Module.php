@@ -2,9 +2,14 @@
 
 namespace LotGD\Core\Tests\FakeModule;
 
-use LotGD\Core\Module;
+use LotGD\Core\Game;
+use LotGD\Core\Module as ModuleBase;
 
-class FakeModule extends Module {
+class Module implements ModuleBase {
+    public static function handleEvent(string $event, array $context) {
+        $context['foo'] = 'baz';
+        return $context;
+    }
     public static function onRegister(Game $g) {}
     public static function onUnregister(Game $g) {}
 }

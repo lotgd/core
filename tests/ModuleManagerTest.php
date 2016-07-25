@@ -16,13 +16,7 @@ use LotGD\Core\Module;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
 use LotGD\Core\Tests\ModelTestCase;
-
-class ModuleManagerTestModule implements Module
-{
-    public static function handleEvent(string $event, array $context) {}
-    public static function onRegister(Game $g) {}
-    public static function onUnregister(Game $g) {}
-}
+use LotGD\Core\Tests\FakeModule\Module as FakeModule;
 
 class ModuleManagerTest extends ModelTestCase
 {
@@ -74,7 +68,7 @@ class ModuleManagerTest extends ModelTestCase
     {
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array(
-            'class' => ModuleManagerTestModule::class
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\'
         ));
 
         $eventManager = $this->getMockBuilder(EventManager::class)
@@ -95,14 +89,14 @@ class ModuleManagerTest extends ModelTestCase
             '/pattern1/',
             '/pattern2/'
         );
-        $class = ModuleManagerTestModule::class;
+        $class = FakeModule::class;
 
         $library = 'lotgd/tests';
 
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array(
-            'class' => $class,
-            'subscriptions' => $subscriptions
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
+            'lotgd-subscriptions' => $subscriptions
         ));
 
         $eventManager = $this->getMockBuilder(EventManager::class)
@@ -128,7 +122,7 @@ class ModuleManagerTest extends ModelTestCase
     {
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array(
-            'class' => ModuleManagerTestModule::class
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
         ));
 
         $library = 'lotgd/tests2';
@@ -156,14 +150,14 @@ class ModuleManagerTest extends ModelTestCase
             '/pattern1/',
             '/pattern2/',
         );
-        $class = ModuleManagerTestModule::class;
+        $class = FakeModule::class;
 
         $library = 'lotgd/tests2';
 
         $package = $this->getMockForAbstractClass(PackageInterface::class);
         $package->method('getExtra')->willReturn(array(
-            'class' => $class,
-            'subscriptions' => $subscriptions
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
+            'lotgd-subscriptions' => $subscriptions
         ));
 
         $eventManager = $this->getMockBuilder(EventManager::class)
@@ -193,7 +187,7 @@ class ModuleManagerTest extends ModelTestCase
     public function testValidateSuccess()
     {
         $pattern = '/test\\.foo.*/';
-        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $class = FakeModule::class;
         $library = 'lotgd/tests';
         $subscriptions = array(
             $pattern,
@@ -203,8 +197,8 @@ class ModuleManagerTest extends ModelTestCase
                    ->getMock();
         $p1->method('getName')->willReturn($library);
         $p1->method('getExtra')->willReturn(array(
-            'class' => $class,
-            'subscriptions' => $subscriptions
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
+            'lotgd-subscriptions' => $subscriptions
         ));
 
         $packages = array($p1);
@@ -239,7 +233,7 @@ class ModuleManagerTest extends ModelTestCase
     public function testValidateFailMissingSubscription()
     {
         $pattern = '/test\\.foo.*/';
-        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $class = FakeModule::class;
         $library = 'lotgd/tests';
         $subscriptions = array(
             $pattern,
@@ -250,8 +244,8 @@ class ModuleManagerTest extends ModelTestCase
                    ->getMock();
         $p1->method('getName')->willReturn($library);
         $p1->method('getExtra')->willReturn(array(
-            'class' => $class,
-            'subscriptions' => $subscriptions
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
+            'lotgd-subscriptions' => $subscriptions
         ));
 
         $packages = array($p1);
@@ -286,7 +280,7 @@ class ModuleManagerTest extends ModelTestCase
     public function testValidateFailMoreInstalledModules()
     {
         $pattern = '/test\\.foo.*/';
-        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $class = FakeModule::class;
         $library = 'lotgd/tests';
 
         $packages = array();
@@ -321,7 +315,7 @@ class ModuleManagerTest extends ModelTestCase
     public function testValidateFailMoreExpectedModules()
     {
         $pattern = '/test\\.foo.*/';
-        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $class = FakeModule::class;
         $library = 'lotgd/tests';
 
         $subscriptions = array(
@@ -332,16 +326,16 @@ class ModuleManagerTest extends ModelTestCase
                    ->getMock();
         $p1->method('getName')->willReturn($library);
         $p1->method('getExtra')->willReturn(array(
-            'class' => $class,
-            'subscriptions' => $subscriptions
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
+            'lotgd-subscriptions' => $subscriptions
         ));
 
         $p2 = $this->getMockBuilder(PackageInterface::class)
                    ->getMock();
         $p2->method('getName')->willReturn('lotgd/tests-another');
         $p2->method('getExtra')->willReturn(array(
-            'class' => $class,
-            'subscriptions' => $subscriptions
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
+            'lotgd-subscriptions' => $subscriptions
         ));
 
         $packages = array($p1, $p2);
@@ -376,7 +370,7 @@ class ModuleManagerTest extends ModelTestCase
     public function testValidateWarningUnconfiguredSubscriptions()
     {
         $pattern = '/test\\.foo.*/';
-        $class = "LotGD\\Core\\Tests\\EventManagerTestInstalledSubscriber";
+        $class = FakeModule::class;
         $library = 'lotgd/tests';
 
         $subscriptions = array(
@@ -387,8 +381,8 @@ class ModuleManagerTest extends ModelTestCase
                    ->getMock();
         $p1->method('getName')->willReturn($library);
         $p1->method('getExtra')->willReturn(array(
-            'class' => $class,
-            'subscriptions' => $subscriptions
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
+            'lotgd-subscriptions' => $subscriptions
         ));
 
         $packages = array($p1);
