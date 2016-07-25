@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
+use Composer\Package\PackageInterface;
+use Composer\Composer;
+
 use LotGD\Core\Game;
 use LotGD\Core\ComposerManager;
 use LotGD\Core\EventHandler;
@@ -13,8 +16,6 @@ use LotGD\Core\Module;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
 use LotGD\Core\Tests\ModelTestCase;
-use Composer\Package\PackageInterface;
-use Composer\Composer;
 
 class ModuleManagerTestModule implements Module
 {
