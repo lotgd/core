@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace LotGD\Core;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 
 use LotGD\Core\Models\Character;
 
@@ -19,12 +20,10 @@ class Game
     public function __construct(
         Configuration $configuration,
         EntityManagerInterface $entityManager,
-        EventManager $eventManager,
         \Monolog\Logger $logger)
     {
         $this->configuration = $configuration;
         $this->entityManager = $entityManager;
-        $this->eventManager = $eventManager;
         $this->logger = $logger;
     }
 
@@ -78,6 +77,15 @@ class Game
     {
         return $this->entityManager;
     }
+    
+    /**
+     * Replaces the game's entity manager with a new one.
+     * @param EntityManagerInterface $em
+     */
+    public function setEntityManager(EntityManagerInterface $em)
+    {
+        $this->entityManager = $em;
+    }
 
     /**
      * Returns the game's event manager.
@@ -85,6 +93,10 @@ class Game
      */
     public function getEventManager(): EventManager
     {
+        if ($this->eventManager === null) {
+            $this->eventManager = new EventManager($this->getEntityManager());
+        }
+        
         return $this->eventManager;
     }
 
