@@ -8,23 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\AnsiQuoteStrategy;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
 
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Exceptions\InvalidConfigurationException;
 
 class Bootstrap
 {
-    private static $annotationMetaDataDirectories = [];
-
-    public static function registerAnnotationMetaDataDirectory(string $directory)
-    {
-        if (is_dir($directory) === false) {
-            throw new ArgumentException("{$directory} needs to be a valdid directory");
-        }
-
-        self::$annotationMetaDataDirectories[] = $directory;
-    }
-
     /**
      * Create a new Game object, with all the necessary configuration.
      * @throws InvalidConfigurationException
@@ -38,21 +29,16 @@ class Bootstrap
         }
         $config = new Configuration($configFilePath);
 
-        $logger = new \Monolog\Logger('lotgd');
+        $logger = new Logger('lotgd');
         // Add lotgd as the prefix for the log filenames.
-        $logger->pushHandler(new \Monolog\Handler\RotatingFileHandler($config->getLogPath() . DIRECTORY_SEPARATOR . 'lotgd', 14));
+        $logger->pushHandler(new RotatingFileHandler($config->getLogPath() . DIRECTORY_SEPARATOR . 'lotgd', 14));
 
         $v = Game::getVersion();
         $logger->info("Bootstrap constructing game (Daenerys 🐲{$v}).");
 
         $pdo = new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
 
-        // Read db annotations from model files
-        $annotationMetaDataDirectories = array_merge(
-            [__DIR__ . '/Models'],
-            self::$annotationMetaDataDirectories
-        );
-        $configuration = Setup::createAnnotationMetadataConfiguration($annotationMetaDataDirectories, true);
+        $configuration = Setup::createAnnotationMetadataConfiguration(Bootstrap::generateAnnotationDirectories($logger, new ComposerManager($logger)), true);
 
         // Set a quote
         $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
@@ -67,5 +53,35 @@ class Bootstrap
         $eventManager = new EventManager($entityManager);
 
         return new Game($config, $entityManager, $eventManager, $logger);
+    }
+
+    public static function generateAnnotationDirectories(Logger $logger, ComposerManager $manager): array
+    {
+        // Read db annotations from our own model files.
+        $directories = [__DIR__ . '/Models'];
+
+        // Find other annotation directories from installed modules.
+        $modulePackages = $manager->getModulePackages();
+        foreach ($modulePackages as $p) {
+            $name = $p->getName();
+            $extra = $p->getExtra();
+            if (!empty($extra['lotgd-namespace'])) {
+                $n = $extra['lotgd-namespace'];
+
+                // Find the directory for this namespace by using the autoloader
+                // to find the required Module class.
+                $autoloader = require(ComposerManager::findAutoloader());
+                $path = $autoloader->findFile($n . 'Module');
+                if ($path === false) {
+                    $logger->error("Module {$name} lacks a {$n}Module class.");
+                    continue;
+                }
+
+                $directories[] = dirname($path);
+            } else {
+                $logger->error("Module {$name} lacks a 'lotgd-namespace' entry in its composer 'extra' field. Its database models will not be properly loaded.");
+            }
+        }
+        return $directories;
     }
 }

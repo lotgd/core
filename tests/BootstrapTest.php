@@ -3,11 +3,25 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
+use Composer\Package\PackageInterface;
+
+use Monolog\Logger;
+use Monolog\Handler\NullHandler;
+
 use LotGD\Core\Bootstrap;
-use LotGD\Core\Tests\AdditionalEntities\UserEntity;
+use LotGD\Core\ComposerManager;
+use LotGD\Core\Tests\FakeModule\UserEntity;
 
 class BootstrapTest extends \PHPUnit_Framework_TestCase
 {
+    private $logger;
+
+    public function setUp()
+    {
+        $this->logger = new Logger('test');
+        $this->logger->pushHandler(new NullHandler());
+    }
+
     public function testGame()
     {
         $g = Bootstrap::createGame();
@@ -16,26 +30,29 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($g->getLogger());
     }
 
-    public function testDoctrineReadsAnnotationsFromAdditionalMetaDataDirectory()
+    public function testGenerateAnnotationDirectories()
     {
-        Bootstrap::registerAnnotationMetaDataDirectory(__DIR__ . "/AdditionalEntities");
+        $composerManager = $this->getMockBuilder(ComposerManager::class)
+                                ->disableOriginalConstructor()
+                                ->getMock();
 
-        $g = Bootstrap::createGame();
+        $package = $this->getMockForAbstractClass(PackageInterface::class);
+        $package->method('getExtra')->willReturn(array(
+            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
+        ));
 
-        $user = new UserEntity();
-        $user->setName("Monthy");
+        $composerManager->method('getModulePackages')->willReturn(array($package));
 
-        $g->getEntityManager()->persist($user);
-        $g->getEntityManager()->flush();
+        $result = Bootstrap::generateAnnotationDirectories($this->logger, $composerManager);
+        $expected = __DIR__ . DIRECTORY_SEPARATOR . 'FakeModule';
 
-        $id = $user->getId();
-        $this->assertInternalType("int", $id);
-
-        $g->getEntityManager()->clear();
-        $user = $g->getEntityManager()->getRepository(UserEntity::class)->find($id);
-
-        $this->assertInternalType("int", $user->getId());
-        $this->assertInternalType("string", $user->getName());
-        $this->assertSame("Monthy", $user->getName());
+        $string = implode(', ', $result);
+        $found = false;
+        foreach ($result as $r) {
+            if (realpath($r) == $expected) {
+                $found = true;
+            }
+        }
+        $this->assertTrue($found, "Annotation directories [{$string}] does not contain {$expected}.");
     }
 }
