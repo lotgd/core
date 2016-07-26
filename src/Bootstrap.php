@@ -15,29 +15,8 @@ use LotGD\Core\Exceptions\InvalidConfigurationException;
 
 class Bootstrap
 {
-    private static $annotationMetaDataDirectories = [];
-    private static $bootstrapCrate = null;
+    private $game;
     
-    public static function clear()
-    {
-        self::$annotationMetaDataDirectories = [];
-        self::$bootstrapCrate = null;
-    }
-    
-    public static function registerCrateBootstrap(BootstrapInterface $bootstrap)
-    {
-        self::$bootstrapCrate = $bootstrap;
-    }
-
-    public static function registerAnnotationMetaDataDirectory(string $directory)
-    {
-        if (is_dir($directory) === false) {
-            throw new ArgumentException("{$directory} needs to be a valdid directory");
-        }
-
-        self::$annotationMetaDataDirectories[] = $directory;
-    }
-
     /**
      * Create a new Game object, with all the necessary configuration.
      * @throws InvalidConfigurationException
@@ -45,19 +24,22 @@ class Bootstrap
      */
     public static function createGame(): Game
     {
-        $config = self::createConfiguration();
+        $boot = new self();
         
-        // Depending on config
-        $logger = self::createLogger($config);
-        $entityManager = self::createEntityManager($config);
+        return $boot->getGame();
+    }
+    
+    public function getGame(): Game
+    {
+        if (is_null($this->game)) {
+            $config = $this->createConfiguration();
+            $logger = $this->createLogger($config);
+            $entityManager = $this->createEntityManager($config);
         
-        // Create game
-        $game = new Game($config, $entityManager, $logger);
+            $this->game = new Game($config, $entityManager, $logger);
+        }
         
-        // Bootstrap modules
-        self::bootstrapModules($game);
-
-        return $game;
+        return $this->game;
     }
     
     /**
@@ -65,7 +47,7 @@ class Bootstrap
      * @return \LotGD\Core\Configuration
      * @throws InvalidConfigurationException
      */
-    protected static function createConfiguration(): Configuration
+    protected function createConfiguration(): Configuration
     {
         // Get the path of LOTGD_CONFIG from the environmental variables
         $configFilePath = getenv('LOTGD_CONFIG');
@@ -80,7 +62,7 @@ class Bootstrap
      * Creates a logger object
      * @return Logger
      */
-    protected static function createLogger(Configuration $config): Logger
+    protected function createLogger(Configuration $config): Logger
     {
         $logger = new Logger('lotgd');
         
@@ -97,31 +79,33 @@ class Bootstrap
      * Creates an entity manager and connects to the database
      * @param \LotGD\Core\Configuration $config
      */
-    protected static function createEntityManager(Configuration $config): EntityManager
+    protected function createEntityManager(Configuration $config): EntityManager
     {
-        // Doctrine
+        // Connect to the database using credentials from config
         $pdo = new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
-
-        $entityManager = self::_createEntityManager($pdo);
+        
+        $entityPaths = $this->getEntityPaths($config);
+        $entityManager = $this->createEntityManagerInstance($pdo, $entityPaths);
         
         return $entityManager;
     }
     
-    protected static function _createEntityManager(\PDO $pdo, array $paths = [])
+    protected function getEntityPaths(Configuration $config): array
     {
-        // Read db annotations from model files
-        if (count($paths) === 0) {
-            $annotationMetaDataDirectories = array_merge(
-                [__DIR__ . '/Models'],
-                self::$annotationMetaDataDirectories,
-                $paths
-            );
-        }
-        else {
-            $annotationMetaDataDirectories = $paths;
+        $directories = [
+            __DIR__ . '/Models',
+        ];
+        
+        if ($config->hasCrateBootstrapClass() && $config->getCrateBootstrapClass()->hasEntityPath()) {
+            $directories[] = $config->getCrateBootstrapClass()->getEntityPath();
         }
         
-        $configuration = Setup::createAnnotationMetadataConfiguration($annotationMetaDataDirectories, true);
+        return $directories;
+    }
+    
+    protected function createEntityManagerInstance(\PDO $pdo, array $paths = [])
+    {        
+        $configuration = Setup::createAnnotationMetadataConfiguration($paths, true);
 
         // Set a quote
         $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
@@ -138,17 +122,7 @@ class Bootstrap
     
     public static function bootstrapModules(Game $game)
     {
-        $entityDirectories = array_merge(
-            [__DIR__ . '/Models'],
-            self::$annotationMetaDataDirectories
-        );
-        
-        // Bootstrap crate first
-        if (!is_null(self::$bootstrapCrate)) {
-            if (self::$bootstrapCrate->hasEntityPath()) {
-                $entityDirectories[] = self::$bootstrapCrate->getEntityPath();
-            }
-        }
+        /*$entityDirectories = self::getEntityDirectories($game->getConfiguration());
         
         // Bootstrap modules        
         foreach($game->getModuleManager()->getModules() as $module) {
@@ -167,6 +141,6 @@ class Bootstrap
         $em = self::_createEntityManager($pdo, $entityDirectories);
         
         // Set NEW entity Manager
-        $game->setEntityManager($em);
+        $game->setEntityManager($em);*/
     }
 }

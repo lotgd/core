@@ -21,35 +21,9 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($g->getEventManager());
         $this->assertNotNull($g->getLogger());
     }
-
-    public function testDoctrineReadsAnnotationsFromAdditionalMetaDataDirectory()
-    {
-        Bootstrap::clear();
-        Bootstrap::registerAnnotationMetaDataDirectory(__DIR__ . "/AdditionalEntities");
-
-        $g = Bootstrap::createGame();
-
-        $user = new UserEntity();
-        $user->setName("Monthy");
-
-        $g->getEntityManager()->persist($user);
-        $g->getEntityManager()->flush();
-
-        $id = $user->getId();
-        $this->assertInternalType("int", $id);
-
-        $g->getEntityManager()->clear();
-        $user = $g->getEntityManager()->getRepository(UserEntity::class)->find($id);
-
-        $this->assertInternalType("int", $user->getId());
-        $this->assertInternalType("string", $user->getName());
-        $this->assertSame("Monthy", $user->getName());
-    }
     
     public function testUserEntityDoesThrowDBALException() {
         $this->expectException(\Doctrine\DBAL\DBALException::class);
-                
-        Bootstrap::clear();
         
         $game = Bootstrap::createGame();
         
@@ -61,10 +35,29 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
     }
     
     public function testBootstrappedCrateDoesExtendDoctrine() {
-        Bootstrap::clear();
-        Bootstrap::registerCrateBootstrap(new BootstrapCrate());
+        $mockBootstrap = $this->getMockBuilder("\LotGD\Core\Bootstrap")
+            ->setMethods(["createConfiguration"])
+            ->getMock();
         
-        $game = Bootstrap::createGame();
+        $mockConfiguration = $this->getMockBuilder("\LotGD\Core\Configuration")
+            ->setConstructorArgs([getenv("LOTGD_CONFIG")])
+            ->setMethods(["hasCrateBootstrapClass", "getCrateBootstrapClass"])
+            ->getMock();
+        
+        $bootstrapClass = BootstrapCrate::class;
+        
+        $mockConfiguration->expects($this->any())
+            ->method("hasCrateBootstrapClass")
+            ->willReturn(true);
+        $mockConfiguration->expects($this->any())
+            ->method("getCrateBootstrapClass")
+            ->willReturn(new $bootstrapClass());
+        
+        $mockBootstrap->expects($this->any())
+            ->method("createConfiguration")
+            ->willReturn($mockConfiguration);
+        
+        $game = $mockBootstrap->getGame();
         
         Bootstrap::bootstrapModules($game);
         
