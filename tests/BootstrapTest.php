@@ -37,14 +37,16 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
                                 ->getMock();
 
         $package = $this->getMockForAbstractClass(PackageInterface::class);
+        $package->method('getName')->willReturn('lotgd/BootstrapTest');
         $package->method('getExtra')->willReturn(array(
             'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
         ));
+        $composerManager->method('getPackages')->willReturn(array($package));
 
-        $composerManager->method('getModulePackages')->willReturn(array($package));
+        $expected = __DIR__ . DIRECTORY_SEPARATOR . 'FakeModule';
+        $composerManager->method('translateNamespaceToPath')->willReturn($expected);
 
         $result = Bootstrap::generateAnnotationDirectories($this->logger, $composerManager);
-        $expected = __DIR__ . DIRECTORY_SEPARATOR . 'FakeModule';
 
         $string = implode(', ', $result);
         $found = false;

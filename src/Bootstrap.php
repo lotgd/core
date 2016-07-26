@@ -60,26 +60,20 @@ class Bootstrap
         // Read db annotations from our own model files.
         $directories = [__DIR__ . '/Models'];
 
-        // Find other annotation directories from installed modules.
-        $modulePackages = $manager->getModulePackages();
-        foreach ($modulePackages as $p) {
+        // Find other annotation directories from installed packages.
+        $packages = $manager->getPackages();
+        foreach ($packages as $p) {
             $name = $p->getName();
             $extra = $p->getExtra();
             if (!empty($extra['lotgd-namespace'])) {
-                $n = $extra['lotgd-namespace'];
+                $namespace = $extra['lotgd-namespace'];
+                $path = $manager->translateNamespaceToPath($namespace);
 
-                // Find the directory for this namespace by using the autoloader
-                // to find the required Module class.
-                $autoloader = require(ComposerManager::findAutoloader());
-                $path = $autoloader->findFile($n . 'Module');
-                if ($path === false) {
-                    $logger->error("Module {$name} lacks a {$n}Module class.");
-                    continue;
+                if ($path === null) {
+                    throw new \Exception("Cannot load classes in the namespace {$namespace} from package {$name}.");
                 }
 
-                $directories[] = dirname($path);
-            } else {
-                $logger->error("Module {$name} lacks a 'lotgd-namespace' entry in its composer 'extra' field. Its database models will not be properly loaded.");
+                $directories[] = $path;
             }
         }
         return $directories;
