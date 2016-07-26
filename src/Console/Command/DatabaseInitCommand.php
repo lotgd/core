@@ -1,6 +1,5 @@
 <?php
-
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command;
 
@@ -9,8 +8,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use LotGD\Core\Console\Main;
+use LotGD\Core\Game;
 
-class DatabaseInitCommand extends Command
+class DatabaseInitCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -20,8 +20,6 @@ class DatabaseInitCommand extends Command
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $g = Main::createGame();
-        
-        $g->getEntityManager()->flush();
+        $this->game->getEntityManager()->flush();
     }
 }

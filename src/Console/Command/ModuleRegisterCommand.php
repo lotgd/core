@@ -3,19 +3,14 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use LotGD\Core\Console\Main;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 
-class ModuleRegisterCommand extends Command
-{
+class ModuleRegisterCommand extends BaseCommand
+{    
     protected function configure()
     {
         $this->setName('module:register')
@@ -24,15 +19,13 @@ class ModuleRegisterCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $g = Main::createGame();
-
-        $modules = $g->getComposerManager()->getModulePackages();
+        $modules = $this->game->getComposerManager()->getModulePackages();
 
         foreach ($modules as $p) {
             $library = $p->getName();
 
             try {
-                $g->getModuleManager()->register($library, $p);
+                $this->game->getModuleManager()->register($library, $p);
 
                 $output->writeln("<info>Registered new module {$library}</info>");
             } catch (ModuleAlreadyExistsException $e) {

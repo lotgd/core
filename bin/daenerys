@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use LotGD\Core\Bootstrap;
+use LotGD\Core\Console\Main as DaenerysConsole;
 
 function includeIfExists($file) 
 {
@@ -16,8 +16,7 @@ includeIfExists(getcwd() . '/vendor/autoload.php') ||
 includeIfExists(__DIR__ . '/../vendor/autoload.php') ||
 includeIfExists(__DIR__ . '/../autoload.php');
 
-$loader = function () {
-    return Bootstrap::createGame();
-};
+putenv("LOTGD_CONFIG=./config/test.yml");
 
-LotGD\Core\Console\Main::main($loader);
+$daenerys = new DaenerysConsole();
+$daenerys->run();

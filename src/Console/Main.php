@@ -15,43 +15,39 @@ use LotGD\Core\Console\Command\{
 };
 
 class Main {
-    protected static $loader = null;
-
-    /**
-     * Saves a closure used as bootstrap loader
-     * @param \Closure $loader
-     */
-    public static function setBootstrapLoader(\Closure $loader)
+    private $application;
+    private $bootstrap;
+    private $game;
+    
+    public function __construct()
     {
-        self::$loader = $loader;
+        $this->application = new Application();
+
+        $this->application->setName("daenerys 🐲 ");
+        $this->application->setVersion("0.0.1 (lotgd/core version " . \LotGD\Core\Game::getVersion() . ")");
     }
-
-    /**
-     * Creates the game using the previously stored bootstrap loader or
-     * uses the default one
-     * @return Game
-     */
-    public static function createGame(): Game
+    
+    protected function addCommands()
     {
-        if (is_null(self::$loader)) {
-            return Bootstrap::createGame();
-        }
-
-        return $loader();
+        $this->application->add(new ModuleValidateCommand($this->game));
+        $this->application->add(new ModuleRegisterCommand($this->game));
+        $this->application->add(new DatabaseInitCommand($this->game));
+        $this->application->add(new ConsoleCommand($this->game));
+        
+        // Add additional ones
+        $this->bootstrap->addDaenerysCommands($this->application);
     }
-
-    public static function main()
+    
+    public function run()
     {
-        $application = new Application();
-
-        $application->setName("daenerys 🐲 ");
-        $application->setVersion("0.0.1 (lotgd/core version " . \LotGD\Core\Game::getVersion() . ")");
-
-        $application->add(new ModuleValidateCommand());
-        $application->add(new ModuleRegisterCommand());
-        $application->add(new DatabaseInitCommand());
-        $application->add(new ConsoleCommand());
-
-        $application->run();
+        // Bootstrap application
+        $this->bootstrap = new Bootstrap();
+        $this->game = $this->bootstrap->getGame();
+        
+        // Add commands
+        $this->addCommands();
+        
+        // Run
+        $this->application->run();
     }
 }

@@ -15,6 +15,7 @@ use Monolog\ {
     Handler\RotatingFileHandler
 };
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Application;
 
 use LotGD\Core\ {
     ComposerManager,
@@ -26,6 +27,7 @@ use LotGD\Core\ {
 class Bootstrap
 {
     private $game;
+    private $bootstrapClasses = [];
     private $annotationDirectories = [];
     
     /**
@@ -44,19 +46,21 @@ class Bootstrap
         $config = $this->createConfiguration();
         $logger = $this->createLogger($config, "lotgd");
         $composer = $this->createComposer($logger);
-        $bootstrapClasses = $this->getBootstrapClasses($composer);
+        $this->bootstrapClasses = $this->getBootstrapClasses($composer);
         
         $pdo = $this->connectToDatabase($config);
-        $entityManager = $this->createEntityManager($pdo, $bootstrapClasses);
+        $entityManager = $this->createEntityManager($pdo);
         
         $eventManager = $this->createEventManager($entityManager);
         
-        return new Game($config, $logger, $entityManager, $eventManager);
+        $this->game = new Game($config, $logger, $entityManager, $eventManager);
+        
+        return $this->game;
     }
     
-    protected function createEntityManager(\PDO $pdo, array $bootstrapClasses): EntityManagerInterface
+    protected function createEntityManager(\PDO $pdo): EntityManagerInterface
     {
-        $this->annotationDirectories = $this->generateAnnotationDirectories($bootstrapClasses);
+        $this->annotationDirectories = $this->generateAnnotationDirectories();
         $configuration = Setup::createAnnotationMetadataConfiguration($this->annotationDirectories, true);
 
         // Set a quote
@@ -180,13 +184,13 @@ class Bootstrap
      * @param array $bootstrapClasses
      * @return array
      */
-    protected function generateAnnotationDirectories(array $bootstrapClasses): array
+    protected function generateAnnotationDirectories(): array
     {
         // Read db annotations from our own model files.
         $directories = [__DIR__ . '/Models'];
         
         // Get additional annotation directories from bootstrap classes
-        foreach ($bootstrapClasses as $bootstrap) {
+        foreach ($this->bootstrapClasses as $bootstrap) {
             if ($bootstrap->hasEntityPath()) {
                 $directories[] = $bootstrap->getEntityPath();
             }
@@ -198,5 +202,13 @@ class Bootstrap
     public function getReadAnnotationDirectories(): array
     {
         return $this->annotationDirectories;
+    }
+    
+    public function addDaenerysCommands(Application $application)
+    {
+        foreach($this->bootstrapClasses as $bootstrap)
+        {
+            $bootstrap->addDaenerysCommand($this->game, $application);
+        }
     }
 }
