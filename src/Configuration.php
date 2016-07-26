@@ -19,6 +19,8 @@ class Configuration
     private $databaseUser;
     private $databasePassword;
     private $logPath;
+    private $crateBootstrapClass;
+    private $crateBootstrapClassInstance;
 
     /**
      * Create the configuration object, reading from the specified path.
@@ -42,6 +44,7 @@ class Configuration
         }
         $this->logPath = $realLogPath;
 
+        // database connection details
         $dsn = $rawConfig['database']['dsn'] ?? '';
         $user = $rawConfig['database']['user'] ?? '';
         $passwd = $rawConfig['database']['password'] ?? '';
@@ -72,6 +75,15 @@ class Configuration
         $this->databaseUser = $user;
         $this->databasePassword = $passwd;
         $this->databaseName = $name;
+        
+        // crate config
+        if (!empty($rawConfig['crate'])) {
+            $crateBootstrapClass = $rawConfig['crate']['bootstrapClass'] ?? null;
+            
+            if (class_exists($crateBootstrapClass, true)) {
+                $this->crateBootstrapClass = $crateBootstrapClass;
+            }
+        }
     }
 
     /**
@@ -118,6 +130,21 @@ class Configuration
     public function getLogPath(): string
     {
         return $this->logPath;
+    }    
+    
+    public function hasCrateBootstrapClass(): bool
+    {
+        return !empty($this->crateBootstrapClass);
+    }
+    
+    public function getCrateBootstrapClass(): BootstrapInterface
+    {
+        if (empty($this->crateBootstrapClassInstance)) {
+            $class = $this->crateBootstrapClass;
+            $this->crateBootstrapClassInstance = new $class();
+        }
+        
+        return $this->crateBootstrapClassInstance;
     }
 
     public function __toString(): string
@@ -125,12 +152,14 @@ class Configuration
         $s = "";
 
         $s .= "database:\n";
-        $s .= "  dsn: " . $this->getDatabaseDSN() . "\n";
+        $s .= "  dsn: \"" . $this->getDatabaseDSN() . "\"\n";
         $s .= "  name: " . $this->getDatabaseName() . "\n";
         $s .= "  user: " . $this->getDatabaseUser() . "\n";
         $s .= "  password: " . $this->getDatabasePassword() . "\n";
         $s .= "logs:\n";
         $s .= "  path: " . $this->getLogPath() . "\n";
+        $s .= "crate:\n";
+        $s .= "  bootstrapClass: " . $this->getCrateBootstrapClass() . "\n";
 
         return $s;
     }

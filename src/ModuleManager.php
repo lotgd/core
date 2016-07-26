@@ -6,6 +6,7 @@ namespace LotGD\Core;
 use Composer\Package\PackageInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
+use LotGD\Core\BootstrapInterface;
 use LotGD\Core\Exceptions\KeyNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;

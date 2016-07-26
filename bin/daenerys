@@ -3,21 +3,13 @@
 
 use LotGD\Core\Bootstrap;
 
-function includeIfExists($file) 
-{
-    if (file_exists($file)) {
-        return include $file;
-    }
-}
-
-// Dance to find the autoloader.
-// TOOD: change this to open up the Composer config and use $c['config']['vendor-dir'] instead of "vendor"
-includeIfExists(getcwd() . '/vendor/autoload.php') ||
-includeIfExists(__DIR__ . '/../vendor/autoload.php') ||
-includeIfExists(__DIR__ . '/../autoload.php');
+$daenerys = require __DIR__ . "/../bootstrap/console.php";
 
 $loader = function () {
+    putenv("LOTGD_CONFIG=./config/test.yml");
     return Bootstrap::createGame();
 };
 
-LotGD\Core\Console\Main::main($loader);
+$daenerys::setBootstrapLoader($loader);
+
+$daenerys->run();
