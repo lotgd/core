@@ -55,6 +55,15 @@ class ComposerManager
     }
 
     /**
+     * Return all the packages installed in the current setup.
+     * @return array Array of \Composer\PackageInterface
+     */
+    public function getPackages(): array
+    {
+        return $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages();
+    }
+
+    /**
      * Return a list of the configured packages which are LotGD modules (type = 'lotgd-module').
      * @return array Array of \Composer\PackageInterface.
      */
@@ -69,6 +78,54 @@ class ComposerManager
         }
 
         return $result;
+    }
+
+    /**
+     * Find the filesystem path where the code for a namespace can be found.
+     * @param string $namespace The namespace to translate.
+     * @return string|null Path representing $namespace or null if $namespace
+     * cannot be found or if the path does not exist.
+     */
+    public function translateNamespaceToPath(string $namespace)
+    {
+        // Find the directory for this namespace by using the autoloader's
+        // classmap.
+        $autoloader = require(ComposerManager::findAutoloader());
+        $prefixes = $autoloader->getPrefixesPsr4();
+
+        // Standardize the namespace to remove any leading \ and add a trailing \
+        $n = $namespace;
+        if ('\\' == $n[0]) {
+            $n = substr($n, 1);
+        }
+        if (strlen($n) > 0 && '\\' != $n[strlen($n) - 1]) {
+            $n .= '\\';
+        }
+
+        $split = explode('\\', $n);
+        $suffix = array_splice($split, -1, 1); // starts with ['']
+        $path = null;
+        while (!empty($split)) {
+            $key = join('\\', $split) . '\\';
+            $dir = join(DIRECTORY_SEPARATOR, $suffix);
+            // Prefix to directory mappings are arrays in Composer's
+            // ClassLoader object. Not sure why. This might break in
+            // some unforseen case.
+            if (isset($prefixes[$key]) && is_dir($prefixes[$key][0] .  DIRECTORY_SEPARATOR . $dir)) {
+                $path = $prefixes[$key][0] .  DIRECTORY_SEPARATOR . $dir;
+                break;
+            }
+            $suffix = array_merge($suffix, array_splice($split, -1, 1));
+        }
+
+        if ($path == null) {
+            return null;
+        }
+        $path = realpath($path);
+        if ($path == false) {
+            return null;
+        }
+        return $path;
     }
 
     /**
