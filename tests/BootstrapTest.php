@@ -10,7 +10,7 @@ use Monolog\Handler\NullHandler;
 
 use LotGD\Core\Bootstrap;
 use LotGD\Core\ComposerManager;
-use LotGD\Core\Tests\FakeModule\UserEntity;
+use LotGD\Core\Tests\FakeModule\Models\UserEntity;
 
 class BootstrapTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,19 +42,27 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
             'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
         ));
         $composerManager->method('getPackages')->willReturn(array($package));
-
-        $expected = __DIR__ . DIRECTORY_SEPARATOR . 'FakeModule';
-        $composerManager->method('translateNamespaceToPath')->willReturn($expected);
-
-        $result = Bootstrap::generateAnnotationDirectories($this->logger, $composerManager);
-
-        $string = implode(', ', $result);
-        $found = false;
-        foreach ($result as $r) {
-            if (realpath($r) == $expected) {
-                $found = true;
-            }
-        }
-        $this->assertTrue($found, "Annotation directories [{$string}] does not contain {$expected}.");
+        
+        $bootstrap = $this->getMockBuilder(Bootstrap::class)
+            ->setMethods(["createComposer"])
+            ->getMock();
+        
+        $bootstrap->method("createComposer")->willReturn($composerManager);
+        
+        $game = $bootstrap->getGame();
+        
+        $this->assertGreaterThanOrEqual(2, $bootstrap->getReadAnnotationDirectories());
+        
+        $user = new UserEntity();
+        $user->setName("Monthy");
+        $game->getEntityManager()->persist($user);
+        $game->getEntityManager()->flush();
+        $id = $user->getId();
+        $this->assertInternalType("int", $id);
+        $game->getEntityManager()->clear();
+        $user = $game->getEntityManager()->getRepository(UserEntity::class)->find($id);
+        $this->assertInternalType("int", $user->getId());
+        $this->assertInternalType("string", $user->getName());
+        $this->assertSame("Monthy", $user->getName());
     }
 }

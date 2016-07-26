@@ -16,17 +16,17 @@ class Game
     private $moduleManager;
     private $logger;
     private $configuration;
-
+    
     public function __construct(
         Configuration $configuration,
+        Logger $logger,
         EntityManagerInterface $entityManager,
-        EventManager $eventManager,
-        Logger $logger)
-    {
+        EventManager $eventManager
+    ) {
         $this->configuration = $configuration;
+        $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->eventManager = $eventManager;
-        $this->logger = $logger;
     }
 
     /**

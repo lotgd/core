@@ -56,7 +56,7 @@ class ComposerManager
 
     /**
      * Return all the packages installed in the current setup.
-     * @return array Array of \Composer\PackageInterface
+     * @return array<Composer\PackageInterface>
      */
     public function getPackages(): array
     {
