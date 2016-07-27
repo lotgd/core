@@ -3,10 +3,17 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
-use Composer\Composer;
+use Composer\{
+    Composer,
+    Factory,
+    IO\NullIO
+};
 use Monolog\Logger;
 
-use LotGD\Core\Exceptions\LibraryDoesNotExistException;
+use LotGD\Core\{  
+    Exceptions\InvalidConfigurationException,
+    Exceptions\LibraryDoesNotExistException
+};
 
 /**
  * Helps perform tasks with the composer configuration.
@@ -32,8 +39,22 @@ class ComposerManager
     public function getComposer(): Composer
     {
         if ($this->composer === null) {
-            $this->composer = \Composer\Factory::create(new \Composer\IO\NullIO());
+            // Search "true" working directory
+            if (file_exists(getcwd() . "/composer.json")) {
+                $cwd = getcwd() . "/";
+            }
+            elseif (file_exists(getcwd() . "/../composer.json")) {
+                $cwd = getcwd() . "/../";
+            }
+            else {
+                $cwd = getcwd();
+                throw new InvalidConfigurationException("composer.json has neither been found in {$cwd} nor in it's parent directory.");
+            }
+            
+            $io = new NullIO();
+            $this->composer = Factory::create($io, $cwd . "composer.json");
         }
+        
         return $this->composer;
     }
 

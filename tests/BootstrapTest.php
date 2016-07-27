@@ -29,6 +29,25 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($g->getEventManager());
         $this->assertNotNull($g->getLogger());
     }
+    
+    public function testWorkingFromChildWorkingDirectory()
+    {
+        $cwd = getcwd();
+        $oldconf = getenv("LOTGD_CONFIG");
+        chdir($cwd . "/tests/");
+        putenv("LOTGD_CONFIG=../".$oldconf);
+        
+        $this->assertStringEndsWith("/tests", getcwd());
+        $this->assertStringStartsWith(".././", getenv("LOTGD_CONFIG"));
+        
+        $game = Bootstrap::createGame();
+        
+        chdir($cwd);
+        putenv("LOTGD_CONFIG=" . $oldconf);
+        
+        $this->assertStringEndsNotWith("/tests", getcwd());
+        $this->assertStringStartsNotWith(".././", getenv("LOTGD_CONFIG"));
+    }
 
     public function testGenerateAnnotationDirectories()
     {
