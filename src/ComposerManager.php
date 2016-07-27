@@ -20,17 +20,7 @@ use LotGD\Core\{
  */
 class ComposerManager
 {
-    private $logger;
     private $composer;
-
-    /**
-     * Creates a new ComposerManager.
-     * @param Monlog\Logger $logger A logger instance for messaging.
-     */
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
-    }
 
     /**
      * Returns a Composer instance to perform underlying operations on. Be careful.

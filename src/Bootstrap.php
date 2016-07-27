@@ -46,10 +46,11 @@ class Bootstrap
      */
     public function getGame(): Game
     {
+        $composer = $this->createComposerManager();
+        $this->bootstrapClasses = $this->getBootstrapClasses($composer);
+        
         $config = $this->createConfiguration();
         $logger = $this->createLogger($config, "lotgd");
-        $composer = $this->createComposerManager($logger);
-        $this->bootstrapClasses = $this->getBootstrapClasses($composer);
         
         $pdo = $this->connectToDatabase($config);
         $entityManager = $this->createEntityManager($pdo);
@@ -100,9 +101,9 @@ class Bootstrap
      * @param Logger $logger
      * @return ComposerManager
      */
-    protected function createComposerManager(Logger $logger): ComposerManager
+    protected function createComposerManager(): ComposerManager
     {
-        $composer = new ComposerManager($logger);
+        $composer = new ComposerManager();
         
         return $composer;
     }
