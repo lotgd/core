@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use DateTime;
+
 class TimeKeeper
 {
     private $adjustedEpoch;
@@ -17,13 +19,13 @@ class TimeKeeper
     private $secondsPerGameMinute;
     private $secondsPerGameSecond;
 
-    public function __construct(\DateTime $gameEpoch, int $gameOffsetSeconds, int $gameDaysPerDay)
+    public function __construct(DateTime $gameEpoch, int $gameOffsetSeconds, int $gameDaysPerDay)
     {
         $gameEpochCopy = clone($gameEpoch);
         $this->adjustedEpoch = $gameEpochCopy->add(
             $this->interval(0, 0, 0, 0, $gameOffsetSeconds)
         );
-        $this->theBeginning = new \DateTime("0000-01-01 UTC");
+        $this->theBeginning = new DateTime("0000-01-01 UTC");
 
         $this->secondsPerGameDay = (float) $this->secondsPerDay / $gameDaysPerDay;
         $this->secondsPerGameYear = $this->secondsPerGameDay * 365;
@@ -45,14 +47,14 @@ class TimeKeeper
         return $d1 != $d2;
     }
 
-    public function gameTime(): \DateTime
+    public function gameTime(): DateTime
     {
-        return $this->convertToGameTime(new \DateTime());
+        return $this->convertToGameTime(new DateTime());
     }
 
     public function convertFromGameTime(
-        \DateTime $time
-    ): \DateTime {
+        DateTime $time
+    ): DateTime {
         // Game dates are in the distant past, better not use getTimestamp().
         $i = $this->theBeginning->diff($time);
 
@@ -67,8 +69,8 @@ class TimeKeeper
     }
 
     public function convertToGameTime(
-        \DateTime $time
-    ): \DateTime {
+        DateTime $time
+    ): DateTime {
         $timeUnix = $time->getTimestamp();
         $epochUnix = $this->adjustedEpoch->getTimestamp();
 

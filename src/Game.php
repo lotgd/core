@@ -115,4 +115,19 @@ class Game
     {
         return $this->logger;
     }
+
+    /**
+     * Returns the time keeper.
+     * @return TimeKeeper
+     */
+    public function getTimeKeeper(): TimeKeeper
+    {
+        if ($this->timeKeeper == null) {
+            $gameEpoch = $this->getConfiguration()->getGameEpoch();
+            $gameOffsetSeconds = $this->getConfiguration()->getGameOffsetSeconds();
+            $gameDaysPerDay = $this->getConfiguration()->getGameDaysPerDay();
+            $this->timeKeeper = new TimeKeeper($gameEpoch, $gameOffsetSeconds, $gameDaysPerDay);
+        }
+        return $this->timeKeeper;
+    }
 }
