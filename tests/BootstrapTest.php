@@ -44,10 +44,10 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $composerManager->method('getPackages')->willReturn(array($package));
         
         $bootstrap = $this->getMockBuilder(Bootstrap::class)
-            ->setMethods(["createComposer"])
+            ->setMethods(["createComposerManager"])
             ->getMock();
         
-        $bootstrap->method("createComposer")->willReturn($composerManager);
+        $bootstrap->method("createComposerManager")->willReturn($composerManager);
         
         $game = $bootstrap->getGame();
         

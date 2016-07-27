@@ -32,7 +32,6 @@ class Bootstrap
     
     /**
      * Create a new Game object, with all the necessary configuration.
-     * @throws InvalidConfigurationException
      * @return Game The newly created Game object.
      */
     public static function createGame(): Game
@@ -41,11 +40,15 @@ class Bootstrap
         return $game->getGame();
     }
     
-    public function getGame()
+    /**
+     * Starts the game kernel with the most important classes and returns the object
+     * @return Game
+     */
+    public function getGame(): Game
     {
         $config = $this->createConfiguration();
         $logger = $this->createLogger($config, "lotgd");
-        $composer = $this->createComposer($logger);
+        $composer = $this->createComposerManager($logger);
         $this->bootstrapClasses = $this->getBootstrapClasses($composer);
         
         $pdo = $this->connectToDatabase($config);
@@ -58,6 +61,11 @@ class Bootstrap
         return $this->game;
     }
     
+    /**
+     * Creates the EntityManager using the pdo connection given in it's argument
+     * @param \PDO $pdo
+     * @return EntityManagerInterface
+     */
     protected function createEntityManager(\PDO $pdo): EntityManagerInterface
     {
         $this->annotationDirectories = $this->generateAnnotationDirectories();
@@ -92,7 +100,7 @@ class Bootstrap
      * @param Logger $logger
      * @return ComposerManager
      */
-    protected function createComposer(Logger $logger): ComposerManager
+    protected function createComposerManager(Logger $logger): ComposerManager
     {
         $composer = new ComposerManager($logger);
         
@@ -137,7 +145,7 @@ class Bootstrap
     }
     
     /**
-     * Returns a configuration object reading from LOTGD_CONFIG
+     * Returns a configuration object reading from the file located at the path stored in LOTGD_CONFIG.
      * @return \LotGD\Core\Configuration
      * @throws InvalidConfigurationException
      */
@@ -145,7 +153,7 @@ class Bootstrap
     {
         $configFilePath = getenv('LOTGD_CONFIG');
         if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
-            throw new InvalidConfigurationException("Invalid or missing configuration file: '{$configFilePath}'.");
+            throw new InvalidConfigurationException("Invalid or missing configuration file: {$configFilePath}.");
         }
         
         $config = new Configuration($configFilePath);
@@ -199,11 +207,19 @@ class Bootstrap
         return $directories;
     }
     
+    /**
+     * Return all directories used for reading annotations.
+     * @return array<string>
+     */
     public function getReadAnnotationDirectories(): array
     {
         return $this->annotationDirectories;
     }
     
+    /**
+     * Adds console commands to a given console application from bootstrapping packages.
+     * @param Application $application
+     */
     public function addDaenerysCommands(Application $application)
     {
         foreach($this->bootstrapClasses as $bootstrap)
