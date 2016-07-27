@@ -5,6 +5,7 @@ namespace LotGD\Core\Tests\FakeModule;
 use Symfony\Component\Console\Application;
 
 use LotGD\Core\BootstrapInterface;
+use LotGD\Core\Game;
 
 class Bootstrap implements BootstrapInterface
 {
@@ -18,7 +19,7 @@ class Bootstrap implements BootstrapInterface
         return __DIR__ . "/Models";
     }
     
-    public function addDaenerysCommand(Application $application)
+    public function addDaenerysCommand(Game $game, Application $application)
     {
         
     }

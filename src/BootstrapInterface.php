@@ -9,5 +9,5 @@ interface BootstrapInterface
 {
     public function hasEntityPath(): bool;
     public function getEntityPath(): string;
-    public function addDaenerysCommand(Application $application);
+    public function addDaenerysCommand(Game $game, Application $application);
 }

@@ -20,7 +20,6 @@ use Symfony\Component\Console\Application;
 use LotGD\Core\ {
     ComposerManager,
     BootstrapInterface,
-    Exceptions\ArgumentException,
     Exceptions\InvalidConfigurationException
 };
 
@@ -47,7 +46,7 @@ class Bootstrap
     public function getGame(): Game
     {
         $composer = $this->createComposerManager();
-        $this->bootstrapClasses = $this->getBootstrapClasses($composer);
+        $this->bootstrapClasses = $this->initPackageBootstraps($composer);
         
         $config = $this->createConfiguration();
         $logger = $this->createLogger($config, "lotgd");
@@ -114,7 +113,7 @@ class Bootstrap
      * @return array
      * @throws \Exception
      */
-    protected function getBootstrapClasses(ComposerManager $composer): array
+    protected function initPackageBootstraps(ComposerManager $composer): array
     {
         $packages = $composer->getPackages();
         $classes = [];
@@ -223,7 +222,7 @@ class Bootstrap
      */
     public function addDaenerysCommands(Application $application)
     {
-        foreach($this->bootstrapClasses as $bootstrap)
+        foreach ($this->bootstrapClasses as $bootstrap)
         {
             $bootstrap->addDaenerysCommand($this->game, $application);
         }

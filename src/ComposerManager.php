@@ -71,7 +71,10 @@ class ComposerManager
      */
     public function getPackages(): array
     {
-        return $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages();
+        return array_merge(
+            [$this->getComposer()->getPackage()],
+            $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages()
+        );
     }
 
     /**
