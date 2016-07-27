@@ -3,5 +3,9 @@ database:
     name: daenerys
     user: root
     password:
+game:
+    epoch: 2016-07-01 00:00:00.0 -8
+    offsetSeconds: 0
+    daysPerDay: 1
 logs:
     path: ../logs

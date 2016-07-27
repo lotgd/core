@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use DateTime;
+
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -19,6 +21,9 @@ class Configuration
     private $databaseUser;
     private $databasePassword;
     private $logPath;
+    private $gameEpoch;
+    private $gameOffsetSeconds;
+    private $gameDaysPerDay;
 
     /**
      * Create the configuration object, reading from the specified path.
@@ -31,14 +36,14 @@ class Configuration
             $rawConfig = Yaml::parse(file_get_contents($configFilePath));
         } catch (ParseException $e) {
             $m = $e->getMessage();
-            throw new InvalidConfigurationException("Unable to parse configuration file at '{$configFilePath}': {$m}.");
+            throw new InvalidConfigurationException("Unable to parse configuration file at {$configFilePath}: {$m}");
         }
 
         // Log dir path is relative to config directory.
         $logPath = $rawConfig['logs']['path'] ?? '';
         $realLogPath = dirname($configFilePath) . DIRECTORY_SEPARATOR . $logPath;
         if ($realLogPath === false || strlen($realLogPath) == 0 || is_dir($realLogPath) === false) {
-            throw new InvalidConfigurationException("Invalid or missing log path: '{$realLogPath}'.");
+            throw new InvalidConfigurationException("Invalid or missing log path: {$realLogPath}");
         }
         $this->logPath = $realLogPath;
 
@@ -48,30 +53,50 @@ class Configuration
         $name = $rawConfig['database']['name'] ?? '';
 
         if ($dsn === false || strlen($dsn) == 0) {
-            $m = "Invalid or missing data source name: '{$dsn}'";
+            $m = "Invalid or missing data source name: {$dsn}";
             $logger->critical($m);
             throw new InvalidConfigurationException($m);
         }
         if ($user === false || strlen($user) == 0) {
-            $m = "Invalid or missing database user: '{$user}'";
+            $m = "Invalid or missing database user: {$user}";
             $logger->critical($m);
-            throw new InvalidConfigurationException("Invalid or missing database user: '{$user}'");
+            throw new InvalidConfigurationException("Invalid or missing database user: {$user}");
         }
         if ($passwd === false) {
-            $m = "Invalid or missing database password: '{$passwd}'";
+            $m = "Invalid or missing database password: {$passwd}";
             $logger->critical($m);
-            throw new InvalidConfigurationException("Invalid or missing database password: '{$passwd}'");
+            throw new InvalidConfigurationException("Invalid or missing database password: {$passwd}");
         }
         if ($name === false) {
-            $m = "Invalid or missing database name: '{$name}'";
+            $m = "Invalid or missing database name: {$name}";
             $logger->critical($m);
-            throw new InvalidConfigurationException("Invalid or missing database name: '{$name}'");
+            throw new InvalidConfigurationException("Invalid or missing database name: {$name}");
         }
 
         $this->databaseDSN = $dsn;
         $this->databaseUser = $user;
         $this->databasePassword = $passwd;
         $this->databaseName = $name;
+
+        $gameEpoch = $rawConfig['game']['epoch'];
+        $gameOffsetSeconds = $rawConfig['game']['offsetSeconds'];
+        $gameDaysPerDay = $rawConfig['game']['daysPerDay'];
+
+        $now = new DateTime();
+
+        if ($now->getTimestamp() < $gameEpoch) {
+            throw new InvalidConfigurationException("Game epoch is set in the future: {$gameEpoch}");
+        }
+        if ($gameOffsetSeconds < 0) {
+            throw new InvalidConfigurationException("Game offset (in seconds) cannot be negative: {$gameOffsetSeconds}");
+        }
+        if ($gameDaysPerDay < 0) {
+            throw new InvalidConfigurationException("Game days per day cannot be negative: {$gameDaysPerDay}");
+        }
+
+        $this->gameEpoch = $gameEpoch;
+        $this->gameOffsetSeconds = $gameOffsetSeconds;
+        $this->gameDaysPerDay = $gameDaysPerDay;
     }
 
     /**
@@ -120,6 +145,34 @@ class Configuration
         return $this->logPath;
     }
 
+    /**
+     * Return which day, in real time, the game's date should start.
+     * @return DateTime
+     */
+    public function getGameEpoch(): DateTime
+    {
+        return $this->gameEpoch;
+    }
+
+    /**
+     * Return the offset, in seconds, from the game epoch, to define when the
+     * game should start.
+     * @return int
+     */
+    public function getGameOffsetSeconds(): int
+    {
+        return $this->gameOffsetSeconds;
+    }
+
+    /**
+     * Return how many game days should exist inside one real time day.
+     * @return int
+     */
+    public function getGameDaysPerDay(): int
+    {
+        return $this->gameDaysPerDay;
+    }
+
     public function __toString(): string
     {
         $s = "";
@@ -129,6 +182,10 @@ class Configuration
         $s .= "  name: " . $this->getDatabaseName() . "\n";
         $s .= "  user: " . $this->getDatabaseUser() . "\n";
         $s .= "  password: <hidden>\n";
+        $s .= "game:\n";
+        $s .= "  epoch: " . $this->getGameEpoch() . "\n";
+        $s .= "  offsetSeconds: " . $this->getGameOffsetSeconds() . "\n";
+        $s .= "  daysPerDay: " . $this->getGameDaysPerDay() . "\n";
         $s .= "logs:\n";
         $s .= "  path: " . $this->getLogPath() . "\n";
 
