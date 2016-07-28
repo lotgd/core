@@ -1,0 +1,11 @@
+database:
+    dsn: some_dsn
+    name: some_name
+    user: some_user
+    password: some_password
+game:
+    epoch: 2016-07-01 01:01:01.0 -8
+    offsetSeconds: 32
+    daysPerDay: 2
+logs:
+    path: ./

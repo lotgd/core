@@ -94,7 +94,7 @@ class Configuration
             throw new InvalidConfigurationException("Game days per day cannot be negative: {$gameDaysPerDay}");
         }
 
-        $this->gameEpoch = $gameEpoch;
+        $this->gameEpoch = (new DateTime())->setTimestamp($gameEpoch);
         $this->gameOffsetSeconds = $gameOffsetSeconds;
         $this->gameDaysPerDay = $gameDaysPerDay;
     }
@@ -183,7 +183,7 @@ class Configuration
         $s .= "  user: " . $this->getDatabaseUser() . "\n";
         $s .= "  password: <hidden>\n";
         $s .= "game:\n";
-        $s .= "  epoch: " . $this->getGameEpoch() . "\n";
+        $s .= "  epoch: " . $this->getGameEpoch()->format(DateTime::ISO8601) . "\n";
         $s .= "  offsetSeconds: " . $this->getGameOffsetSeconds() . "\n";
         $s .= "  daysPerDay: " . $this->getGameDaysPerDay() . "\n";
         $s .= "logs:\n";
