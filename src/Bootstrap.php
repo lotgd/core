@@ -25,8 +25,9 @@ use LotGD\Core\ {
 
 class Bootstrap
 {
+    private $rootDir;
     private $game;
-    private $bootstrapClasses = [];
+    private $bootConfigurationManager = [];
     private $annotationDirectories = [];
     
     /**
@@ -43,10 +44,12 @@ class Bootstrap
      * Starts the game kernel with the most important classes and returns the object
      * @return Game
      */
-    public function getGame(): Game
+    public function getGame(string $rootDir = null): Game
     {
+        $this->rootDir = $rootDir ?? getcwd();
+        
         $composer = $this->createComposerManager();
-        $this->bootstrapClasses = $this->initPackageBootstraps($composer);
+        $this->bootConfigurationManager = $this->createBootConfigurationManager($composer, $this->rootDir);
         
         $config = $this->createConfiguration();
         $logger = $this->createLogger($config, "lotgd");
@@ -61,28 +64,11 @@ class Bootstrap
         return $this->game;
     }
     
-    /**
-     * Creates the EntityManager using the pdo connection given in it's argument
-     * @param \PDO $pdo
-     * @return EntityManagerInterface
-     */
-    protected function createEntityManager(\PDO $pdo): EntityManagerInterface
-    {
-        $this->annotationDirectories = $this->generateAnnotationDirectories();
-        $configuration = Setup::createAnnotationMetadataConfiguration($this->annotationDirectories, true);
-
-        // Set a quote
-        $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
-
-        // Create entity manager
-        $entityManager = EntityManager::create(["pdo" => $pdo], $configuration);
-
-        // Create Schema and update database if needed
-        $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->updateSchema($metaData);
-        
-        return $entityManager;
+    public function createBootConfigurationManager(
+        ComposerManager $composerManager, 
+        string $cwd
+    ): BootConfigurationManager {
+        return new BootConfigurationManager($composerManager, $cwd);
     }
     
     /**
@@ -102,8 +88,7 @@ class Bootstrap
      */
     protected function createComposerManager(): ComposerManager
     {
-        $composer = new ComposerManager();
-        
+        $composer = new ComposerManager();    
         return $composer;
     }
     
@@ -151,12 +136,13 @@ class Bootstrap
      */
     protected function createConfiguration(): Configuration
     {
-        $configFilePath = getenv('LOTGD_CONFIG');
+        $configFilePath = getenv('LOTGD_CONFIG') ?? "/config/lotgd.yml";
+        
         if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
             throw new InvalidConfigurationException("Invalid or missing configuration file: {$configFilePath}.");
         }
         
-        $config = new Configuration($configFilePath);
+        $config = new Configuration($configFilePath, $this->rootDir);
         return $config;
     }
     
@@ -186,6 +172,30 @@ class Bootstrap
     {
         return new EventManager($entityManager);
     }
+    
+    /**
+     * Creates the EntityManager using the pdo connection given in it's argument
+     * @param \PDO $pdo
+     * @return EntityManagerInterface
+     */
+    protected function createEntityManager(\PDO $pdo): EntityManagerInterface
+    {
+        $this->annotationDirectories = $this->generateAnnotationDirectories();
+        $configuration = Setup::createAnnotationMetadataConfiguration($this->annotationDirectories, true);
+
+        // Set a quote
+        $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
+
+        // Create entity manager
+        $entityManager = EntityManager::create(["pdo" => $pdo], $configuration);
+
+        // Create Schema and update database if needed
+        $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
+        $schemaTool = new SchemaTool($entityManager);
+        $schemaTool->updateSchema($metaData);
+        
+        return $entityManager;
+    }
 
     /**
      * Is used to get all directories used to generate annotations.
@@ -198,13 +208,9 @@ class Bootstrap
         $directories = [__DIR__ . '/Models'];
         
         // Get additional annotation directories from bootstrap classes
-        foreach ($this->bootstrapClasses as $bootstrap) {
-            if ($bootstrap->hasEntityPath()) {
-                $directories[] = $bootstrap->getEntityPath();
-            }
-        }
+        $packageDirectories = $this->bootConfigurationManager->getEntityDirectories();
         
-        return $directories;
+        return array_merge($directories, $packageDirectories);
     }
     
     /**
@@ -222,9 +228,6 @@ class Bootstrap
      */
     public function addDaenerysCommands(Application $application)
     {
-        foreach ($this->bootstrapClasses as $bootstrap)
-        {
-            $bootstrap->addDaenerysCommand($this->game, $application);
-        }
+        $this->bootConfigurationManager->addDaenerysCommands($this->game, $application);
     }
 }
