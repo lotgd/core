@@ -44,11 +44,17 @@ class BootConfigurationManager
         return $entityDirectories;
     }
     
+    /**
+     * Adds commands from packages to daenerys
+     * @param \LotGD\Core\Game $game
+     * @param Application $application
+     */
     public function addDaenerysCommands(Game $game, Application $application)
     {
         foreach ($this->configurations as $config) {
-            if ($config->hasDaenerysCommands()) {
-                $config->addDaenerysCommands($game, $application);
+            $commands = $config->getDaenerysCommands();
+            foreach ($commands as $command) {
+                $application->add(new $command($game));
             }
         }
     }
