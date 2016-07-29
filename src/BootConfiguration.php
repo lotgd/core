@@ -53,7 +53,7 @@ class BootConfiguration
         }
         
         $this->findEntityDirectory();
-        $this->findDenerysCommands();
+        $this->findDaenerysCommands();
     }
     
     /**
@@ -172,14 +172,10 @@ class BootConfiguration
      * Searches the config file for daenerys commands and, if found, adds the class name to a list
      * @return type
      */
-    protected function findDenerysCommands()
+    protected function findDaenerysCommands()
     {
         $list = $this->iterateKey("bootstrap", "daenerysCommands");
         $this->daenerysCommands = [];
-        
-        if (is_array($list) === false) {
-            return;
-        }
         
         foreach ($list as $command) {
             $this->daenerysCommands = $this->rootNamespace . $command;
@@ -193,17 +189,13 @@ class BootConfiguration
     public function hasDaenerysCommands(): bool
     {
         return count($this->daenerysCommands) > 0 ? true : false;
-    }
+    }    
     
     /**
-     * Adds daenerys commands from this configuration to the application.
-     * @param \LotGD\Core\Game $game
-     * @param Application $application
+     * Returns a list of daenerys commands
      */
-    public function addDaenerysCommands(Game $game, Application $application)
+    public function getDaenerysCommands(): array
     {
-        foreach ($this->daenerysCommands as $command) {
-            $application->addCommands(new $command($game));
-        }
+        return $this->daenerysCommands;
     }
 }
