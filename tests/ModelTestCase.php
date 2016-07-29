@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
 
 use LotGD\Core\Configuration;
+use LotGD\Core\Exceptions\InvalidConfigurationException;
 
 /**
  * Description of ModelTestCase
@@ -30,7 +31,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
     final public function getConnection(): \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
     {
         if ($this->connection === null) {
-            $configFilePath = getenv('LOTGD_CONFIG');
+            $configFilePath = getcwd() . getenv('LOTGD_CONFIG');
             if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
                 throw new InvalidConfigurationException("Invalid or missing configuration file: '{$configFilePath}'.");
             }

@@ -22,7 +22,7 @@ class BootConfigurationManager
         foreach($packages as $package)
         {            
             if ($package->getType() === "lotgd-crate" || $package->getType() === "lotgd-module") {
-                $this->configurations[] = new BootConfiguration($composerManager, $package);
+                $this->configurations[] = new BootConfiguration($composerManager, $package, $cwd);
             }
         }
     }
@@ -48,7 +48,7 @@ class BootConfigurationManager
     {
         foreach ($this->configurations as $config) {
             if ($config->hasDaenerysCommands()) {
-                $this->addDaenerysCommands($game, $application);
+                $config->addDaenerysCommands($game, $application);
             }
         }
     }

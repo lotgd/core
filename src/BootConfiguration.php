@@ -24,17 +24,33 @@ class BootConfiguration
     private $rawConfig;
     private $models;
     private $daenerysCommands;
+    private $cwd;
     
-    public function __construct(ComposerManager $composerManager, PackageInterface $package)
+    public function __construct(ComposerManager $composerManager, PackageInterface $package, string $cwd)
     {
         $this->composerManager = $composerManager;
         $this->package = $package;
+        $this->cwd = $cwd;
         
         $installationManager = $composerManager->getComposer()->getInstallationManager();
-        $confFile = $installationManager->getInstallPath($package)  . "/lotgd.yml";
+        
+        // only lotgd-modules are installed in the vendor directory
+        if ($package->getType() === "lotgd-module") {
+            $confFile = $installationManager->getInstallPath($package)  . "/lotgd.yml";
+        }
+        else {
+            $confFile = $cwd . "/lotgd.yml";
+        }
         
         $this->rootNamespace = $this->findRootNamespace($package);
-        $this->rawConfig = Yaml::parse(file_get_contents($confFile));
+        if (file_exists($confFile)) {
+            $this->rawConfig = Yaml::parse(file_get_contents($confFile));
+        }
+        else {
+            $name = $package->getName();
+            $type = $package->getType();
+            throw new \Exception("Package {$name} of type {$type} does not have a lotgd.yml in it's root ($confFile).");
+        }
         
         $this->findEntityDirectory();
         $this->findDenerysCommands();
@@ -45,7 +61,6 @@ class BootConfiguration
      * 
      * This function searches the package's configuration to find it's root namespace.
      * For this, it uses the following order:
-     *  - look in ["extra"]["lotgd-namespace"]
      *  - check psr-4 autoload configuration. If used, it takes the first element
      *  - check psr-0 autoload configuration. If used, it takes the first element
      * @param PackageInterface $package
@@ -54,24 +69,24 @@ class BootConfiguration
      */
     protected function findRootNamespace(PackageInterface $package): string
     {
-        // if one is defined, we use that.
-        if (isset($package->getExtra()["lotgd-namespace"])) {
-            return $package->getExtra()["lotgd-namespace"];
-        }
-        
         $autoload = $package->getAutoload();
         if (isset($autoload["psr-4"]) && count($autoload["psr-4"]) > 0) {
-            return $autoload["psr-4"][0];
+            return key($autoload["psr-4"]);
         }
         
         if (isset($autoload["psr-0"]) && count($autoload["psr-0"]) > 0) {
-            return $autoload["psr-0"][0];
+            return key($autoload["psr-0"]);
         }
         
         $name = $package->getName();
         throw new \Exception("{$name} has no valid namespace.");
     }
     
+    /**
+     * Returns a subkey if it exists or null.
+     * @param array $arguments
+     * @return type
+     */
     protected function getSubKeyIfItExists(array $arguments)
     {
         $parent = $this->rawConfig;
@@ -125,7 +140,7 @@ class BootConfiguration
         $entityNamespace = $this->rootNamespace . $entityNamespace;
         
         if (is_null($entityNamespace) === false) {
-            $entityDirectory = $this->composerManager->getComposer()->translateNamespaceToPath($entityNamespace);
+            $entityDirectory = $this->composerManager->translateNamespaceToPath($entityNamespace, $this->cwd);
             
             if (is_dir($entityDirectory) === false) {
                 throw new \Exception("{$entityDirectory}, generated from {$entityNamespace}, is not a valid directory.");
@@ -153,6 +168,10 @@ class BootConfiguration
         return $this->entityDirectory;
     }
     
+    /**
+     * Searches the config file for daenerys commands and, if found, adds the class name to a list
+     * @return type
+     */
     protected function findDenerysCommands()
     {
         $list = $this->iterateKey("bootstrap", "daenerysCommands");
@@ -167,6 +186,20 @@ class BootConfiguration
         }
     }
     
+    /**
+     * Returns true if this configuration has daenerys commands
+     * @return bool
+     */
+    public function hasDaenerysCommands(): bool
+    {
+        return count($this->daenerysCommands) > 0 ? true : false;
+    }
+    
+    /**
+     * Adds daenerys commands from this configuration to the application.
+     * @param \LotGD\Core\Game $game
+     * @param Application $application
+     */
     public function addDaenerysCommands(Game $game, Application $application)
     {
         foreach ($this->daenerysCommands as $command) {

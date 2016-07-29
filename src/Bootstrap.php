@@ -32,16 +32,18 @@ class Bootstrap
     
     /**
      * Create a new Game object, with all the necessary configuration.
+     * @param string $rootDir The root directory if it is different from getcwd()
      * @return Game The newly created Game object.
      */
-    public static function createGame(): Game
+    public static function createGame(string $rootDir = null): Game
     {
         $game = new self();
-        return $game->getGame();
+        return $game->getGame($rootDir);
     }
     
     /**
      * Starts the game kernel with the most important classes and returns the object
+     * @param string $rootDir The root directory if it is different from getcwd()
      * @return Game
      */
     public function getGame(string $rootDir = null): Game
@@ -64,7 +66,13 @@ class Bootstrap
         return $this->game;
     }
     
-    public function createBootConfigurationManager(
+    /**
+     * Creates the boot configuration manager
+     * @param ComposerManager $composerManager
+     * @param string $cwd
+     * @return \LotGD\Core\BootConfigurationManager
+     */
+    protected function createBootConfigurationManager(
         ComposerManager $composerManager, 
         string $cwd
     ): BootConfigurationManager {
@@ -136,7 +144,14 @@ class Bootstrap
      */
     protected function createConfiguration(): Configuration
     {
-        $configFilePath = getenv('LOTGD_CONFIG') ?? "/config/lotgd.yml";
+        $configFilePath = getenv('LOTGD_CONFIG');
+        
+        if (empty($configFilePath)) {
+            $configFilePath = $this->rootDir . "/config/lotgd.yml";
+        }
+        else {
+            $configFilePath = $this->rootDir . $configFilePath;
+        }
         
         if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
             throw new InvalidConfigurationException("Invalid or missing configuration file: {$configFilePath}.");

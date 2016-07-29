@@ -97,14 +97,16 @@ class ComposerManager
     /**
      * Find the filesystem path where the code for a namespace can be found.
      * @param string $namespace The namespace to translate.
+     * @param string $cwd Current working directory
      * @return string|null Path representing $namespace or null if $namespace
      * cannot be found or if the path does not exist.
      */
-    public function translateNamespaceToPath(string $namespace)
+    public function translateNamespaceToPath(string $namespace, string $cwd = null)
     {
         // Find the directory for this namespace by using the autoloader's
         // classmap.
-        $autoloader = require(ComposerManager::findAutoloader());
+        $cwd = $cwd ?? getcwd();
+        $autoloader = require(ComposerManager::findAutoloader($cwd));
         $prefixes = $autoloader->getPrefixesPsr4();
 
         // Standardize the namespace to remove any leading \ and add a trailing \
@@ -145,16 +147,18 @@ class ComposerManager
     /**
      * Returns a path (could be relative) to the proper autoload.php file in
      * the current setup.
+     * @param string $cwd current working directory
      */
-    public static function findAutoloader(): string
+    public static function findAutoloader(string $cwd): string
     {
         // Dance to find the autoloader.
         // TOOD: change this to open up the Composer config and use $c['config']['vendor-dir'] instead of "vendor"
         $order = [
-            getcwd() . '/vendor/autoload.php',
+            $cwd . '/vendor/autoload.php',
             __DIR__ . '/../vendor/autoload.php',
             __DIR__ . '/../autoload.php',
         ];
+
         foreach ($order as $path) {
             if (file_exists($path)) {
                 return $path;

@@ -16,7 +16,5 @@ includeIfExists(getcwd() . '/vendor/autoload.php') ||
 includeIfExists(__DIR__ . '/../vendor/autoload.php') ||
 includeIfExists(__DIR__ . '/../autoload.php');
 
-putenv("LOTGD_CONFIG=./config/test.yml");
-
 $daenerys = new DaenerysConsole();
 $daenerys->run();
