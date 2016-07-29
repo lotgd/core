@@ -36,10 +36,10 @@ class BootConfiguration
         
         // only lotgd-modules are installed in the vendor directory
         if ($package->getType() === "lotgd-module") {
-            $confFile = $installationManager->getInstallPath($package)  . "/lotgd.yml";
+            $confFile = $installationManager->getInstallPath($package)  . DIRECTORY_SEPARATOR . "lotgd.yml";
         }
         else {
-            $confFile = $cwd . "/lotgd.yml";
+            $confFile = $cwd . DIRECTORY_SEPARATOR . "lotgd.yml";
         }
         
         $this->rootNamespace = $this->findRootNamespace($package);

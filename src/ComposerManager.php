@@ -122,8 +122,8 @@ class ComposerManager
         $suffix = array_splice($split, -1, 1); // starts with ['']
         $path = null;
         while (!empty($split)) {
-            $key = join('\\', $split) . '\\';
-            $dir = join(DIRECTORY_SEPARATOR, $suffix);
+            $key = implode('\\', $split) . '\\';
+            $dir = implode(DIRECTORY_SEPARATOR, $suffix);
             // Prefix to directory mappings are arrays in Composer's
             // ClassLoader object. Not sure why. This might break in
             // some unforseen case.
@@ -154,10 +154,10 @@ class ComposerManager
         // Dance to find the autoloader.
         // TOOD: change this to open up the Composer config and use $c['config']['vendor-dir'] instead of "vendor"
         $order = [
-            $cwd . '/vendor/autoload.php',
-            __DIR__ . '/../vendor/autoload.php',
-            __DIR__ . '/../autoload.php',
-        ];
+            implode(DIRECTORY_SEPARATOR, [$cwd, "vendor", "autoload.php"]),
+            implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "vendor", "autoload.php"]),
+            implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "autoload.php"]),
+        ]; 
 
         foreach ($order as $path) {
             if (file_exists($path)) {

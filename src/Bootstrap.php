@@ -101,43 +101,6 @@ class Bootstrap
     }
     
     /**
-     * Returns all bootstrap classes
-     * @param ComposerManager $composer
-     * @return array
-     * @throws \Exception
-     */
-    protected function initPackageBootstraps(ComposerManager $composer): array
-    {
-        $packages = $composer->getPackages();
-        $classes = [];
-        
-        foreach ($packages as $package) {
-            if (isset($package->getExtra()["lotgd-namespace"]) === false) {
-                continue;
-            }
-            
-            $cn = $package->getExtra()["lotgd-namespace"] . "Bootstrap";
-            
-            // silently ignore that class does not exist, could be one that doesn't need to bootstrap
-            if (class_exists($cn, true) === false) {
-                continue;
-            }
-            
-            $cl = new $cn();
-            
-            if ($cl instanceof BootstrapInterface) {
-                $classes[] = $cl;
-            }
-            else {
-                $name = $package->getName() . "@" . $package->getVersion();
-                throw new \Exception("Package {$name} does not implement BootstrapInterface in it's Bootstrap class");
-            }
-        }
-        
-        return $classes;
-    }
-    
-    /**
      * Returns a configuration object reading from the file located at the path stored in LOTGD_CONFIG.
      * @return \LotGD\Core\Configuration
      * @throws InvalidConfigurationException
@@ -147,7 +110,7 @@ class Bootstrap
         $configFilePath = getenv('LOTGD_CONFIG');
         
         if (empty($configFilePath)) {
-            $configFilePath = $this->rootDir . "/config/lotgd.yml";
+            $configFilePath = implode(DIRECTORY_SEPARATOR, [$this->rootDir, "config", "lotgd.yml"]);
         }
         else {
             $configFilePath = $this->rootDir . $configFilePath;
@@ -220,7 +183,7 @@ class Bootstrap
     protected function generateAnnotationDirectories(): array
     {
         // Read db annotations from our own model files.
-        $directories = [__DIR__ . '/Models'];
+        $directories = [__DIR__ . DIRECTORY_SEPARATOR . 'Models'];
         
         // Get additional annotation directories from bootstrap classes
         $packageDirectories = $this->bootConfigurationManager->getEntityDirectories();
