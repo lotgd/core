@@ -116,7 +116,7 @@ class Bootstrap
             $configFilePath = implode(DIRECTORY_SEPARATOR, [$this->rootDir, "config", "lotgd.yml"]);
         }
         else {
-            $configFilePath = $this->rootDir . $configFilePath;
+            $configFilePath = $this->rootDir . DIRECTORY_SEPARATOR . $configFilePath;
         }
 
         if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
