@@ -12,7 +12,9 @@ trait SceneBasics
     private $title = "{No scene set}";
     /** @Column(type="text") */
     private $description = "{No scene set}";
-    
+    /** @Column(type="string", length=255) */
+    private $template = "{No template set}";
+
     /**
      * Sets scene title
      * @param string $title
@@ -21,7 +23,7 @@ trait SceneBasics
     {
         $this->title = $title;
     }
-    
+
     /**
      * Returns scene title
      * @return string
@@ -30,7 +32,7 @@ trait SceneBasics
     {
         return $this->title;
     }
-    
+
     /**
      * Sets scene description
      * @param string $description
@@ -39,7 +41,7 @@ trait SceneBasics
     {
         $this->description = $description;
     }
-    
+
     /**
      * Returns scene description
      * @return string
@@ -47,5 +49,23 @@ trait SceneBasics
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    /**
+     * Sets scene template
+     * @param string $template
+     */
+    public function setTemplate(string $template)
+    {
+        $this->template = $template;
+    }
+
+    /**
+     * Returns scene template
+     * @return string
+     */
+    public function getTemplate(): string
+    {
+        return $this->template;
     }
 }
