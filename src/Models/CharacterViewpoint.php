@@ -10,7 +10,7 @@ use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\SceneBasics;
 
 /**
- * A CharacterScene is the current Scene a character is experiencing with
+ * A CharacterViewpoint is the current Scene a character is experiencing with
  * all changes from modules included.
  * @Entity
  * @Table(name="character_viewpoints")
@@ -19,21 +19,21 @@ class CharacterViewpoint implements CreateableInterface
 {
     use Creator;
     use SceneBasics;
-    
+
     /** @Id @ManyToOne(targetEntity="Character", inversedBy="id", cascade="persist") */
     private $owner;
     /** @Column(type="array") */
     private $actions = [];
     /** @Column(type="array") */
-    private $attachements = [];
+    private $attachments = [];
     /** @Column(type="array") */
     private $data = [];
-    
+
     /** @var array */
     private static $fillable = [
         "owner"
     ];
-    
+
     /**
      * Returns the owner
      * @return \LotGD\Core\Models\Character
@@ -42,7 +42,7 @@ class CharacterViewpoint implements CreateableInterface
     {
         return $this->owner;
     }
-    
+
     /**
      * Sets the owner
      * @param \LotGD\Core\Models\Character $owner
@@ -51,9 +51,9 @@ class CharacterViewpoint implements CreateableInterface
     {
         $this->owner = $owner;
     }
-    
+
     /**
-     * Copies the static data from a scene to a characterScene entity
+     * Copies the static data from a scene to this CharacterViewpoint entity
      * @param \LotGD\Core\Models\Scene $scene
      */
     public function changeFromScene(Scene $scene)
@@ -61,7 +61,7 @@ class CharacterViewpoint implements CreateableInterface
         $this->setTitle($scene->getTitle());
         $this->setDescription($scene->getDescription());
     }
-    
+
     /**
      * Returns all actions
      * @return array
@@ -70,7 +70,7 @@ class CharacterViewpoint implements CreateableInterface
     {
         return $this->actions;
     }
-    
+
     /**
      * Sets actions
      * @param array $actions
@@ -79,7 +79,7 @@ class CharacterViewpoint implements CreateableInterface
     {
         $this->actions = $actions;
     }
-    
+
     /**
      * Returns all data
      * @return array
@@ -88,7 +88,7 @@ class CharacterViewpoint implements CreateableInterface
     {
         return $this->data;
     }
-    
+
     /**
      * Sets all data
      * @param array $data
@@ -97,7 +97,7 @@ class CharacterViewpoint implements CreateableInterface
     {
         $this->data = $data;
     }
-    
+
     /**
      * Returns a single data field
      * @param string $fieldname Fieldname
@@ -108,7 +108,7 @@ class CharacterViewpoint implements CreateableInterface
     {
         return $this->data[$fieldname] ?? $default;
     }
-    
+
     /**
      * Sets a single data field
      * @param string $fieldname
@@ -116,5 +116,21 @@ class CharacterViewpoint implements CreateableInterface
     public function setDataField(string $fieldname, $value)
     {
         $this->data[$fieldname] = $value;
+    }
+
+    /**
+     * Returns the action that corresponds to the given ID, if present.
+     * @return Action|null
+     */
+    public function findActionById(string $id)
+    {
+        foreach ($this->getActions() as $group) {
+            foreach ($group->getSctions() as $a) {
+                if ($a->getId() == $actionId) {
+                    return $a;
+                }
+            }
+        }
+        return null;
     }
 }
