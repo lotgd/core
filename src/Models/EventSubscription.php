@@ -47,6 +47,11 @@ class EventSubscription implements CreateableInterface
         return $this->pattern;
     }
 
+    /**
+     * Set the pattern used to match against event names.
+     * Format is PHP regular expressions.
+     * @param string $pattern
+     */
     public function setPattern(string $pattern)
     {
         $this->pattern = $pattern;
@@ -61,6 +66,10 @@ class EventSubscription implements CreateableInterface
         return $this->class;
     }
 
+    /**
+     * Sets the class name subscribed to this event.
+     * @param string $class
+     */
     public function setClass(string $class)
     {
         $this->class = $class;
@@ -75,6 +84,10 @@ class EventSubscription implements CreateableInterface
         return $this->library;
     }
 
+    /**
+     * Sets the library that this subscription is part of, in vendor/module format.
+     * @param string $library
+     */
     public function setLibrary(string $library)
     {
         $this->library = $library;

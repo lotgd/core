@@ -8,6 +8,9 @@ use Monolog\Logger;
 
 use LotGD\Core\Models\Character;
 
+/**
+ * The main game class.
+ */
 class Game
 {
     private $entityManager;
@@ -16,7 +19,10 @@ class Game
     private $moduleManager;
     private $logger;
     private $configuration;
-    
+
+    /**
+     * Construct a game. You probably want to use Bootstrap to do this.
+     */
     public function __construct(
         Configuration $configuration,
         Logger $logger,

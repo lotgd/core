@@ -32,7 +32,7 @@ class Character implements CharacterInterface, CreateableInterface
     use Creator;
     use SoftDeletable;
     use PropertyManager;
-    
+
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
     /** @Column(type="string", length=50); */
@@ -49,7 +49,7 @@ class Character implements CharacterInterface, CreateableInterface
     private $properties;
     /** @OneToMany(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
     private $characterViewpoint;
-    /** 
+    /**
      * @ManyToMany(targetEntity="MessageThread", inversedBy="participants", cascade={"persist"})
      * @JoinTable(
      *  name="message_threads_x_characters",
@@ -66,14 +66,14 @@ class Character implements CharacterInterface, CreateableInterface
     private $buffs;
     /** @var BuffList */
     private $buffList;
-    
+
     /** @var array */
     private static $fillable = [
         "name",
         "maxHealth",
         "level",
     ];
-    
+
     /**
      * Creates a character at full health
      */
@@ -83,7 +83,10 @@ class Character implements CharacterInterface, CreateableInterface
         $newCharacter->setHealth($newCharacter->getMaxHealth());
         return $newCharacter;
     }
-    
+
+    /**
+     * Construct an empty character.
+     */
     public function __construct()
     {
         $this->properties = new ArrayCollection();
@@ -91,7 +94,7 @@ class Character implements CharacterInterface, CreateableInterface
         $this->buffs = new ArrayCollection();
         $this->messageThreads = new ArrayCollection();
     }
-    
+
     /**
      * Returns the entity's id
      * @return int The id
@@ -100,7 +103,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->id;
     }
-    
+
     /**
      * Sets the character's name and generates the display name
      * @param string $name The name to set
@@ -110,7 +113,7 @@ class Character implements CharacterInterface, CreateableInterface
         $this->name = $name;
         $this->generateDisplayName();
     }
-    
+
     /**
      * Returns the character's name
      * @return string The name
@@ -119,7 +122,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->name;
     }
-    
+
     /**
      * Generates the display name which is a composition of title and name.
      */
@@ -127,7 +130,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         $this->displayName = $this->name;
     }
-    
+
     /**
      * Returns displayName, a combination of title, name and suffix, mixed with colour codes
      * @return string The displayName
@@ -136,7 +139,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->displayName;
     }
-    
+
     /**
      * Sets the maximum health of a character to a given value. It also sets the
      * health if none has been set yet.
@@ -146,7 +149,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         $this->maxHealth = $maxHealth;
     }
-    
+
     /**
      * Returns the maximum health
      * @return int
@@ -155,7 +158,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->maxHealth;
     }
-    
+
     /**
      * Sets current health
      * @param int $health
@@ -164,7 +167,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         $this->health = $health;
     }
-    
+
     /**
      * Returns current health
      * @return int
@@ -173,7 +176,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->health;
     }
-    
+
     /**
      * Does damage to the entity.
      * @param int $damage
@@ -181,12 +184,12 @@ class Character implements CharacterInterface, CreateableInterface
     public function damage(int $damage)
     {
         $this->health -= $damage;
-        
+
         if ($this->health < 0) {
             $this->health = 0;
         }
     }
-    
+
     /**
      * Heals the enemy
      * @param int $heal
@@ -195,12 +198,12 @@ class Character implements CharacterInterface, CreateableInterface
     public function heal(int $heal, bool $overheal = false)
     {
         $this->health += $heal;
-        
+
         if ($this->health > $this->getMaxHealth() && $overheal === false) {
             $this->health = $this->getMaxHealth();
         }
     }
-    
+
     /**
      * Returns true if the character is alive.
      * @return bool
@@ -209,7 +212,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->getHealth() > 0;
     }
-    
+
     /**
      * Returns the character's level
      * @return int
@@ -218,7 +221,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->level;
     }
-    
+
     /**
      * Returns the character's virtual attribute "attack"
      */
@@ -226,7 +229,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->level * 2;
     }
-    
+
     /**
      * Returns the character's virtual attribute "defense"
      */
@@ -234,7 +237,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         return $this->level * 2;
     }
-    
+
     /**
      * Sets the character's level
      * @param int $level
@@ -243,7 +246,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         $this->level = $level;
     }
-    
+
     /**
      * Returns the current character scene and creates one if it is non-existant
      * @return \LotGD\Core\Models\CharacterViewpoint
@@ -254,10 +257,10 @@ class Character implements CharacterInterface, CreateableInterface
             $characterScene = CharacterViewpoint::Create(["owner" => $this]);
             $this->characterViewpoint->add($characterScene);
         }
-        
+
         return $this->characterViewpoint->first();
     }
-    
+
     /**
      * Returns a list of buffs
      */
@@ -266,7 +269,7 @@ class Character implements CharacterInterface, CreateableInterface
         $this->buffList = $this->buffList ?? new BuffList($this->buffs);
         return $this->buffList;
     }
-    
+
     /**
      * Adds a buff to the buffList
      */
@@ -278,7 +281,7 @@ class Character implements CharacterInterface, CreateableInterface
             $this->getBuffs()->renew($buff);
         }
     }
-    
+
     /**
      * Returns a list of message threads this user has created.
      * @return Collection

@@ -19,6 +19,7 @@ class ModuleManager
     private $g;
 
     /**
+     * Construct a module manager.
      * @param Game $g The game.
      */
     public function __construct(Game $g)
@@ -26,6 +27,9 @@ class ModuleManager
         $this->g = $g;
     }
 
+    /**
+     * Return the package's event subscriptions as an array of regex patterns.
+     */
     private static function getPackageSubscriptions(PackageInterface $package): array
     {
         $name = $package->getName();

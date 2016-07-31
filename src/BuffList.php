@@ -34,7 +34,7 @@ class BuffList
     protected $activeBuffs = [];
     /** @var Doctrine\Common\Collections\ArrayCollection */
     protected $usedBuffs;
-    
+
     /** @var boolean True of the modifiers have already been calculated */
     protected $modifiersCalculated = false;
     /** @var boolean True if the badguy is invulnurable */
@@ -53,10 +53,10 @@ class BuffList
     protected $goodguyAttackModifier = 1.;
     /** @var float */
     protected $goodguyDefenseModifier = 1.;
-    
+
     protected $events;
     protected $loaded = false;
-    
+
     /**
      * Initiates some variables
      * @param Collection $buffs
@@ -67,7 +67,7 @@ class BuffList
         $this->events = new ArrayCollection();
         $this->usedBuffs = new ArrayCollection();
     }
-    
+
     /**
      * Loads all buffs (since it's a lazy correlation)
      */
@@ -79,7 +79,7 @@ class BuffList
             }
         }
     }
-    
+
     /**
      * Returns true if the given buff has already been used this round.
      * @param Buff $buff
@@ -93,10 +93,10 @@ class BuffList
         else {
             $used = false;
         }
-        
+
         return $used;
     }
-    
+
     /**
      * Marks the given buff as used
      * @param Buff $buff
@@ -105,7 +105,7 @@ class BuffList
     {
         $this->usedBuffs->add($buff);
     }
-    
+
     /**
      * Returns the buff's start or round message
      * @param Buff $buff
@@ -122,10 +122,10 @@ class BuffList
         elseif($used === false) {
             $return = $buff->getRoundMessage();
         }
-        
+
         return $return;
     }
-    
+
     /**
      * Resets the buff usage for a new round
      */
@@ -135,12 +135,15 @@ class BuffList
         $this->usedBuffs = new ArrayCollection();
         $this->modifiersCalculated = false;
     }
-    
+
+    /**
+     * Returns whether any buffs are in use.
+     */
     public function hasBuffsInUse(): bool
     {
         return count($this->usedBuffs) > 0 ? true : false;
     }
-    
+
     /**
      * Activates all buffs that activate upon the given activation parameter.
      * @param int $activation
@@ -153,37 +156,37 @@ class BuffList
         if ($activation%2 !== 0 && $activation !== 1) {
             throw new ArgumentException("You can only activate one activation type at a time.");
         }
-        
+
         if (!empty($this->activeBuffs[$activation])) {
             throw new BuffListAlreadyActivatedException("You can activate the buff list for the given activation step only once.");
         }
-        
+
         $this->activeBuffs[$activation] = new ArrayCollection();
         $activationEvents = new ArrayCollection();
-        
+
         foreach ($this->iterateBuffList() as $buff) {
             // Continue to next buff if the activation is not in this round.
             if ($buff->getsActivatedAt($activation) === false) {
                 continue;
             }
-            
+
             $this->activeBuffs[$activation]->add($buff);
-  
+
             // Returns start or roundMessage if the buff has not been used yet.
             $buffMessage = $this->getBuffMessage($buff);
             if ($buffMessage !== "") {
                 $activationEvents->add(new BuffMessageEvent($buffMessage));
             }
-            
+
             // Needs to come at the end
             if ($this->hasBuffBeenUsed($buff) === false) {
                 $this->useBuff($buff);
             }
         }
-        
+
         return $activationEvents;
     }
-    
+
     /**
      * Decreases the rounds left on all used buffs
      * @return Collection A Collection containing expire messages (if there are any)
@@ -192,27 +195,27 @@ class BuffList
     {
         /* @var $endEvents Collection */
         $endEvents = new ArrayCollection();
-        
+
         foreach($this->usedBuffs as $buff) {
             /* @var $roundsLeft int */
             $roundsLeft = $buff->getRounds() - 1;
             $buff->setRounds($roundsLeft);
-            
+
             if ($roundsLeft === 0) {
                 /* @var $endMessage string */
                 $endMessage = $buff->getEndMessage();
-                
+
                 if ($endMessage !== "") {
                     $endEvents->add(new BuffMessageEvent($endMessage));
                 }
-                
+
                 $this->remove($buff);
             }
         }
-        
+
         return $endEvents;
     }
-    
+
     /**
      * Removes a buff from the buff list.
      * @param Buff $buff
@@ -223,7 +226,7 @@ class BuffList
         $this->buffs->removeElement($buff);
         $this->usedBuffs->removeElement($buff);
     }
-    
+
     /**
      * Adds a buff to the buff list, occupying the slot.
      * @param Buff $buff
@@ -233,15 +236,15 @@ class BuffList
     {
         $this->loadBuffs();
         $slot = $buff->getSlot();
-        
+
         if (isset($this->buffsBySlot[$buff->getSlot()])) {
             throw new BuffSlotOccupiedException("The slot {$slot} is already occupied.");
         }
-        
+
         $this->buffs->add($buff);
         $this->buffsBySlot[$buff->getSlot()] = $buff;
     }
-    
+
     /**
      * Renews a buff.
      * @param Buff $buff
@@ -250,15 +253,15 @@ class BuffList
     {
         $this->loadBuffs();
         $slot = $buff->getSlot();
-        
+
         if (isset($this->buffsBySlot[$buff->getSlot()])) {
             $this->buffs->removeElement($buff);
         }
-        
+
         $this->buffs->add($buff);
         $this->buffsBySlot[$buff->getSlot()] = $buff;
     }
-    
+
     /**
      * Calculates all total modifiers
      * @return type
@@ -268,7 +271,7 @@ class BuffList
         if ($this->modifiersCalculated === true) {
             return;
         }
-        
+
         $this->badguyAttackModifier = 1.;
         $this->badguyDamageModifier = 1.;
         $this->badguyDefenseModifier = 1.;
@@ -277,7 +280,7 @@ class BuffList
         $this->goodguyDamageModifier = 1.;
         $this->goodguyDefenseModifier = 1.;
         $this->goodguyInvulnurable = false;
-        
+
         /* @var $buff \LotGD\Core\Model\Buff */
         foreach ($this->iterateBuffList() as $buff) {
             $this->badguyAttackModifier *= $buff->getBadguyAttackModifier();
@@ -290,7 +293,7 @@ class BuffList
             $this->goodguyInvulnurable = $this->goodguyInvulnurable || $buff->goodguyIsInvulnurable();
         }
     }
-    
+
     /**
      * Iterates over every buff that gets activated at one point during a round.
      * @return Generator|\LotGD\Core\Model\Buff[]
@@ -307,7 +310,7 @@ class BuffList
             }
         }
     }
-    
+
     /**
      * Returns the badguy attack modifier calculated over the whole bufflist
      * @return float
@@ -317,7 +320,7 @@ class BuffList
         $this->calculateModifiers();
         return $this->badguyAttackModifier;
     }
-    
+
      /**
      * Returns the badguy defense modifier calculated over the whole bufflist
      * @return float
@@ -327,7 +330,7 @@ class BuffList
         $this->calculateModifiers();
         return $this->badguyDefenseModifier;
     }
-    
+
     /**
      * Returns the badguy damage modifier calculated over the whole bufflist
      * @return float
@@ -337,7 +340,7 @@ class BuffList
         $this->calculateModifiers();
         return $this->badguyDamageModifier;
     }
-    
+
     /**
      * Returns true if the badguy is invulnurable
      * @return bool
@@ -347,7 +350,7 @@ class BuffList
         $this->calculateModifiers();
         return $this->badguyInvulnurable;
     }
-    
+
     /**
      * Returns the badguy attack modifier calculated over the whole bufflist
      * @return float
@@ -357,7 +360,7 @@ class BuffList
         $this->calculateModifiers();
         return $this->goodguyAttackModifier;
     }
-    
+
      /**
      * Returns the badguy defense modifier calculated over the whole bufflist
      * @return float
@@ -367,7 +370,7 @@ class BuffList
         $this->calculateModifiers();
         return $this->goodguyDefenseModifier;
     }
-    
+
      /**
      * Returns the badguy damage modifier calculated over the whole bufflist
      * @return float
@@ -377,7 +380,7 @@ class BuffList
         $this->calculateModifiers();
         return $this->goodguyDamageModifier;
     }
-    
+
     /**
      * Returns true if the goodguy is invulnurable
      * @return bool
@@ -387,7 +390,7 @@ class BuffList
         $this->calculateModifiers();
         return $this->goodguyInvulnurable;
     }
-    
+
     /**
      * Processes buffs that do direct damage or regeneration
      * @param int $activation
@@ -403,7 +406,7 @@ class BuffList
         FighterInterface $badguy
     ): Collection {
         $events = [];
-        
+
         foreach ($this->activeBuffs[$activation] as $buff) {
             // Add good guy regeneration
             if ($buff->getGoodguyRegeneration() !== 0) {
@@ -414,7 +417,7 @@ class BuffList
                     $buff->getNoEffectMessage()
                 );
             }
-            
+
             // Add bad guy regeneration
             if ($buff->getBadguyRegeneration() !== 0) {
                 $events[] = new RegenerationBuffEvent(
@@ -424,23 +427,23 @@ class BuffList
                     $buff->getNoEffectMessage()
                 );
             }
-            
+
             // Minion buff
             if ($buff->getNumberOfMinions() > 0) {
                 /* @var $n int */
                 $n = $buff->getNumberOfMinions();
                 /* @var $attacksOne bool */
-                $attacksOne = ($buff->getMinionMinGoodguyDamage() || $buff->getMinionMaxGoodguyDamage() !== 0) 
+                $attacksOne = ($buff->getMinionMinGoodguyDamage() || $buff->getMinionMaxGoodguyDamage() !== 0)
                     || ($buff->getMinionMinBadguyDamage() || $buff->getMinionMaxBadguyDamage() !== 0);
                 /* @var $attacksBoth bool */
-                $attacksBoth = ($buff->getMinionMinGoodguyDamage() || $buff->getMinionMaxGoodguyDamage() !== 0) 
+                $attacksBoth = ($buff->getMinionMinGoodguyDamage() || $buff->getMinionMaxGoodguyDamage() !== 0)
                     && ($buff->getMinionMinBadguyDamage() || $buff->getMinionMaxBadguyDamage() !== 0);
-                
+
                 // Faulty buff - if minions attack no one, it's better to have no minions at all. Or they will just do... nothing.
                 if ($attacksOne === false) {
                     $n = 0;
                 }
-                
+
                 // Add a minion event for every single minion
                 for ($i = 0; $i < $n; $i++) {
                     // If the buff is setup to attack both good and badguy, we throw a dice to decide who the minion attacks
@@ -459,7 +462,7 @@ class BuffList
                     else {
                         $who = -1;
                     }
-                    
+
                     if ($who === 1) {
                         // Minion does damage to the goodguy
                         $damage = $game->getDiceBag()->normal($buff->getMinionMinGoodguyDamage(), $buff->getMinionMaxGoodguyDamage());
@@ -470,7 +473,7 @@ class BuffList
                         $damage = $game->getDiceBag()->normal($buff->getMinionMinBadguyDamage(), $buff->getMinionMaxBadguyDamage());
                         $target = $badguy;
                     }
-                        
+
                     if ($damage < 0) {
                         $message = $buff->getEffectFailsMessage();
                     }
@@ -489,12 +492,12 @@ class BuffList
                 }
             }
         }
-        
+
         return new ArrayCollection(
             $events
         );
     }
-    
+
     /**
      * Processes buffs that are dependant on the damage done in one round
      * @param int $activation
@@ -512,7 +515,7 @@ class BuffList
         FighterInterface $badguy
     ): Collection {
         $events = [];
-        
+
         foreach($this->activeBuffs[$activation] as $buff) {
             if ($buff->getGoodguyDamageReflection() !== 0.) {
                 if ($damage > 0) {
@@ -532,14 +535,14 @@ class BuffList
                         $message = $buff->getEffectSucceedsMessage();
                     }
                 }
-                
+
                 $events[] = new DamageReflectionEvent(
-                    $badguy, 
+                    $badguy,
                     $reflectedDamage,
                     $message
                 );
             }
-            
+
             if ($buff->getBadguyDamageReflection() !== 0.) {
                 if ($damage > 0) {
                     // Damage is > 0, so badguy takes damage, we can normally reflect
@@ -558,14 +561,14 @@ class BuffList
                     $reflectedDamage = 0;
                     $message = $buff->getEffectFailsMessage();
                 }
-                
+
                 $events[] = new DamageReflectionEvent(
-                    $goodguy, 
+                    $goodguy,
                     $reflectedDamage,
                     $message
                 );
             }
-            
+
             if ($buff->getGoodguyLifetap() !== 0.) {
                 if ($damage > 0) {
                     // Damage is > 0, badguy takes damage. Goodguy lifetap works only upon damage to the goodguy.
@@ -586,14 +589,14 @@ class BuffList
                     $healAmount = 0;
                     $message = $buff->getNoEffectMessage();
                 }
-                
+
                 $events[] = new DamageLifetapEvent(
                     $badguy,
                     $healAmount,
                     $message
                 );
             }
-            
+
             if ($buff->getBadguyLifetap() !== 0.) {
                 if ($damage > 0) {
                     // Damage is > 0, badguy takes damage. We act upon this to heal goodguy.
@@ -614,7 +617,7 @@ class BuffList
                     $healAmount = 0;
                     $message = $buff->getNoEffectMessage();
                 }
-                
+
                 $events[] = new DamageLifetapEvent(
                     $goodguy,
                     $healAmount,
@@ -622,7 +625,7 @@ class BuffList
                 );
             }
         }
-        
+
         return new ArrayCollection($events);
     }
 }

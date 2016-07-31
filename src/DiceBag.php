@@ -4,8 +4,15 @@ declare (strict_types = 1);
 
 namespace LotGD\Core;
 
+/**
+ * A collection of random number generators, with various distributions.
+ */
 class DiceBag
 {
+    /**
+     * Returns true $p percent of the time, where $p is between 0 and 1.
+     * @param float $p
+     */
     public function chance(float $p): bool
     {
         $r = $this->uniform(0., 1.);
@@ -13,11 +20,21 @@ class DiceBag
         return $r < $p;
     }
 
+    /**
+     * Generates a uniformly randomly number between $min and $max.
+     * @param float $min
+     * @param float $max
+     */
     public function uniform(float $min, float $max): float
     {
         return (mt_rand(0, 100) / 100.0) * ($max - $min) + $min;
     }
 
+    /**
+     * Generates a normally distributed random number between $min and $max.
+     * @param float $min
+     * @param float $max
+     */
     public function normal(float $min, float $max): float
     {
         if ($min > $max) {
@@ -38,7 +55,7 @@ class DiceBag
 
         return $r;
     }
-    
+
     /**
      * This function has uniform distribution except for the extreme values, which are
      * half as likely to happen.
@@ -53,14 +70,14 @@ class DiceBag
         if (is_null($min)) {
             return mt_rand();
         }
-        
+
         $min *= 1000;
-        
+
         if (is_null($max)) {
             return (int)round(mt_rand($min)/1000, 0);
         }
         $max *= 1000;
-        
+
         if ($min === $max) {
             return (int)round($min/1000, 0);
         }

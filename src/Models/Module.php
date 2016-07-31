@@ -27,6 +27,9 @@ class Module implements SaveableInterface
     /** @Column(type="datetime") */
     private $createdAt;
 
+    /**
+     * Construct a new module entry.
+     */
     public function __construct(string $library)
     {
         $this->createdAt = new \DateTime();

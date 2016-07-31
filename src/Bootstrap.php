@@ -23,13 +23,16 @@ use LotGD\Core\ {
     Exceptions\InvalidConfigurationException
 };
 
+/**
+ * The entry point for constructing a properly configured LotGD Game object.
+ */
 class Bootstrap
 {
     private $rootDir;
     private $game;
     private $bootConfigurationManager = [];
     private $annotationDirectories = [];
-    
+
     /**
      * Create a new Game object, with all the necessary configuration.
      * @param string $rootDir The root directory if it is different from getcwd()
@@ -40,7 +43,7 @@ class Bootstrap
         $game = new self();
         return $game->getGame($rootDir);
     }
-    
+
     /**
      * Starts the game kernel with the most important classes and returns the object
      * @param string $rootDir The root directory if it is different from getcwd()
@@ -49,23 +52,23 @@ class Bootstrap
     public function getGame(string $rootDir = null): Game
     {
         $this->rootDir = $rootDir ?? getcwd();
-        
+
         $composer = $this->createComposerManager();
         $this->bootConfigurationManager = $this->createBootConfigurationManager($composer, $this->rootDir);
-        
+
         $config = $this->createConfiguration();
         $logger = $this->createLogger($config, "lotgd");
-        
+
         $pdo = $this->connectToDatabase($config);
         $entityManager = $this->createEntityManager($pdo);
-        
+
         $eventManager = $this->createEventManager($entityManager);
-        
+
         $this->game = new Game($config, $logger, $entityManager, $eventManager);
-        
+
         return $this->game;
     }
-    
+
     /**
      * Creates the boot configuration manager
      * @param ComposerManager $composerManager
@@ -73,12 +76,12 @@ class Bootstrap
      * @return \LotGD\Core\BootConfigurationManager
      */
     protected function createBootConfigurationManager(
-        ComposerManager $composerManager, 
+        ComposerManager $composerManager,
         string $cwd
     ): BootConfigurationManager {
         return new BootConfigurationManager($composerManager, $cwd);
     }
-    
+
     /**
      * Connects to a database using pdo
      * @param \LotGD\Core\Configuration $config
@@ -88,7 +91,7 @@ class Bootstrap
     {
         return new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
     }
-    
+
     /**
      * Creates and returns an instance of ComposerManager
      * @param Logger $logger
@@ -96,10 +99,10 @@ class Bootstrap
      */
     protected function createComposerManager(): ComposerManager
     {
-        $composer = new ComposerManager();    
+        $composer = new ComposerManager();
         return $composer;
     }
-    
+
     /**
      * Returns a configuration object reading from the file located at the path stored in LOTGD_CONFIG.
      * @return \LotGD\Core\Configuration
@@ -108,22 +111,22 @@ class Bootstrap
     protected function createConfiguration(): Configuration
     {
         $configFilePath = getenv('LOTGD_CONFIG');
-        
+
         if (empty($configFilePath)) {
             $configFilePath = implode(DIRECTORY_SEPARATOR, [$this->rootDir, "config", "lotgd.yml"]);
         }
         else {
             $configFilePath = $this->rootDir . $configFilePath;
         }
-        
+
         if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
             throw new InvalidConfigurationException("Invalid or missing configuration file: {$configFilePath}.");
         }
-        
+
         $config = new Configuration($configFilePath, $this->rootDir);
         return $config;
     }
-    
+
     /**
      * Returns a logger instance
      * @param type $name
@@ -137,10 +140,10 @@ class Bootstrap
 
         $v = Game::getVersion();
         $logger->info("Bootstrap constructing game (Daenerys 🐲{$v}).");
-        
+
         return $logger;
     }
-    
+
     /**
      * Creates and returns an instance of the EventManager
      * @param EntityManagerInterface $entityManager
@@ -150,7 +153,7 @@ class Bootstrap
     {
         return new EventManager($entityManager);
     }
-    
+
     /**
      * Creates the EntityManager using the pdo connection given in it's argument
      * @param \PDO $pdo
@@ -171,7 +174,7 @@ class Bootstrap
         $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->updateSchema($metaData);
-        
+
         return $entityManager;
     }
 
@@ -184,13 +187,13 @@ class Bootstrap
     {
         // Read db annotations from our own model files.
         $directories = [__DIR__ . DIRECTORY_SEPARATOR . 'Models'];
-        
+
         // Get additional annotation directories from bootstrap classes
         $packageDirectories = $this->bootConfigurationManager->getEntityDirectories();
-        
+
         return array_merge($directories, $packageDirectories);
     }
-    
+
     /**
      * Return all directories used for reading annotations.
      * @return array<string>
@@ -199,7 +202,7 @@ class Bootstrap
     {
         return $this->annotationDirectories;
     }
-    
+
     /**
      * Adds console commands to a given console application from bootstrapping packages.
      * @param Application $application

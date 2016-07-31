@@ -6,7 +6,7 @@ namespace LotGD\Core\Models\BattleEvents;
 use LotGD\Core\Models\FighterInterface;
 
 /**
- * Description of CriticalHitEvent
+ * Battle event representing a stronger than average attack.
  */
 class CriticalHitEvent extends BattleEvent
 {
@@ -14,17 +14,25 @@ class CriticalHitEvent extends BattleEvent
     protected $attacker;
     /** @var int */
     protected $criticalAttackValue;
-    
+
+    /**
+     * Construct a CriticalHitEvent with attacker $attacker.
+     * @param FighterInterface $attacker
+     * @param int $criticalAttackValue
+     */
     public function __construct(FighterInterface $attacker, int $criticalAttackValue)
     {
         $this->attacker = $attacker;
         $this->criticalAttackValue = $criticalAttackValue;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function decorate(Game $game): string
     {
         $pureAttackersAttack = $this->attacker->getAttack($game, true);
-        
+
         if ($this->criticalAttackValue > $pureAttackersAttack * 4) {
             return "You execute a MEGA power move!!!";
         } elseif ($this->criticalAttackValue > $pureAttackersAttack * 3) {

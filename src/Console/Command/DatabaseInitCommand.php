@@ -10,14 +10,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 use LotGD\Core\Console\Main;
 use LotGD\Core\Game;
 
+/**
+ * Danerys command to initiate the database with default values.
+ */
 class DatabaseInitCommand extends BaseCommand
 {
+    /**
+     * @inheritDoc
+     */
     protected function configure()
     {
         $this->setName('database:init')
              ->setDescription('Initiates database with default values.');
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->game->getEntityManager()->flush();

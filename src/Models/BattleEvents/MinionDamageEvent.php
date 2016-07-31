@@ -7,14 +7,23 @@ use LotGD\Core\Exceptions\BattleEventException;
 use LotGD\Core\Models\FighterInterface;
 
 /**
- * BattleEvent
+ * Battle event that represents damage to a minion.
  */
 class MinionDamageEvent extends BattleEvent
 {
     protected $target;
     protected $damage;
     protected $message;
-    
+
+    /**
+     * Construct a MinionDamageEvent against $target, with damage $damage
+     * and message $message.
+     * $message can contain '{target}' and '{amount}'
+     * which will be replaced by the name of the target and the damage, respectively.
+     * @param FighterInterface $target
+     * @param int $damage
+     * @param string $message
+     */
     public function __construct(
         FighterInterface $target,
         int $damage,
@@ -24,11 +33,14 @@ class MinionDamageEvent extends BattleEvent
         $this->damage = $damage;
         $this->message = $message;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function decorate(Game $game): string
     {
         parent::decorate();
-        
+
         return str_replace(
             [
                 "{target}",
@@ -41,7 +53,10 @@ class MinionDamageEvent extends BattleEvent
             $this->message
         );
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function apply()
     {
         parent::apply();

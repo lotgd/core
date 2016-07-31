@@ -6,14 +6,23 @@ namespace LotGD\Core\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Danerys command to validate installed modules.
+ */
 class ModuleValidateCommand extends BaseCommand
 {
+    /**
+     * @inheritDoc
+     */
     protected function configure()
     {
         $this->setName('module:validate')
              ->setDescription('Validate installed modules');
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $results = $this->game->getModuleManager()->validate();

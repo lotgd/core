@@ -5,6 +5,9 @@ namespace LotGD\Core;
 
 use DateTime;
 
+/**
+ * Configurable way to convert back and forth between real time and game time.
+ */
 class TimeKeeper
 {
     private $adjustedEpoch;
@@ -19,6 +22,12 @@ class TimeKeeper
     private $secondsPerGameMinute;
     private $secondsPerGameSecond;
 
+    /**
+     * Construct a TimeKeeper with required configuration.
+     * @param DateTime $gameEpoch When in real time is game day 0.
+     * @param int $gameOffsetSeconds How many seconds from midnight on the epoch should the first game day start.
+     * @param int $gameDaysPerDay How many game days are in one real day.
+     */
     public function __construct(DateTime $gameEpoch, int $gameOffsetSeconds, int $gameDaysPerDay)
     {
         $gameEpochCopy = clone($gameEpoch);
@@ -34,6 +43,11 @@ class TimeKeeper
         $this->secondsPerGameSecond = $this->secondsPerGameMinute / 60;
     }
 
+    /**
+     * Returns whether a user who is interating with the game now and last
+     * interacted at $lastInteractionTime should experience a New Day event.
+     * @param DateTime $lastInteractionTime
+     */
     public function isNewDay(DateTime $lastInteractionTime): bool
     {
         if ($lastInteractionTime == null) {
@@ -47,11 +61,20 @@ class TimeKeeper
         return $d1 != $d2;
     }
 
+    /**
+     * Return the current game time.
+     * @return DateTime
+     */
     public function gameTime(): DateTime
     {
         return $this->convertToGameTime(new DateTime());
     }
 
+    /**
+     * Given a game time, convert it to a real time.
+     * @param DateTime $time Game time to convert.
+     * @return DateTime Real time corresponding to game time $time.
+     */
     public function convertFromGameTime(
         DateTime $time
     ): DateTime {
@@ -68,6 +91,11 @@ class TimeKeeper
         return $ret->add($this->interval(0, 0, 0, 0, (int) $seconds));
     }
 
+    /**
+     * Given a real time, convert it to a game time.
+     * @param DateTime $time Real time to convert.
+     * @return DateTime Game time corresponding to real time $time.
+     */
     public function convertToGameTime(
         DateTime $time
     ): DateTime {
@@ -97,6 +125,9 @@ class TimeKeeper
         );
     }
 
+    /**
+     * Convenience method to generate a DateInterval from an exploded date.
+     */
     private function interval(
         int $years,
         int $days,

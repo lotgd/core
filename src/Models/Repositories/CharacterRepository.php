@@ -11,17 +11,20 @@ use Doctrine\ORM\QueryBuilder;
 use LotGD\Core\Models\Character;
 
 /**
- * Description of CharacterRepository
+ * Convenience methods to query for characters.
  */
 class CharacterRepository extends EntityRepository
 {
     const SKIP_SOFTDELETED = 0;
     const INCLUDE_SOFTDELETED = 1;
     const ONLY_SOFTDELETED = 2;
-    
-    protected function modifyQuery(QueryBuilder $queryBuilder, int $level)
+
+    /**
+     * Change the provided query to handle the specified deletion mode.
+     */
+    protected function modifyQuery(QueryBuilder $queryBuilder, int $deletes)
     {
-        switch ($level) {
+        switch ($deletes) {
             case self::SKIP_SOFTDELETED:
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->orX(
@@ -30,7 +33,7 @@ class CharacterRepository extends EntityRepository
                     )
                 );
                 break;
-            
+
             case self::ONLY_SOFTDELETED:
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->lte('c.deletedAt', 'CURRENT_TIMESTAMP()')
@@ -38,32 +41,38 @@ class CharacterRepository extends EntityRepository
                 break;
         }
     }
-    
-    public function find($id, int $level = self::SKIP_SOFTDELETED)
+
+    /**
+     * Find a character by ID.
+     */
+    public function find($id, int $deletes = self::SKIP_SOFTDELETED)
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select("c")
             ->from(Character::class, "c")
             ->where($queryBuilder->expr()->eq("c.id", ":id"))
             ->setParameter("id", $id);
-        
-        $this->modifyQuery($queryBuilder, $level);
-        
+
+        $this->modifyQuery($queryBuilder, $deletes);
+
         try {
             return $queryBuilder->getQuery()->getSingleResult();
         } catch (NoResultException $e) {
             return null;
         }
     }
-    
-    public function findAll(int $level = self::SKIP_SOFTDELETED)
+
+    /**
+     * Return all characters.
+     */
+    public function findAll(int $deletes = self::SKIP_SOFTDELETED)
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select("c")
             ->from(Character::class, "c");
-        
-        $this->modifyQuery($queryBuilder, $level);
-        
+
+        $this->modifyQuery($queryBuilder, $deletes);
+
         return $queryBuilder->getQuery()->getResult();
     }
 }

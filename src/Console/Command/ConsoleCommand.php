@@ -6,14 +6,23 @@ namespace LotGD\Core\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Daenerys command to start a PHP REPL with a basic game set up.
+ */
 class ConsoleCommand extends BaseCommand
 {
+    /**
+     * @inheritDoc
+     */
     protected function configure()
     {
         $this->setName('console')
              ->setDescription('Start a shell to interact with the game.');
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         print("Daenerys console, the dragon prompt. lotgd/core " . \LotGD\Core\Game::getVersion() . ".\n");

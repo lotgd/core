@@ -9,7 +9,8 @@ use Symfony\Component\Yaml\Yaml;
 use LotGD\Core\ComposerManager;
 
 /**
- * BootConfiguration
+ * Represents the configuration of a LotGD package (core, crate or module),
+ * with its configuration parameters.
  * @author sauterb
  */
 class BootConfiguration
@@ -25,15 +26,21 @@ class BootConfiguration
     private $models;
     private $daenerysCommands;
     private $cwd;
-    
+
+    /**
+     * Construct a configuration.
+     * @param ComposerManager $composerManager
+     * @param PackageInterface $package
+     * @param string $cwd
+     */
     public function __construct(ComposerManager $composerManager, PackageInterface $package, string $cwd)
     {
         $this->composerManager = $composerManager;
         $this->package = $package;
         $this->cwd = $cwd;
-        
+
         $installationManager = $composerManager->getComposer()->getInstallationManager();
-        
+
         // only lotgd-modules are installed in the vendor directory
         if ($package->getType() === "lotgd-module") {
             $confFile = $installationManager->getInstallPath($package)  . DIRECTORY_SEPARATOR . "lotgd.yml";
@@ -41,7 +48,7 @@ class BootConfiguration
         else {
             $confFile = $cwd . DIRECTORY_SEPARATOR . "lotgd.yml";
         }
-        
+
         $this->rootNamespace = $this->findRootNamespace($package);
         if (file_exists($confFile)) {
             $this->rawConfig = Yaml::parse(file_get_contents($confFile));
@@ -51,14 +58,14 @@ class BootConfiguration
             $type = $package->getType();
             throw new \Exception("Package {$name} of type {$type} does not have a lotgd.yml in it's root ($confFile).");
         }
-        
+
         $this->findEntityDirectory();
         $this->findDaenerysCommands();
     }
-    
+
     /**
      * Searches for a root namespace
-     * 
+     *
      * This function searches the package's configuration to find it's root namespace.
      * For this, it uses the following order:
      *  - check psr-4 autoload configuration. If used, it takes the first element
@@ -73,15 +80,15 @@ class BootConfiguration
         if (isset($autoload["psr-4"]) && count($autoload["psr-4"]) > 0) {
             return key($autoload["psr-4"]);
         }
-        
+
         if (isset($autoload["psr-0"]) && count($autoload["psr-0"]) > 0) {
             return key($autoload["psr-0"]);
         }
-        
+
         $name = $package->getName();
         throw new \Exception("{$name} has no valid namespace.");
     }
-    
+
     /**
      * Returns a subkey if it exists or null.
      * @param array $arguments
@@ -90,7 +97,7 @@ class BootConfiguration
     protected function getSubKeyIfItExists(array $arguments)
     {
         $parent = $this->rawConfig;
-        
+
         foreach ($arguments as $argument){
             if (isset($parent[$argument])) {
                 $parent = $parent[$argument];
@@ -99,10 +106,10 @@ class BootConfiguration
                 return null;
             }
         }
-        
+
         return $parent;
     }
-    
+
     /**
      * Tries to iterate an array element given by the arguments
      * @param scalar $argument1,... array keys, by increasing depth
@@ -110,14 +117,14 @@ class BootConfiguration
     protected function iterateKey(...$arguments)
     {
         $result = $this->getSubKeyIfItExists($arguments);
-        
+
         if (is_array($result)) {
             foreach ($result as $key => $val) {
                 yield $key => $val;
             }
         }
     }
-    
+
     /**
      * Returns a subkey of an array if it exists or null
      * @param scalar $argument1,... array keys, by increasing depth
@@ -128,28 +135,28 @@ class BootConfiguration
         $result = $this->getSubKeyIfItExists($arguments);
         return $result;
     }
-    
+
     /**
      * internal function. Adds models to the boot configuration.
      */
     protected function findEntityDirectory()
     {
         $this->entityDirectory = null;
-        
+
         $entityNamespace = $this->getConfig("bootstrap", "entityNamespace");
         $entityNamespace = $this->rootNamespace . $entityNamespace;
-        
+
         if (is_null($entityNamespace) === false) {
             $entityDirectory = $this->composerManager->translateNamespaceToPath($entityNamespace, $this->cwd);
-            
+
             if (is_dir($entityDirectory) === false) {
                 throw new \Exception("{$entityDirectory}, generated from {$entityNamespace}, is not a valid directory.");
             }
-            
+
             $this->entityDirectory = $entityDirectory;
         }
     }
-    
+
     /**
      * Returns true if there are any models to add.
      * @return type
@@ -158,7 +165,7 @@ class BootConfiguration
     {
         return $this->entityDirectory === null ? false : true;
     }
-    
+
     /**
      * Returns a list of fqcn for all models added by packages.
      * @return array<string>
@@ -167,7 +174,7 @@ class BootConfiguration
     {
         return $this->entityDirectory;
     }
-    
+
     /**
      * Searches the config file for daenerys commands and, if found, adds the class name to a list
      * @return type
@@ -176,12 +183,12 @@ class BootConfiguration
     {
         $list = $this->iterateKey("bootstrap", "daenerysCommands");
         $this->daenerysCommands = [];
-        
+
         foreach ($list as $command) {
             $this->daenerysCommands = $this->rootNamespace . $command;
         }
     }
-    
+
     /**
      * Returns true if this configuration has daenerys commands
      * @return bool
@@ -189,8 +196,8 @@ class BootConfiguration
     public function hasDaenerysCommands(): bool
     {
         return count($this->daenerysCommands) > 0 ? true : false;
-    }    
-    
+    }
+
     /**
      * Returns a list of daenerys commands
      */

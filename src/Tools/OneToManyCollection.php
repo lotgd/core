@@ -11,6 +11,9 @@ use LotGD\Core\Exceptions\KeyNotFoundException;
 use LotGD\Core\Exceptions\NotImplementedException;
 use LotGD\Core\Exceptions\WrongTypeException;
 
+/**
+ * A one-to-many relation between two entities.
+ */
 class OneToManyCollection implements Collection
 {
     /** @var string */
@@ -21,9 +24,9 @@ class OneToManyCollection implements Collection
     private $collection;
     /** @var int */
     private $numberOfRows;
-    
+
     /**
-     * Constructor
+     * Constructor for a one to many colelction of type $typeClass.
      * @param EntityManagerInterface $entityManager
      * @param string $typeClass
      * @throws ClassNotFoundException
@@ -33,26 +36,25 @@ class OneToManyCollection implements Collection
         if(class_exists($typeClass) === false) {
             throw new ClassNotFoundException(sprintf("The class %s has not been found.", $typeClass));
         }
-        
+
         $this->entityManager = $entityManager;
         $this->typeClass = $typeClass;
-        
+
         // Load eagerly everything.
         $this->collection = $this->entityManager->getRepository($this->typeClass)->findAll();
     }
-    
+
     /**
-     * returns the class this collection consists of.
+     * Returns the class this collection consists of.
      * @return string
      */
     public function getTypeClass(): ClassMetadata
     {
         return $this->entityManager->getClassMetadata($this->typeClass);
     }
-    
+
     /**
-     * Counts the number of settings stored
-     * @return int
+     * @inheritDoc
      */
     public function count(): int
     {
@@ -64,7 +66,7 @@ class OneToManyCollection implements Collection
                 ->getQuery()
                 ->getSingleScalarResult();
         }
-        
+
         if ($this->collection === null) {
             return $this->numberOfRows;
         }
@@ -74,7 +76,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * Checks if the element matches the typeClass of this collection
+     * Checks if the element matches the type of this collection.
      * @param mixed $element
      * @throws WrongTypeException
      */
@@ -84,25 +86,24 @@ class OneToManyCollection implements Collection
             throw new WrongTypeException(sprintf('$element needs to be of type %s', $this->typeClass));
         }
     }
-    
+
     /**
-     * Adds an element to the collection
-     * @param mixed $element
+     * @inheritDoc
      */
     public function add($element)
     {
         $this->checkElementType($element);
-        
+
         if ($this->collection === null) {
             $this->collection = [];
         }
-        
+
         $this->collection[] = $element;
         $this->entityManager->persist($element);
     }
-    
+
     /**
-     * Clears the collection
+     * @inheritDoc
      */
     public function clear()
     {
@@ -112,11 +113,9 @@ class OneToManyCollection implements Collection
             ->execute();
         $this->collection = [];
     }
-    
+
     /**
-     * Returns true if a item is contained in this collection
-     * @param type $element
-     * @return bool
+     * @inheritDoc
      */
     public function contains($element): bool
     {
@@ -126,22 +125,20 @@ class OneToManyCollection implements Collection
         catch (WrongTypeException $e) {
             return false;
         }
-        
+
         return in_array($element, $this->collection);
     }
-    
+
     /**
-     * Checks if this the collection is empty
-     * @return bool
+     * @inheritDoc
      */
     public function isEmpty(): bool
     {
         return empty($this->collection);
     }
-    
+
     /**
-     * Removes an element from this collection by the given key
-     * @param int|string $key
+     * @inheritDoc
      */
     public function remove($key)
     {
@@ -150,10 +147,9 @@ class OneToManyCollection implements Collection
             $this->removeElement($element);
         }
     }
-    
+
     /**
-     * Removes an element from this collection
-     * @param type $element
+     * @inheritDoc
      */
     public function removeElement($element)
     {
@@ -163,18 +159,17 @@ class OneToManyCollection implements Collection
             unset($this->collection[$key]);
         }
     }
-    
+
     /**
-     * Checks if this collection contains a certain key
-     * @param int|string $key
+     * @inheritDoc
      */
     public function containsKey($key)
     {
         return isset($this->collection[$key]);
     }
-    
+
     /**
-     * Returns the element saved at the given position
+     * Returns the element saved with the given key.
      * @param int|string $key
      * @return type
      * @throws KeyNotFoundException
@@ -188,135 +183,173 @@ class OneToManyCollection implements Collection
             throw new KeyNotFoundException(sprintf("The key %s has not been found within the collection", $key));
         }
     }
-    
+
     /**
-     * Returns all collection keys
-     * @return array
+     * @inheritDoc
      */
     public function getKeys(): array
     {
         return array_keys($this->collection);
     }
-    
+
     /**
-     * Returns all collection values
-     * @return array
+     * @inheritDoc
      */
     public function getValues(): array
     {
         return array_values($this->collection);
     }
-    
+
     /**
-     * Sets the element at position $key to $value.
-     * @param int|string $key
-     * @param mixed $value
+     * @inheritDoc
      */
-    public function set($key, $element)
+    public function set($key, $value)
     {
-        $this->checkElementType($element);
-        
+        $this->checkElementType($value);
+
         $this->remove($key);
-        $this->collection[$key] = $element;
-        $this->entityManager->persist($element);
+        $this->collection[$key] = $value;
+        $this->entityManager->persist($value);
     }
-    
+
     /**
-     * Returns an array representation of this collection
-     * @return array
+     * @inheritDoc
      */
     public function toArray(): array
     {
         return $this->collection;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function first()
     {
         return first($this->collection);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function last()
     {
         return last($this->collection);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function key()
     {
         return key($this->collection);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function next()
     {
         return next($this->collection);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function current()
     {
         return current($this->collection);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function exists(\Closure $p): bool
     {
         throw new NotImplementedException();
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function filter(\Closure $p)
     {
         throw new NotImplementedException();
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function forAll(\Closure $p)
     {
         throw new NotImplementedException();
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function map(\Closure $p)
     {
         throw new NotImplementedException();
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function partition(\Closure $p)
     {
         throw new NotImplementedException();
     }
-    
+
     /**
-     * Returns the index of a specific element
-     * @param mixed $element
-     * @return int|string
+     * @inheritDoc
      */
     public function indexOf($element)
     {
         $this->checkElementType($element);
         return array_search($element, $this->collection);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function slice($offset, $length = null)
     {
         throw new NotImplementedException();
     }
-    
+
     /**
-     * Gets a Iterator over this collection
+     * Gets a Iterator over this collection.
      * @return \ArrayIterator
      */
     public function getIterator()
     {
         return new \ArrayIterator($this->collection);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function offsetGet($key) {
         return $this->get($key);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function offsetSet($key, $element) {
-        $this->set($key, $element);
+         $this->set($key, $element);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function offsetUnset($key) {
         $this->remove($key);
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function offsetExists($key) {
         return isset($this->collection[$key]);
     }

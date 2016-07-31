@@ -173,6 +173,10 @@ class Configuration
         return $this->gameDaysPerDay;
     }
 
+    /**
+     * Generate a textual representation of the configuration, for debugging
+     * purposes.
+     */
     public function __toString(): string
     {
         $s = "";

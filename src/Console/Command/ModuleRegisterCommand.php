@@ -9,14 +9,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 
+/**
+ * Danerys command to register and initiate any newly installed modules.
+ */
 class ModuleRegisterCommand extends BaseCommand
-{    
+{
+    /**
+     * @inheritDoc
+     */
     protected function configure()
     {
         $this->setName('module:register')
              ->setDescription('Register and initialize any newly installed modules');
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $modules = $this->game->getComposerManager()->getModulePackages();
