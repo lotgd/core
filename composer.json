@@ -20,8 +20,16 @@
         "symfony/console": "^3.0",
         "d11wtq/boris": "^1.0"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/austenmc/php-docblock-checker"
+        }
+
+    ],
     "require-dev": {
         "phpunit/phpunit": "*",
-        "phpunit/dbunit": "*"
+        "phpunit/dbunit": "*",
+        "block8/php-docblock-checker": "2.0.0"
     }
 }
