@@ -203,6 +203,12 @@ class Game
         $nextViewpoint->save();
     }
 
+    /**
+     * Returns a viewpoint made from a Scene $s and the current user, complete
+     * with actions built from the scene's children and those modified/added by
+     * the hook 'h/lotgd/core/actions-for/[scene-template]'.
+     * @param Scene $s
+     */
     private function setupViewpoint(Scene $s): CharacterViewpoint
     {
         $v = new CharacterViewpoint([
@@ -211,6 +217,14 @@ class Game
         $v->changeFromScene($s);
         $ag = new ActionGroup('lotgd/core/default', '', 'A');
         $as = array_map(function ($c) { return new Action($c->getId()); }, $s->getChildren());
+
+        $context = [
+            'viewpoint' => $v,
+            'actions' => $as
+        ];
+        $this->getEventManager()->publish('h/lotgd/core/actions-for/' . $s->getTemplate(), $context);
+        $as = $context['actions'];
+
         $ag->setActions($as);
 
         return $v;
