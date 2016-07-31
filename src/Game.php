@@ -8,8 +8,9 @@ use Monolog\Logger;
 
 use LotGD\Core\Models\Character;
 use LotGD\Core\Exceptions\ {
-    SceneNotFoundException,
-    ActionNotException
+    ActionNotException,
+    CharacterNotFoundException,
+    SceneNotFoundException
 };
 
 /**
@@ -143,6 +144,9 @@ class Game
      */
     public function getCharacter(): Character
     {
+        if ($this->character === null) {
+            throw new CharacterNotFoundException("No current character selected.");
+        }
         return $this->character;
     }
 
@@ -153,6 +157,35 @@ class Game
     public function setCharacter(Character $c)
     {
         $this->character = $c;
+    }
+
+    /**
+     * Return the viewpoint for the current user.
+     * @return CharacterViewpoint
+     */
+    public function getViewpoint(): CharacterViewpoint
+    {
+        $v = $this->getEntityManager()->getRepository(CharacterViewpoint::class)->find([
+            'owner' => $this->getCharacter()
+        ]);
+
+        if ($v === null) {
+            // No viewpoint set up for this user. Run the hook to find the default
+            // scene.
+            $context = [
+                'character' => $this->getCharacter(),
+                'scene' => null
+            ];
+            $this->getEventManager()->publish('h/lotgd/core/default-scene', $context);
+
+            $s = $context['scene'];
+            if ($s === null) {
+                throw new InvalidConfigurationException("No subscriber to h/lotgd/core/default-scene returned a scene.");
+            }
+            $v = $this->setupViewpoint($s);
+        }
+
+        return $v;
     }
 
     /**
