@@ -19,7 +19,7 @@ class EventManagerTestInvalidSubscriber
 
 class EventManagerTestSubscriber implements EventHandler
 {
-    public static function handleEvent(string $event, array $context) {}
+    public static function handleEvent(string $event, array &$context) {}
 }
 
 class EventManagerTest extends ModelTestCase

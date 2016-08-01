@@ -47,9 +47,6 @@ class EventManager
             if (preg_match($s->getPattern(), $event)) {
                 $class = $s->getClass();
                 $c = $class::handleEvent($event, $context);
-                if ($c !== null) {
-                    $context = $c;
-                }
             }
         }
     }

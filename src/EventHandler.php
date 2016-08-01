@@ -13,5 +13,5 @@ interface EventHandler
      * the next handler is called. Otherwise, return null. Any changes made will be propogated
      * to the event publisher as well.
      */
-    public static function handleEvent(string $event, array $context);
+    public static function handleEvent(string $event, array &$context);
 }
