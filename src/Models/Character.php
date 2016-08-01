@@ -248,14 +248,13 @@ class Character implements CharacterInterface, CreateableInterface
     }
 
     /**
-     * Returns the current character scene and creates one if it is non-existant
-     * @return \LotGD\Core\Models\CharacterViewpoint
+     * Returns the current character viewpoint or null if one is not set.
+     * @return \LotGD\Core\Models\CharacterViewpoint|null
      */
-    public function getCharacterViewpoint(): CharacterViewpoint
+    public function getCharacterViewpoint()
     {
         if (count($this->characterViewpoint) === 0) {
-            $characterScene = CharacterViewpoint::Create(["owner" => $this]);
-            $this->characterViewpoint->add($characterScene);
+            return null;
         }
 
         return $this->characterViewpoint->first();
