@@ -20,7 +20,7 @@ class CharacterViewpoint implements CreateableInterface
     use Creator;
     use SceneBasics;
 
-    /** @Id @ManyToOne(targetEntity="Character", inversedBy="id", cascade="persist") */
+    /** @Id @OneToOne(targetEntity="Character", inversedBy="characterViewpoint", cascade="persist") */
     private $owner;
     /** @Column(type="array") */
     private $actions = [];
@@ -61,6 +61,10 @@ class CharacterViewpoint implements CreateableInterface
         $this->setTitle($scene->getTitle());
         $this->setDescription($scene->getDescription());
         $this->setTemplate($scene->getTemplate());
+
+        $this->setActions([]);
+        $this->setAttachments([]);
+        $this->setData([]);
     }
 
     /**
@@ -79,6 +83,24 @@ class CharacterViewpoint implements CreateableInterface
     public function setActions(array $actions)
     {
         $this->actions = $actions;
+    }
+
+    /**
+     * Returns all attachments.
+     * @return array
+     */
+    public function getAttachments(): array
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * Sets attachments.
+     * @param array $actions
+     */
+    public function setAttachments(array $attachments)
+    {
+        $this->attachments = $attachments;
     }
 
     /**
@@ -126,8 +148,8 @@ class CharacterViewpoint implements CreateableInterface
     public function findActionById(string $id)
     {
         foreach ($this->getActions() as $group) {
-            foreach ($group->getSctions() as $a) {
-                if ($a->getId() == $actionId) {
+            foreach ($group->getActions() as $a) {
+                if ($a->getId() == $id) {
                     return $a;
                 }
             }

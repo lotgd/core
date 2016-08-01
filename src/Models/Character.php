@@ -47,7 +47,7 @@ class Character implements CharacterInterface, CreateableInterface
     private $level = 1;
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist"}) */
     private $properties;
-    /** @OneToMany(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
+    /** @OneToOne(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
     private $characterViewpoint;
     /**
      * @ManyToMany(targetEntity="MessageThread", inversedBy="participants", cascade={"persist"})
@@ -90,7 +90,6 @@ class Character implements CharacterInterface, CreateableInterface
     public function __construct()
     {
         $this->properties = new ArrayCollection();
-        $this->characterViewpoint = new ArrayCollection();
         $this->buffs = new ArrayCollection();
         $this->messageThreads = new ArrayCollection();
     }
@@ -253,11 +252,15 @@ class Character implements CharacterInterface, CreateableInterface
      */
     public function getCharacterViewpoint()
     {
-        if (count($this->characterViewpoint) === 0) {
-            return null;
-        }
+        return $this->characterViewpoint;
+    }
 
-        return $this->characterViewpoint->first();
+    /**
+     * Sets the current character viewpoint.
+     */
+    public function setCharacterViewpoint(CharacterViewpoint $v)
+    {
+        $this->characterViewpoint = $v;
     }
 
     /**
