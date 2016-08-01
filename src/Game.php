@@ -6,10 +6,15 @@ namespace LotGD\Core;
 use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
 
-use LotGD\Core\Models\Character;
+use LotGD\Core\Models\ {
+    Character,
+    CharacterViewpoint,
+    Scene
+};
 use LotGD\Core\Exceptions\ {
     ActionNotException,
     CharacterNotFoundException,
+    InvalidConfigurationException,
     SceneNotFoundException
 };
 
@@ -165,14 +170,13 @@ class Game
      */
     public function getViewpoint(): CharacterViewpoint
     {
-        $v = $this->getEntityManager()->getRepository(CharacterViewpoint::class)->find([
-            'owner' => $this->getCharacter()
-        ]);
+        $v = $this->getCharacter()->getCharacterViewpoint();
 
         if ($v === null) {
             // No viewpoint set up for this user. Run the hook to find the default
             // scene.
             $context = [
+                'g' => $this,
                 'character' => $this->getCharacter(),
                 'scene' => null
             ];
@@ -183,6 +187,7 @@ class Game
                 throw new InvalidConfigurationException("No subscriber to h/lotgd/core/default-scene returned a scene.");
             }
             $v = $this->setupViewpoint($s);
+            $v->save($this->getEntityManager());
         }
 
         return $v;
@@ -221,6 +226,7 @@ class Game
             // $nextViewpoint, including the ability to redirect the user to
             // a different scene, by setting $context['redirect'] to a new action.
             $context = [
+                'g' => $this,
                 'viewpoint' => $nextViewpoint,
                 'redirect' => null
             ];
@@ -240,25 +246,23 @@ class Game
      * Returns a viewpoint made from a Scene $s and the current user, complete
      * with actions built from the scene's children and those modified/added by
      * the hook 'h/lotgd/core/actions-for/[scene-template]'.
-     * @param Scene $s
+     * @param Sc[eng] $s
      */
     private function setupViewpoint(Scene $s): CharacterViewpoint
     {
-        $v = new CharacterViewpoint([
-            'owner' => $this->getCharacter()
-        ]);
+        $v = new CharacterViewpoint();
+        $v->setOwner($this->getCharacter());
         $v->changeFromScene($s);
         $ag = new ActionGroup('lotgd/core/default', '', 'A');
-        $as = array_map(function ($c) { return new Action($c->getId()); }, $s->getChildren());
+        $as = array_map(function ($c) { return new Action($c->getId()); }, $s->getChildren()->toArray());
 
         $context = [
+            'g' => $this,
             'viewpoint' => $v,
-            'actions' => $as
+            'actions' => [$ag]
         ];
         $this->getEventManager()->publish('h/lotgd/core/actions-for/' . $s->getTemplate(), $context);
-        $as = $context['actions'];
-
-        $ag->setActions($as);
+        $v->setActions($context['actions']);
 
         return $v;
     }
