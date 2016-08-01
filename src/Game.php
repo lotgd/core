@@ -265,5 +265,21 @@ class Game
         ];
         $this->getEventManager()->publish('h/lotgd/core/actions-for/' . $s->getTemplate(), $context);
         $v->setActions($context['actions']);
+
+        $context = [
+            'g' => $this,
+            'viewpoint' => $v,
+            'attachments' => []
+        ];
+        $this->getEventManager()->publish('h/lotgd/core/attachments-for/' . $s->getTemplate(), $context);
+        $v->setAttachments($context['attachments']);
+
+        $context = [
+            'g' => $this,
+            'viewpoint' => $v,
+            'data' => []
+        ];
+        $this->getEventManager()->publish('h/lotgd/core/data-for/' . $s->getTemplate(), $context);
+        $v->setData($context['data']);
     }
 }
