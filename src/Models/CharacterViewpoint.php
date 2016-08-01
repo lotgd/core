@@ -60,6 +60,7 @@ class CharacterViewpoint implements CreateableInterface
     {
         $this->setTitle($scene->getTitle());
         $this->setDescription($scene->getDescription());
+        $this->setTemplate($scene->getTemplate());
     }
 
     /**
