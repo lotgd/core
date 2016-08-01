@@ -170,7 +170,7 @@ class Game
      */
     public function getViewpoint(): CharacterViewpoint
     {
-        $v = $this->getCharacter()->getCharacterViewpoint();
+        $v = $this->getCharacter()->getViewpoint();
 
         if ($v === null) {
             // No viewpoint set up for this user. Run the hook to find the default
@@ -188,7 +188,7 @@ class Game
             }
             $v = new CharacterViewpoint();
             $this->setupViewpoint($v, $s);
-            $this->getCharacter()->setCharacterViewpoint($v);
+            $this->getCharacter()->setViewpoint($v);
             $v->save($this->getEntityManager());
         }
 
@@ -241,7 +241,7 @@ class Game
             }
         }
 
-        $this->getCharacter()->setCharacterViewpoint($v);
+        $this->getCharacter()->setViewpoint($v);
         $v->save($this->getEntityManager());
     }
 

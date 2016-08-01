@@ -23,7 +23,7 @@ class CharacterViewpointTest extends ModelTestCase
         // Test character with a characterScene
         $testCharacter = $em->getRepository(Character::class)->find(2);
         $this->assertSame(2, $testCharacter->getId());
-        $characterScene = $testCharacter->getCharacterViewpoint();
+        $characterScene = $testCharacter->getViewpoint();
 
         $this->assertInstanceOf(CharacterViewpoint::class, $characterScene);
         $this->assertSame("The Village", $characterScene->getTitle());
@@ -32,7 +32,7 @@ class CharacterViewpointTest extends ModelTestCase
         // Test character without a characterScene
         $testCharacter = $em->getRepository(Character::class)->find(1);
         $this->assertSame(1, $testCharacter->getId());
-        $characterScene = $testCharacter->getCharacterViewpoint();
+        $characterScene = $testCharacter->getViewpoint();
 
         $this->assertNull($characterScene);
 
@@ -48,11 +48,11 @@ class CharacterViewpointTest extends ModelTestCase
 
         $testScene = $em->getRepository(Scene::class)->find(2);
 
-        $this->assertSame("The Village", $testCharacter->getCharacterViewpoint()->getTitle());
+        $this->assertSame("The Village", $testCharacter->getViewpoint()->getTitle());
 
-        $testCharacter->getCharacterViewpoint()->changeFromScene($testScene);
+        $testCharacter->getViewpoint()->changeFromScene($testScene);
 
-        $this->assertSame("The Forest", $testCharacter->getCharacterViewpoint()->getTitle());
+        $this->assertSame("The Forest", $testCharacter->getViewpoint()->getTitle());
 
         $em->flush();
     }

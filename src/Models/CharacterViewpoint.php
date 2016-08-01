@@ -20,7 +20,7 @@ class CharacterViewpoint implements CreateableInterface
     use Creator;
     use SceneBasics;
 
-    /** @Id @OneToOne(targetEntity="Character", inversedBy="characterViewpoint", cascade="persist") */
+    /** @Id @OneToOne(targetEntity="Character", inversedBy="viewpoint", cascade="persist") */
     private $owner;
     /** @Column(type="array") */
     private $actions = [];

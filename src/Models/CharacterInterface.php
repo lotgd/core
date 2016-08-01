@@ -13,6 +13,6 @@ interface CharacterInterface extends FighterInterface
     public function getDisplayName(): string;
     public function getHealth(): int;
     public function getMaxHealth(): int;
-    public function getCharacterViewpoint();
+    public function getViewpoint();
     public function getProperty(string $name, $default = null);
 }
