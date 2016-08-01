@@ -6,6 +6,8 @@ namespace LotGD\Core\Tests;
 use Monolog\Logger;
 use Monolog\Handler\NullHandler;
 
+use LotGD\Core\Action;
+use LotGD\Core\ActionGroup;
 use LotGD\Core\Bootstrap;
 use LotGD\Core\Configuration;
 use LotGD\Core\EventHandler;
@@ -14,8 +16,11 @@ use LotGD\Core\Game;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\CharacterViewpoint;
 use LotGD\Core\Models\Scene;
-use LotGD\Core\Exceptions\CharacterNotFoundException;
-use LotGD\Core\Exceptions\InvalidConfigurationException;
+use LotGD\Core\Exceptions\ {
+    ActionNotFoundException,
+    CharacterNotFoundException,
+    InvalidConfigurationException
+};
 use LotGD\Core\Tests\ModelTestCase;
 
 class DefaultSceneProvider implements EventHandler
@@ -89,6 +94,41 @@ class GameTest extends ModelTestCase
         $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/default-scene/', DefaultSceneProvider::class, 'lotgd/core/tests');
 
         $v = $this->g->getViewpoint();
+        // Run it twice to make sure no additional DB operations happen.
+        $v = $this->g->getViewpoint();
         $this->assertEquals('lotgd/tests/village', $v->getTemplate());
+    }
+
+    public function testTakeActionNonExistant()
+    {
+        $c = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $this->g->setCharacter($c);
+
+        // For now, I cant seem to serialize a proper ActionGroup to store in
+        // the yaml for this test suite, so build one naturally :)
+        $v = $this->g->getViewpoint();
+
+        $this->expectException(ActionNotFoundException::class);
+        $this->g->takeAction('non-existent');
+    }
+
+    public function testTakeActionNavigate()
+    {
+        $c = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $this->g->setCharacter($c);
+
+        // For now, I cant seem to serialize a proper ActionGroup to store in
+        // the yaml for this test suite, so build one naturally :)
+        $v = $this->g->getViewpoint();
+        $a = $v->getActions()[0]->getActions()[0];
+        $this->assertNotNull($a);
+
+        $s = $this->getEntityManager()->find(Scene::class, $a->getDestinationSceneId());
+        $this->assertNotNull($s);
+
+        $this->g->takeAction($a->getId());
+
+        $v = $this->g->getViewpoint();
+        $this->assertSame($s->getTemplate(), $v->getTemplate());
     }
 }

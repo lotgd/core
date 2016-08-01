@@ -39,6 +39,6 @@ class Action
      */
     public function getDestinationSceneId(): int
     {
-        return $this->$destinationSceneId;
+        return $this->destinationSceneId;
     }
 }
