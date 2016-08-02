@@ -62,9 +62,7 @@ class Bootstrap
         $pdo = $this->connectToDatabase($config);
         $entityManager = $this->createEntityManager($pdo);
 
-        $eventManager = $this->createEventManager($entityManager);
-
-        $this->game = new Game($config, $logger, $entityManager, $eventManager);
+        $this->game = new Game($config, $logger, $entityManager);
 
         return $this->game;
     }
@@ -142,16 +140,6 @@ class Bootstrap
         $logger->info("Bootstrap constructing game (Daenerys 🐲{$v}).");
 
         return $logger;
-    }
-
-    /**
-     * Creates and returns an instance of the EventManager
-     * @param EntityManagerInterface $entityManager
-     * @return \LotGD\Core\EventManager
-     */
-    protected function createEventManager(EntityManagerInterface $entityManager): EventManager
-    {
-        return new EventManager($entityManager);
     }
 
     /**

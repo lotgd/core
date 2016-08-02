@@ -38,13 +38,11 @@ class Game
     public function __construct(
         Configuration $configuration,
         Logger $logger,
-        EntityManagerInterface $entityManager,
-        EventManager $eventManager
+        EntityManagerInterface $entityManager
     ) {
         $this->configuration = $configuration;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
-        $this->eventManager = $eventManager;
     }
 
     /**
@@ -104,6 +102,9 @@ class Game
      */
     public function getEventManager(): EventManager
     {
+        if ($this->eventManager === null) {
+            $this->eventManager = new EventManager($this);
+        }
         return $this->eventManager;
     }
 
@@ -176,7 +177,6 @@ class Game
             // No viewpoint set up for this user. Run the hook to find the default
             // scene.
             $context = [
-                'g' => $this,
                 'character' => $this->getCharacter(),
                 'scene' => null
             ];
@@ -228,7 +228,6 @@ class Game
             // $nextViewpoint, including the ability to redirect the user to
             // a different scene, by setting $context['redirect'] to a new action.
             $context = [
-                'g' => $this,
                 'viewpoint' => $v,
                 'redirect' => null
             ];
@@ -262,7 +261,6 @@ class Game
         $v->setActions([$ag]);
 
         $context = [
-            'g' => $this,
             'viewpoint' => $v,
         ];
         $this->getEventManager()->publish('h/lotgd/core/viewpoint-for/' . $s->getTemplate(), $context);

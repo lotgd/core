@@ -6,7 +6,7 @@ use LotGD\Core\Game;
 use LotGD\Core\Module as ModuleBase;
 
 class Module implements ModuleBase {
-    public static function handleEvent(string $event, array &$context) {
+    public static function handleEvent(Game $g, string $event, array &$context) {
         $context['foo'] = 'baz';
         return $context;
     }

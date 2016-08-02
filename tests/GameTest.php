@@ -29,14 +29,14 @@ class DefaultSceneProvider implements EventHandler
     public static $attachments = ['actions'];
     public static $data = ['data'];
 
-    public static function handleEvent(string $event, array &$context)
+    public static function handleEvent(Game $g, string $event, array &$context)
     {
         switch ($event) {
             case 'h/lotgd/core/default-scene':
                 if (!isset($context['character'])) {
                     throw new \Exception("Key 'character' was expected on event h/lotgd/core/default-scene.");
                 }
-                $context['scene'] = $context['g']->getEntityManager()->getRepository(Scene::class)->find(1);
+                $context['scene'] = $g->getEntityManager()->getRepository(Scene::class)->find(1);
                 break;
             case 'h/lotgd/core/viewpoint-for/lotgd/tests/village':
                 $v = $context['viewpoint'];
@@ -62,7 +62,7 @@ class GameTest extends ModelTestCase
         $logger  = new Logger('test');
         $logger->pushHandler(new NullHandler());
 
-        $this->g = new Game(new Configuration(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . getenv('LOTGD_CONFIG')), $logger, $this->getEntityManager(), new EventManager($this->getEntityManager()));
+        $this->g = new Game(new Configuration(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . getenv('LOTGD_CONFIG')), $logger, $this->getEntityManager());
     }
 
     public function testGetCharacterException()

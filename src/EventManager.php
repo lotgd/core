@@ -17,14 +17,14 @@ use LotGD\Core\Exceptions\WrongTypeException;
  */
 class EventManager
 {
-    private $em;
+    private $g;
 
     /**
-     * @param EntityManagerInterface $em The database entity manager.
+     * @param Game $g The game.
      */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(Game $g)
     {
-        $this->em = $em;
+        $this->g = $g;
     }
 
     /**
@@ -46,7 +46,7 @@ class EventManager
         foreach ($subscriptions as $s) {
             if (preg_match($s->getPattern(), $event)) {
                 $class = $s->getClass();
-                $c = $class::handleEvent($event, $context);
+                $c = $class::handleEvent($this->g, $event, $context);
             }
         }
     }
@@ -94,7 +94,7 @@ class EventManager
             'class' => $class,
             'library' => $library
         ]);
-        $e->save($this->em);
+        $e->save($this->g->getEntityManager());
     }
 
     /**
@@ -108,7 +108,7 @@ class EventManager
      */
     public function unsubscribe(string $pattern, string $class, string $library)
     {
-        $e = $this->em->getRepository(EventSubscription::class)->find(array(
+        $e = $this->g->getEntityManager()->getRepository(EventSubscription::class)->find(array(
             'pattern' => $pattern,
             'class' => $class,
             'library' => $library
@@ -116,7 +116,7 @@ class EventManager
         if (!$e) {
             throw new SubscriptionNotFoundException("Subscription not found with pattern={$pattern} class={$class} library={$library}.");
         }
-        $e->delete($this->em);
+        $e->delete($this->g->getEntityManager());
     }
 
     /**
@@ -124,6 +124,6 @@ class EventManager
      */
     public function getSubscriptions(): array
     {
-        return $this->em->getRepository(EventSubscription::class)->findAll();
+        return $this->g->getEntityManager()->getRepository(EventSubscription::class)->findAll();
     }
 }
