@@ -7,6 +7,10 @@ characters:
         id: 2
         name: "Char with a Scene"
         displayName: "B"
+    -
+        id: 3
+        name: "Char without a Scene"
+        displayName: "C"
 character_viewpoints:
     -
         owner_id: 2

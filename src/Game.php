@@ -247,8 +247,9 @@ class Game
 
     /**
      * Returns a viewpoint made from a Scene $s and the current user, complete
-     * with actions built from the scene's children and those modified/added by
-     * the hook 'h/lotgd/core/actions-for/[scene-template]'.
+     * with actions built from the scene's children. Further modifications to
+     * the viewpoint can be made by responding to the hook
+     * 'h/lotgd/core/viewpoint-for/[scene-template]'.
      */
     private function setupViewpoint(CharacterViewpoint $v, Scene $s)
     {
@@ -258,28 +259,12 @@ class Game
         $as = array_map(function ($c) { return new Action($c->getId()); }, $s->getChildren()->toArray());
         $ag->setActions($as);
 
-        $context = [
-            'g' => $this,
-            'viewpoint' => $v,
-            'actions' => [$ag]
-        ];
-        $this->getEventManager()->publish('h/lotgd/core/actions-for/' . $s->getTemplate(), $context);
-        $v->setActions($context['actions']);
+        $v->setActions([$ag]);
 
         $context = [
             'g' => $this,
             'viewpoint' => $v,
-            'attachments' => []
         ];
-        $this->getEventManager()->publish('h/lotgd/core/attachments-for/' . $s->getTemplate(), $context);
-        $v->setAttachments($context['attachments']);
-
-        $context = [
-            'g' => $this,
-            'viewpoint' => $v,
-            'data' => []
-        ];
-        $this->getEventManager()->publish('h/lotgd/core/data-for/' . $s->getTemplate(), $context);
-        $v->setData($context['data']);
+        $this->getEventManager()->publish('h/lotgd/core/viewpoint-for/' . $s->getTemplate(), $context);
     }
 }

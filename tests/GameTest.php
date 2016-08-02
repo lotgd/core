@@ -25,6 +25,10 @@ use LotGD\Core\Tests\ModelTestCase;
 
 class DefaultSceneProvider implements EventHandler
 {
+    public static $actions = ['actions'];
+    public static $attachments = ['actions'];
+    public static $data = ['data'];
+
     public static function handleEvent(string $event, array &$context)
     {
         switch ($event) {
@@ -33,6 +37,13 @@ class DefaultSceneProvider implements EventHandler
                     throw new \Exception("Key 'character' was expected on event h/lotgd/core/default-scene.");
                 }
                 $context['scene'] = $context['g']->getEntityManager()->getRepository(Scene::class)->find(1);
+                break;
+            case 'h/lotgd/core/viewpoint-for/lotgd/tests/village':
+                $v = $context['viewpoint'];
+                $v->setActions(self::$actions);
+                $v->setAttachments(self::$attachments);
+                $v->setData(self::$data);
+                break;
         }
     }
 }
@@ -92,11 +103,20 @@ class GameTest extends ModelTestCase
         $this->g->setCharacter($c);
 
         $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/default-scene/', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/viewpoint-for\/.*/', DefaultSceneProvider::class, 'lotgd/core/tests');
 
         $v = $this->g->getViewpoint();
         // Run it twice to make sure no additional DB operations happen.
         $v = $this->g->getViewpoint();
         $this->assertEquals('lotgd/tests/village', $v->getTemplate());
+
+        // Validate the changes made by the hook.
+        $actions = serialize(DefaultSceneProvider::$actions);
+        $attachments = serialize(DefaultSceneProvider::$attachments);
+        $data = serialize(DefaultSceneProvider::$data);
+        $this->assertEquals('lotgd/tests/village', $v->getTemplate());
+
+        $this->g->getEventManager()->unsubscribe('/h\/lotgd\/core\/viewpoint-for\/.*/', DefaultSceneProvider::class, 'lotgd/core/tests');
     }
 
     public function testTakeActionNonExistant()
@@ -114,7 +134,7 @@ class GameTest extends ModelTestCase
 
     public function testTakeActionNavigate()
     {
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find(3);
         $this->g->setCharacter($c);
 
         // For now, I cant seem to serialize a proper ActionGroup to store in
