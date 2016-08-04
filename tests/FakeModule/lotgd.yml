@@ -1,2 +1,3 @@
-bootstrap:
-    entityNamespace: "Models"
+entityNamespace: "LotGD\\Core\\Tests\\FakeModule\\Models\\"
+subscriptionPatterns:
+    - "e/lotgd/core/tests/event"

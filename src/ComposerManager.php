@@ -10,7 +10,7 @@ use Composer\{
 };
 use Monolog\Logger;
 
-use LotGD\Core\{  
+use LotGD\Core\{
     Exceptions\InvalidConfigurationException,
     Exceptions\LibraryDoesNotExistException
 };
@@ -38,11 +38,11 @@ class ComposerManager
                 $cwd = getcwd();
                 throw new InvalidConfigurationException("composer.json has neither been found in {$cwd} nor in it's parent directory.");
             }
-            
+
             $io = new NullIO();
             $this->composer = Factory::create($io, $cwd . "composer.json");
         }
-        
+
         return $this->composer;
     }
 
@@ -95,16 +95,14 @@ class ComposerManager
     /**
      * Find the filesystem path where the code for a namespace can be found.
      * @param string $namespace The namespace to translate.
-     * @param string $cwd Current working directory
      * @return string|null Path representing $namespace or null if $namespace
      * cannot be found or if the path does not exist.
      */
-    public function translateNamespaceToPath(string $namespace, string $cwd = null)
+    public function translateNamespaceToPath(string $namespace)
     {
         // Find the directory for this namespace by using the autoloader's
         // classmap.
-        $cwd = $cwd ?? getcwd();
-        $autoloader = require(ComposerManager::findAutoloader($cwd));
+        $autoloader = require(ComposerManager::findAutoloader());
         $prefixes = $autoloader->getPrefixesPsr4();
 
         // Standardize the namespace to remove any leading \ and add a trailing \
@@ -145,14 +143,13 @@ class ComposerManager
     /**
      * Returns a path (could be relative) to the proper autoload.php file in
      * the current setup.
-     * @param string $cwd current working directory
      */
-    public static function findAutoloader(string $cwd): string
+    public static function findAutoloader(): string
     {
         // Dance to find the autoloader.
         // TOOD: change this to open up the Composer config and use $c['config']['vendor-dir'] instead of "vendor"
         $order = [
-            implode(DIRECTORY_SEPARATOR, [$cwd, "vendor", "autoload.php"]),
+            implode(DIRECTORY_SEPARATOR, [getcwd(), "vendor", "autoload.php"]),
             implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "vendor", "autoload.php"]),
             implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "autoload.php"]),
         ];

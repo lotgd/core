@@ -31,16 +31,17 @@ class ModuleRegisterCommand extends BaseCommand
         $modules = $this->game->getComposerManager()->getModulePackages();
 
         foreach ($modules as $p) {
-            $library = $p->getName();
+            $library = new LibraryConfiguration($this->game->getComposerManager(), $p);
+            $name = $library->getName();
 
             try {
-                $this->game->getModuleManager()->register($library, $p);
+                $this->game->getModuleManager()->register($library);
 
-                $output->writeln("<info>Registered new module {$library}</info>");
+                $output->writeln("<info>Registered new module {$name}</info>");
             } catch (ModuleAlreadyExistsException $e) {
-                $output->writeln("Skipping already registered module {$library}");
+                $output->writeln("Skipping already registered module {$name}");
             } catch (ClassNotFoundException $e) {
-                $output->writeln("<error>Error installing module {$library}: " . $e->getMessage() . "</error>");
+                $output->writeln("<error>Error installing module {$name}: " . $e->getMessage() . "</error>");
             }
         }
     }

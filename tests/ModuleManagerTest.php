@@ -11,6 +11,7 @@ use LotGD\Core\ComposerManager;
 use LotGD\Core\EventHandler;
 use LotGD\Core\EventManager;
 use LotGD\Core\EventSubscription;
+use LotGD\Core\LibraryConfiguration;
 use LotGD\Core\ModuleManager;
 use LotGD\Core\Module;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
@@ -40,10 +41,13 @@ class ModuleManagerTest extends ModelTestCase
 
     public function testModuleAlreadyExists()
     {
-        $package = $this->getMockForAbstractClass(PackageInterface::class);
+        $library = $this->getMockBuilder(LibraryConfiguration::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $library->method('getName')->willReturn('lotgd/tests');
 
         $this->expectException(ModuleAlreadyExistsException::class);
-        $this->mm->register('lotgd/tests', $package);
+        $this->mm->register($library);
     }
 
     public function testGetModules()
@@ -58,26 +62,30 @@ class ModuleManagerTest extends ModelTestCase
 
     public function testModuleDoesNotExist()
     {
-        $package = $this->getMockForAbstractClass(PackageInterface::class);
+        $library = $this->getMockBuilder(LibraryConfiguration::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $library->method('getName')->willReturn('lotgd/no-module');
 
         $this->expectException(ModuleDoesNotExistException::class);
-        $this->mm->unregister('lotgd/no-module', $package);
+        $this->mm->unregister($library);
     }
 
     public function testUnregisterWithNoEvents()
     {
-        $package = $this->getMockForAbstractClass(PackageInterface::class);
-        $package->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\'
-        ));
+        $library = $this->getMockBuilder(LibraryConfiguration::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $library->method('getName')->willReturn('lotgd/tests');
+        $library->method('getRootNamespace')->willReturn('LotGD\\Core\\Tests\\FakeModule\\');
+        $library->method('getSubscriptionPatterns')->willReturn([]);
 
         $eventManager = $this->getMockBuilder(EventManager::class)
                              ->disableOriginalConstructor()
                              ->getMock();
-
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->unregister('lotgd/tests', $package);
+        $this->mm->unregister($library);
 
         $modules = $this->mm->getModules();
         $this->assertEmpty($modules);
@@ -85,19 +93,18 @@ class ModuleManagerTest extends ModelTestCase
 
     public function testUnregisterWithEvents()
     {
+        $class = FakeModule::class;
+        $name = 'lotgd/tests';
         $subscriptions = array(
             '/pattern1/',
             '/pattern2/'
         );
-        $class = FakeModule::class;
-
-        $library = 'lotgd/tests';
-
-        $package = $this->getMockForAbstractClass(PackageInterface::class);
-        $package->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
-            'lotgd-subscriptions' => $subscriptions
-        ));
+        $library = $this->getMockBuilder(LibraryConfiguration::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $library->method('getName')->willReturn($name);
+        $library->method('getRootNamespace')->willReturn('LotGD\\Core\\Tests\\FakeModule\\');
+        $library->method('getSubscriptionPatterns')->willReturn($subscriptions);
 
         $eventManager = $this->getMockBuilder(EventManager::class)
                              ->disableOriginalConstructor()
@@ -106,13 +113,13 @@ class ModuleManagerTest extends ModelTestCase
         $eventManager->expects($this->exactly(2))
                      ->method('unsubscribe')
                      ->withConsecutive(
-                         array($this->equalTo($subscriptions[0]), $this->equalTo($class), $library),
-                         array($this->equalTo($subscriptions[1]), $this->equalTo($class), $library)
+                         array($this->equalTo($subscriptions[0]), $this->equalTo($class), $name),
+                         array($this->equalTo($subscriptions[1]), $this->equalTo($class), $name)
                      );
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->unregister($library, $package);
+        $this->mm->unregister($library);
 
         $modules = $this->mm->getModules();
         $this->assertEmpty($modules);
@@ -120,12 +127,16 @@ class ModuleManagerTest extends ModelTestCase
 
     public function testRegisterWithNoEvents()
     {
-        $package = $this->getMockForAbstractClass(PackageInterface::class);
-        $package->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
-        ));
-
-        $library = 'lotgd/tests2';
+        $class = FakeModule::class;
+        $name = 'lotgd/tests2';
+        $subscriptions = array(
+        );
+        $library = $this->getMockBuilder(LibraryConfiguration::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $library->method('getName')->willReturn($name);
+        $library->method('getRootNamespace')->willReturn('LotGD\\Core\\Tests\\FakeModule\\');
+        $library->method('getSubscriptionPatterns')->willReturn($subscriptions);
 
         $eventManager = $this->getMockBuilder(EventManager::class)
                              ->disableOriginalConstructor()
@@ -133,7 +144,7 @@ class ModuleManagerTest extends ModelTestCase
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->register($library, $package);
+        $this->mm->register($library);
 
         $modules = $this->mm->getModules();
 
@@ -141,24 +152,23 @@ class ModuleManagerTest extends ModelTestCase
         $timeDiff = (new \DateTime())->getTimestamp() - $modules[1]->getCreatedAt()->getTimestamp();
         $this->assertLessThanOrEqual(5, $timeDiff);
         $this->assertGreaterThanOrEqual(-5, $timeDiff);
-        $this->assertEquals($library, $modules[1]->getLibrary());
+        $this->assertEquals($name, $modules[1]->getLibrary());
     }
 
     public function testRegisterWithEvents()
     {
+        $class = FakeModule::class;
+        $name = 'lotgd/tests2';
         $subscriptions = array(
             '/pattern1/',
-            '/pattern2/',
+            '/pattern2/'
         );
-        $class = FakeModule::class;
-
-        $library = 'lotgd/tests2';
-
-        $package = $this->getMockForAbstractClass(PackageInterface::class);
-        $package->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
-            'lotgd-subscriptions' => $subscriptions
-        ));
+        $library = $this->getMockBuilder(LibraryConfiguration::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $library->method('getName')->willReturn($name);
+        $library->method('getRootNamespace')->willReturn('LotGD\\Core\\Tests\\FakeModule\\');
+        $library->method('getSubscriptionPatterns')->willReturn($subscriptions);
 
         $eventManager = $this->getMockBuilder(EventManager::class)
                              ->disableOriginalConstructor()
@@ -167,13 +177,13 @@ class ModuleManagerTest extends ModelTestCase
         $eventManager->expects($this->exactly(2))
                      ->method('subscribe')
                      ->withConsecutive(
-                         array($this->equalTo($subscriptions[0]), $this->equalTo($class), $library),
-                         array($this->equalTo($subscriptions[1]), $this->equalTo($class), $library)
+                         array($this->equalTo($subscriptions[0]), $this->equalTo($class), $name),
+                         array($this->equalTo($subscriptions[1]), $this->equalTo($class), $name)
                      );
 
         $this->game->method('getEventManager')->willReturn($eventManager);
 
-        $this->mm->register($library, $package);
+        $this->mm->register($library);
 
         $modules = $this->mm->getModules();
 
@@ -181,245 +191,6 @@ class ModuleManagerTest extends ModelTestCase
         $timeDiff = (new \DateTime())->getTimestamp() - $modules[1]->getCreatedAt()->getTimestamp();
         $this->assertLessThanOrEqual(5, $timeDiff);
         $this->assertGreaterThanOrEqual(-5, $timeDiff);
-        $this->assertEquals($library, $modules[1]->getLibrary());
-    }
-
-    public function testValidateSuccess()
-    {
-        $pattern = '/test\\.foo.*/';
-        $class = FakeModule::class;
-        $library = 'lotgd/tests';
-        $subscriptions = array(
-            $pattern,
-        );
-
-        $p1 = $this->getMockBuilder(PackageInterface::class)
-                   ->getMock();
-        $p1->method('getName')->willReturn($library);
-        $p1->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
-            'lotgd-subscriptions' => $subscriptions
-        ));
-
-        $packages = array($p1);
-
-        $composerManager = $this->getMockBuilder(ComposerManager::class)
-                                ->disableOriginalConstructor()
-                                ->setMethods(array('getModulePackages'))
-                                ->getMock();
-        $composerManager->method('getModulePackages')->willReturn($packages);
-
-        $s1 = $this->getMockBuilder(EventSubscription::class)
-                   ->disableOriginalConstructor()
-                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
-                   ->getMock();
-        $s1->method('getPattern')->willReturn($pattern);
-        $s1->method('getClass')->willReturn($class);
-        $s1->method('getLibrary')->willReturn($library);
-        $installedSubscriptions = array($s1);
-
-        $eventManager = $this->getMockBuilder(EventManager::class)
-                             ->disableOriginalConstructor()
-                             ->getMock();
-        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
-
-        $this->game->method('getComposerManager')->willReturn($composerManager);
-        $this->game->method('getEventManager')->willReturn($eventManager);
-
-        $r = $this->mm->validate();
-        $this->assertEmpty($r);
-    }
-
-    public function testValidateFailMissingSubscription()
-    {
-        $pattern = '/test\\.foo.*/';
-        $class = FakeModule::class;
-        $library = 'lotgd/tests';
-        $subscriptions = array(
-            $pattern,
-            '/another pattern/',
-        );
-
-        $p1 = $this->getMockBuilder(PackageInterface::class)
-                   ->getMock();
-        $p1->method('getName')->willReturn($library);
-        $p1->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
-            'lotgd-subscriptions' => $subscriptions
-        ));
-
-        $packages = array($p1);
-
-        $composerManager = $this->getMockBuilder(ComposerManager::class)
-                                ->disableOriginalConstructor()
-                                ->setMethods(array('getModulePackages'))
-                                ->getMock();
-        $composerManager->method('getModulePackages')->willReturn($packages);
-
-        $s1 = $this->getMockBuilder(EventSubscription::class)
-                   ->disableOriginalConstructor()
-                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
-                   ->getMock();
-        $s1->method('getPattern')->willReturn($pattern);
-        $s1->method('getClass')->willReturn($class);
-        $s1->method('getLibrary')->willReturn($library);
-        $installedSubscriptions = array($s1);
-
-        $eventManager = $this->getMockBuilder(EventManager::class)
-                             ->disableOriginalConstructor()
-                             ->getMock();
-        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
-
-        $this->game->method('getComposerManager')->willReturn($composerManager);
-        $this->game->method('getEventManager')->willReturn($eventManager);
-
-        $r = $this->mm->validate();
-        $this->assertTrue(strpos($r[0], "Couldn't find subscription") !== false);
-    }
-
-    public function testValidateFailMoreInstalledModules()
-    {
-        $pattern = '/test\\.foo.*/';
-        $class = FakeModule::class;
-        $library = 'lotgd/tests';
-
-        $packages = array();
-
-        $composerManager = $this->getMockBuilder(ComposerManager::class)
-                                ->disableOriginalConstructor()
-                                ->setMethods(array('getModulePackages'))
-                                ->getMock();
-        $composerManager->method('getModulePackages')->willReturn($packages);
-
-        $s1 = $this->getMockBuilder(EventSubscription::class)
-                   ->disableOriginalConstructor()
-                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
-                   ->getMock();
-        $s1->method('getPattern')->willReturn($pattern);
-        $s1->method('getClass')->willReturn($class);
-        $s1->method('getLibrary')->willReturn($library);
-        $installedSubscriptions = array($s1);
-
-        $eventManager = $this->getMockBuilder(EventManager::class)
-                             ->disableOriginalConstructor()
-                             ->getMock();
-        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
-
-        $this->game->method('getComposerManager')->willReturn($composerManager);
-        $this->game->method('getEventManager')->willReturn($eventManager);
-
-        $r = $this->mm->validate();
-        $this->assertTrue(strpos($r[0], "more installed modules") !== false);
-    }
-
-    public function testValidateFailMoreExpectedModules()
-    {
-        $pattern = '/test\\.foo.*/';
-        $class = FakeModule::class;
-        $library = 'lotgd/tests';
-
-        $subscriptions = array(
-            $pattern
-        );
-
-        $p1 = $this->getMockBuilder(PackageInterface::class)
-                   ->getMock();
-        $p1->method('getName')->willReturn($library);
-        $p1->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
-            'lotgd-subscriptions' => $subscriptions
-        ));
-
-        $p2 = $this->getMockBuilder(PackageInterface::class)
-                   ->getMock();
-        $p2->method('getName')->willReturn('lotgd/tests-another');
-        $p2->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
-            'lotgd-subscriptions' => $subscriptions
-        ));
-
-        $packages = array($p1, $p2);
-
-        $composerManager = $this->getMockBuilder(ComposerManager::class)
-                                ->disableOriginalConstructor()
-                                ->setMethods(array('getModulePackages'))
-                                ->getMock();
-        $composerManager->method('getModulePackages')->willReturn($packages);
-
-        $s1 = $this->getMockBuilder(EventSubscription::class)
-                   ->disableOriginalConstructor()
-                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
-                   ->getMock();
-        $s1->method('getPattern')->willReturn($pattern);
-        $s1->method('getClass')->willReturn($class);
-        $s1->method('getLibrary')->willReturn($library);
-        $installedSubscriptions = array($s1);
-
-        $eventManager = $this->getMockBuilder(EventManager::class)
-                             ->disableOriginalConstructor()
-                             ->getMock();
-        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
-
-        $this->game->method('getComposerManager')->willReturn($composerManager);
-        $this->game->method('getEventManager')->willReturn($eventManager);
-
-        $r = $this->mm->validate();
-        $this->assertTrue(strpos($r[0], "more modules configured") !== false);
-    }
-
-    public function testValidateWarningUnconfiguredSubscriptions()
-    {
-        $pattern = '/test\\.foo.*/';
-        $class = FakeModule::class;
-        $library = 'lotgd/tests';
-
-        $subscriptions = array(
-            $pattern
-        );
-
-        $p1 = $this->getMockBuilder(PackageInterface::class)
-                   ->getMock();
-        $p1->method('getName')->willReturn($library);
-        $p1->method('getExtra')->willReturn(array(
-            'lotgd-namespace' => 'LotGD\\Core\\Tests\\FakeModule\\',
-            'lotgd-subscriptions' => $subscriptions
-        ));
-
-        $packages = array($p1);
-
-        $composerManager = $this->getMockBuilder(ComposerManager::class)
-                                ->disableOriginalConstructor()
-                                ->setMethods(array('getModulePackages'))
-                                ->getMock();
-        $composerManager->method('getModulePackages')->willReturn($packages);
-
-        $s1 = $this->getMockBuilder(EventSubscription::class)
-                   ->disableOriginalConstructor()
-                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
-                   ->getMock();
-        $s1->method('getPattern')->willReturn($pattern);
-        $s1->method('getClass')->willReturn($class);
-        $s1->method('getLibrary')->willReturn($library);
-
-        $s2 = $this->getMockBuilder(EventSubscription::class)
-                   ->disableOriginalConstructor()
-                   ->setMethods(array('getPattern', 'getClass', 'getLibrary'))
-                   ->getMock();
-        $s2->method('getPattern')->willReturn('/some pattern/');
-        $s2->method('getClass')->willReturn(ModuleManagerTestModule::class);
-        $s2->method('getLibrary')->willReturn($library);
-
-        $installedSubscriptions = array($s1, $s2);
-
-        $eventManager = $this->getMockBuilder(EventManager::class)
-                             ->disableOriginalConstructor()
-                             ->getMock();
-        $eventManager->method('getSubscriptions')->willReturn($installedSubscriptions);
-
-        $this->game->method('getComposerManager')->willReturn($composerManager);
-        $this->game->method('getEventManager')->willReturn($eventManager);
-
-        $r = $this->mm->validate();
-        $this->assertTrue(strpos($r[0], "not present in the configuration") !== false);
+        $this->assertEquals($name, $modules[1]->getLibrary());
     }
 }

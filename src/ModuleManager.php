@@ -6,6 +6,7 @@ namespace LotGD\Core;
 use Composer\Package\PackageInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
+use LotGD\Core\PackageConfiguration;
 use LotGD\Core\Exceptions\KeyNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
@@ -28,58 +29,29 @@ class ModuleManager
     }
 
     /**
-     * Return the package's event subscriptions as an array of regex patterns.
-     */
-    private static function getPackageSubscriptions(PackageInterface $package): array
-    {
-        $name = $package->getName();
-        $extra = $package->getExtra();
-        if (!empty($extra['lotgd-subscriptions'])) {
-            $subscriptions = array();
-
-            // Minimal scrub to the subscriptions list.
-            foreach ($extra['lotgd-subscriptions'] as $s) {
-                if (!is_string($s)) {
-                    $this->g->getLogger()->error("Module {$name} has invalid event subscription: {$s}.");
-                    continue;
-                }
-                array_push($subscriptions, $s);
-            }
-            return $subscriptions;
-        } else {
-            return array();
-        }
-    }
-
-    /**
      * Called when a module is added to the system. Performs setup tasks like
      * registering the events this module responds to.
      *
-     * @param string $library Name of the module, in 'vendor/module-name' format.
-     * @param PackageInterface $package Composer package containing this module.
+     * @param LibraryConfiguration $library LibraryConfiguration representing this module.
      * @throws ModuleAlreadyExistsException if the module is already installed.
      * @throws ClassNotFoundException if an event subscription class cannot be resolved.
      * @throws WrongTypeException if an event subscription class does not implement the Module
      * interface or the pattern is not a valid regular expression.
      */
-    public function register(string $library, PackageInterface $package)
+    public function register(LibraryConfiguration $library)
     {
-        $m = $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($library);
+        $name = $library->getName();
+        $package = $library->getComposerPackage();
+
+        $m = $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($name);
         if ($m) {
-            throw new ModuleAlreadyExistsException($library);
+            throw new ModuleAlreadyExistsException($name);
         } else {
             // TODO: handle error cases here.
-            $m = new ModuleModel($library);
+            $m = new ModuleModel($name);
             $m->save($this->g->getEntityManager());
 
-            $name = $package->getName();
-
-            if (!isset($package->getExtra()['lotgd-namespace']) ||
-                !is_string($package->getExtra()['lotgd-namespace'])) {
-                throw new KeyNotFoundException("Module {$name} is missing a valid 'lotgd-namespace' entry in its extra field.");
-            }
-
-            $class = $package->getExtra()['lotgd-namespace'] . 'Module';
+            $class = $library->getRootNamespace() . 'Module';
             try {
                 $klass = new \ReflectionClass($class);
             } catch (\LogicException $e) {
@@ -95,9 +67,9 @@ class ModuleManager
             }
 
             // Subscribe to the module's events.
-            $subscriptions = ModuleManager::getPackageSubscriptions($package);
+            $subscriptions = $library->getSubscriptionPatterns();
             foreach ($subscriptions as $s) {
-                $this->g->getEventManager()->subscribe($s, $class, $library);
+                $this->g->getEventManager()->subscribe($s, $class, $name);
             }
 
             // Run the module's onRegister handler.
@@ -109,28 +81,30 @@ class ModuleManager
      * Called when a module is removed from the system. Performs teardown tasks like
      * unregistering the events this module responds to.
      *
-     * @param string $library Name of the module, in 'vendor/module-name' format.
-     * @param PackageInterface $package Composer package containing this module.
+     * @param LibraryConfiguration $library LibraryConfiguration representing this module.
      * @throws ModuleDoesNotExistException if the module is not installed.
      */
-    public function unregister(string $library, PackageInterface $package)
+    public function unregister(LibraryConfiguration $library)
     {
-        $m = $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($library);
+        $name = $library->getName();
+        $package = $library->getComposerPackage();
+
+        $m = $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($name);
         if (!$m) {
-            throw new ModuleDoesNotExistException($library);
+            throw new ModuleDoesNotExistException($name);
         } else {
             // TODO: handle error cases here.
             $m->delete($this->g->getEntityManager());
 
-            $class = $package->getExtra()['lotgd-namespace'] . 'Module';
+            $class = $library->getRootNamespace() . 'Module';
 
             // Unsubscribe the module's events.
-            $subscriptions = ModuleManager::getPackageSubscriptions($package);
+            $subscriptions = $library->getSubscriptionPatterns();
             foreach ($subscriptions as $s) {
                 try {
-                    $this->g->getEventManager()->unsubscribe($s, $class, $library);
+                    $this->g->getEventManager()->unsubscribe($s, $class, $name);
                 } catch (SubscriptionNotFoundException $e) {
-                    // TODO: log this but continue on.
+                    $this->g->getLogger()->error("Could not find subscription {$s} in library {$name} to unsubscribe.");
                 }
             }
 
@@ -175,11 +149,12 @@ class ModuleManager
         // TODO: Replace this n^2 algorithm to valiate event subscriptions with something faster. :)
         $currentSubscriptions = $this->g->getEventManager()->getSubscriptions();
         foreach ($packages as $p) {
-            $name = $p->getName();
-            $class = $p->getExtra()['lotgd-namespace'] . 'Module';
+            $library = new LibraryConfiguration($this->g->getComposerManager(), $p);
+            $name = $library->getName();
+            $class = $library->getRootNamespace() . 'Module';
 
-            $expectedSubscriptions = ModuleManager::getPackageSubscriptions($p);
-            $currentSubscriptionsForThisPackage = array_filter($currentSubscriptions, function ($s) use ($name) {
+            $expectedSubscriptions = $library->getSubscriptionPatterns();
+            $currentSubscriptionsForThisPackage = array_filter($currentSubscriptions, function($s) use ($name) {
                 return $s->getLibrary() === $name;
             });
 

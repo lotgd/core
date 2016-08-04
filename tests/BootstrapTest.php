@@ -17,7 +17,7 @@ use LotGD\Core\Tests\FakeModule\Models\UserEntity;
 class BootstrapTest extends \PHPUnit_Framework_TestCase
 {
     private $logger;
-    
+
     public function setUp()
     {
         $this->logger = new Logger('test');
@@ -31,7 +31,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($g->getEventManager());
         $this->assertNotNull($g->getLogger());
     }
-    
+
     public function testBootstrapLoadsPackageModels()
     {
         $installationManager = $this->getMockBuilder(InstallationManager::class)
@@ -39,13 +39,13 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
             ->setMethods(["getInstallPath"])
             ->getMock();
         $installationManager->method("getInstallPath")->willReturn(__DIR__ . "/FakeModule");
-        
+
         $composer = $this->getMockBuilder(\Composer\Composer::class)
             ->disableOriginalConstructor()
             ->setMethods(["getInstallationManager"])
             ->getMock();
         $composer->method("getInstallationManager")->willReturn($installationManager);
-        
+
         $fakeModulePackage = $this->getMockBuilder(AliasPackage::class)
             ->disableOriginalConstructor()
             ->setMethods(["getType", "getAutoload"])
@@ -56,7 +56,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
                 "LotGD\\Core\\Tests\\FakeModule\\" => "FakeModule/"
             ]
         ]);
-        
+
         $composerManager = $this->getMockBuilder(ComposerManager::class)
             ->setMethods(["getPackages", "getComposer", "translateNamespaceToPath"])
             ->getMock();
@@ -65,19 +65,17 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $composerManager
             ->expects($this->exactly(1))
             ->method("translateNamespaceToPath")
-            ->with("LotGD\\Core\\Tests\\FakeModule\\Models")
+            ->with("LotGD\\Core\\Tests\\FakeModule\\Models\\")
             ->willReturn(__DIR__ . "/FakeModule/Models");
-        
+
         $bootstrap = $this->getMockBuilder(Bootstrap::class)
             ->setMethods(["createComposerManager"])
             ->getMock();
         $bootstrap->method("createComposerManager")->willReturn($composerManager);
-        
+
         // run tests
         $game = $bootstrap->getGame();
-        
-        $this->assertGreaterThanorEqual(3, $bootstrap->getReadAnnotationDirectories());
-        
+
         $user = new UserEntity();
         $user->setName("Monthy");
         $game->getEntityManager()->persist($user);

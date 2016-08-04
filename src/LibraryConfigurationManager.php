@@ -2,17 +2,17 @@
 
 namespace LotGD\Core;
 
+use Composer\Package\PackageInterface;
 use Symfony\Component\Console\Application;
 
 use LotGD\Core\ComposerManager;
 
 /**
- * Handle the boot configurations for the installed core, crate and modules.
+ * Handle the library configurations for the installed core, crate and modules.
  */
-class BootConfigurationManager
+class LibraryConfigurationManager
 {
-    private $cwd;
-    /** @var array<BootConfiguration> */
+    /** @var array<LibraryConfiguration> */
     private $configurations = null;
 
     /**
@@ -20,22 +20,29 @@ class BootConfigurationManager
      * @param ComposerManager $composerManager
      * @param string $cwd
      */
-    public function __construct(ComposerManager $composerManager, string $cwd)
+    public function __construct(ComposerManager $composerManager)
     {
-        $this->cwd = $cwd;
-
         $packages = $composerManager->getPackages();
         $this->configurations = [];
 
         foreach ($packages as $package) {
             if ($package->getType() === "lotgd-crate" || $package->getType() === "lotgd-module") {
-                $this->configurations[] = new BootConfiguration($composerManager, $package, $cwd);
+                $config = new LibraryConfiguration($composerManager, $package);
+                $this->configurations[] = $config;
             }
         }
     }
 
     /**
-     * Returns a list of all entity directories from lotgd packages
+     * Return an array of the library configurations.
+     * @return array<LibraryConfiguration>
+     */
+    public function getConfigurations(): array {
+        return $this->configurations;
+    }
+
+    /**
+     * Returns a list of all entity directories from LotGD libraries.
      * @return array
      */
     public function getEntityDirectories(): array
@@ -49,20 +56,5 @@ class BootConfigurationManager
         }
 
         return $entityDirectories;
-    }
-
-    /**
-     * Adds commands from packages to daenerys
-     * @param \LotGD\Core\Game $game
-     * @param Application $application
-     */
-    public function addDaenerysCommands(Game $game, Application $application)
-    {
-        foreach ($this->configurations as $config) {
-            $commands = $config->getDaenerysCommands();
-            foreach ($commands as $command) {
-                $application->add(new $command($game));
-            }
-        }
     }
 }

@@ -9,11 +9,11 @@ use Symfony\Component\Yaml\Yaml;
 use LotGD\Core\ComposerManager;
 
 /**
- * Represents the configuration of a LotGD package (core, crate or module),
+ * Represents the configuration of a LotGD library (like the core, crate or module),
  * with its configuration parameters.
  * @author sauterb
  */
-class BootConfiguration
+class LibraryConfiguration
 {
     /** @var ComposerManager */
     private $composerManager;
@@ -22,31 +22,32 @@ class BootConfiguration
     /** @var string */
     private $rootNamespace;
     /** @var array */
+    private $subscriptionPatterns;
+    /** @var array */
     private $rawConfig;
-    private $models;
     private $daenerysCommands;
-    private $cwd;
 
     /**
      * Construct a configuration.
      * @param ComposerManager $composerManager
      * @param PackageInterface $package
-     * @param string $cwd
      */
-    public function __construct(ComposerManager $composerManager, PackageInterface $package, string $cwd)
+    public function __construct(ComposerManager $composerManager, PackageInterface $package)
     {
         $this->composerManager = $composerManager;
         $this->package = $package;
-        $this->cwd = $cwd;
 
-        $installationManager = $composerManager->getComposer()->getInstallationManager();
-
-        // only lotgd-modules are installed in the vendor directory
+        // Only lotgd-modules are installed in the vendor directory
+        $path = '';
         if ($package->getType() === "lotgd-module") {
-            $confFile = $installationManager->getInstallPath($package)  . DIRECTORY_SEPARATOR . "lotgd.yml";
+            $installationManager = $composerManager->getComposer()->getInstallationManager();
+            $path = $installationManager->getInstallPath($package);
         } else {
-            $confFile = $cwd . DIRECTORY_SEPARATOR . "lotgd.yml";
+            // TODO: this seems dangerous, look at whether we can find out if $package represents the current dir.
+            $path = getcwd();
         }
+
+        $confFile = $path . DIRECTORY_SEPARATOR . 'lotgd.yml';
 
         $this->rootNamespace = $this->findRootNamespace($package);
         if (file_exists($confFile)) {
@@ -54,11 +55,30 @@ class BootConfiguration
         } else {
             $name = $package->getName();
             $type = $package->getType();
-            throw new \Exception("Package {$name} of type {$type} does not have a lotgd.yml in it's root ($confFile).");
+            throw new \Exception("Library {$name} of type {$type} does not have a lotgd.yml in it's root ($confFile).");
         }
 
         $this->findEntityDirectory();
         $this->findDaenerysCommands();
+        $this->findSubscriptionPatterns();
+    }
+
+    /**
+     * Return the underlying Composer package.
+     * @return PackageInterface
+     */
+    public function getComposerPackage(): PackageInterface
+    {
+        return $this->package;
+    }
+
+    /**
+     * Return the name, in vendor/library format, of this library.
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->package->getName();
     }
 
     /**
@@ -85,6 +105,15 @@ class BootConfiguration
 
         $name = $package->getName();
         throw new \Exception("{$name} has no valid namespace.");
+    }
+
+    /**
+     * Returns the root namespace.
+     * @return string
+     */
+    public function getRootNamespace(): string
+    {
+        return $this->rootNamespace;
     }
 
     /**
@@ -134,17 +163,17 @@ class BootConfiguration
     }
 
     /**
-     * internal function. Adds models to the boot configuration.
+     * Derives the path where any entity classes might reside from the entityNamespace
+     * entry in the config file.
      */
     protected function findEntityDirectory()
     {
         $this->entityDirectory = null;
 
-        $entityNamespace = $this->getConfig("bootstrap", "entityNamespace");
-        $entityNamespace = $this->rootNamespace . $entityNamespace;
+        $entityNamespace = $this->getConfig("entityNamespace");
 
         if (is_null($entityNamespace) === false) {
-            $entityDirectory = $this->composerManager->translateNamespaceToPath($entityNamespace, $this->cwd);
+            $entityDirectory = $this->composerManager->translateNamespaceToPath($entityNamespace);
 
             if (is_dir($entityDirectory) === false) {
                 throw new \Exception("{$entityDirectory}, generated from {$entityNamespace}, is not a valid directory.");
@@ -174,11 +203,10 @@ class BootConfiguration
 
     /**
      * Searches the config file for daenerys commands and, if found, adds the class name to a list
-     * @return type
      */
     protected function findDaenerysCommands()
     {
-        $list = $this->iterateKey("bootstrap", "daenerysCommands");
+        $list = $this->iterateKey("daenerysCommands");
         $this->daenerysCommands = [];
 
         foreach ($list as $command) {
@@ -201,5 +229,26 @@ class BootConfiguration
     public function getDaenerysCommands(): array
     {
         return $this->daenerysCommands;
+    }
+
+    /**
+     * Extract from $rawConfig any event subscriptions.
+     */
+    protected function findSubscriptionPatterns()
+    {
+        $list = $this->iterateKey("subscriptionPatterns");
+        $this->subscriptionPatterns = [];
+
+        foreach ($list as $s) {
+            $this->subscriptionPatterns[] = $s;
+        }
+    }
+
+    /**
+     * Returns a list of event subscription patterns and only the patterns.
+     */
+    public function getSubscriptionPatterns(): array
+    {
+        return $this->subscriptionPatterns;
     }
 }

@@ -28,33 +28,28 @@ use LotGD\Core\ {
  */
 class Bootstrap
 {
-    private $rootDir;
     private $game;
-    private $bootConfigurationManager = [];
+    private $libraryConfigurationManager = [];
     private $annotationDirectories = [];
 
     /**
      * Create a new Game object, with all the necessary configuration.
-     * @param string $rootDir The root directory if it is different from getcwd()
      * @return Game The newly created Game object.
      */
-    public static function createGame(string $rootDir = null): Game
+    public static function createGame(): Game
     {
         $game = new self();
-        return $game->getGame($rootDir);
+        return $game->getGame();
     }
 
     /**
      * Starts the game kernel with the most important classes and returns the object
-     * @param string $rootDir The root directory if it is different from getcwd()
      * @return Game
      */
-    public function getGame(string $rootDir = null): Game
+    public function getGame(): Game
     {
-        $this->rootDir = $rootDir ?? getcwd();
-
         $composer = $this->createComposerManager();
-        $this->bootConfigurationManager = $this->createBootConfigurationManager($composer, $this->rootDir);
+        $this->libraryConfigurationManager = $this->createLibraryConfigurationManager($composer);
 
         $config = $this->createConfiguration();
         $logger = $this->createLogger($config, "lotgd");
@@ -68,16 +63,14 @@ class Bootstrap
     }
 
     /**
-     * Creates the boot configuration manager
+     * Creates a library configuration manager
      * @param ComposerManager $composerManager
-     * @param string $cwd
-     * @return \LotGD\Core\BootConfigurationManager
+     * @return \LotGD\Core\LibraryConfigurationManager
      */
-    protected function createBootConfigurationManager(
-        ComposerManager $composerManager,
-        string $cwd
-    ): BootConfigurationManager {
-        return new BootConfigurationManager($composerManager, $cwd);
+    protected function createLibraryConfigurationManager(
+        ComposerManager $composerManager
+    ): LibraryConfigurationManager {
+        return new LibraryConfigurationManager($composerManager);
     }
 
     /**
@@ -111,16 +104,14 @@ class Bootstrap
         $configFilePath = getenv('LOTGD_CONFIG');
 
         if (empty($configFilePath)) {
-            $configFilePath = implode(DIRECTORY_SEPARATOR, [$this->rootDir, "config", "lotgd.yml"]);
-        } else {
-            $configFilePath = $this->rootDir . DIRECTORY_SEPARATOR . $configFilePath;
+            $configFilePath = implode(DIRECTORY_SEPARATOR, [getcwd(), "config", "lotgd.yml"]);
         }
 
         if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
             throw new InvalidConfigurationException("Invalid or missing configuration file: {$configFilePath}.");
         }
 
-        $config = new Configuration($configFilePath, $this->rootDir);
+        $config = new Configuration($configFilePath);
         return $config;
     }
 
@@ -175,27 +166,23 @@ class Bootstrap
         // Read db annotations from our own model files.
         $directories = [__DIR__ . DIRECTORY_SEPARATOR . 'Models'];
 
-        // Get additional annotation directories from bootstrap classes
-        $packageDirectories = $this->bootConfigurationManager->getEntityDirectories();
+        // Get additional annotation directories from library configs.
+        $libraryDirectories = $this->libraryConfigurationManager->getEntityDirectories();
 
-        return array_merge($directories, $packageDirectories);
+        return array_merge($directories, $libraryDirectories);
     }
 
     /**
-     * Return all directories used for reading annotations.
-     * @return array<string>
-     */
-    public function getReadAnnotationDirectories(): array
-    {
-        return $this->annotationDirectories;
-    }
-
-    /**
-     * Adds console commands to a given console application from bootstrapping packages.
+     * Adds Symfony/Console commands to the provided application from configured libraries.
      * @param Application $application
      */
     public function addDaenerysCommands(Application $application)
     {
-        $this->bootConfigurationManager->addDaenerysCommands($this->game, $application);
+        foreach ($this->libraryConfigurationManager->getConfigurations() as $config) {
+            $commands = $config->getDaenerysCommands();
+            foreach ($commands as $command) {
+                $application->add(new $command($game));
+            }
+        }
     }
 }
