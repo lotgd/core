@@ -42,10 +42,13 @@ class EventManager
         // TODO: Add an in-memory cache here. Will likely only be in the 1000s of
         // patterns, so no need to go to the remote key-value store.
 
+        $this->g->getLogger()->addDebug("Publishing event {$event}.");
+
         $subscriptions = $this->getSubscriptions();
         foreach ($subscriptions as $s) {
             if (preg_match($s->getPattern(), $event)) {
                 $class = $s->getClass();
+                $this->g->getLogger()->addDebug("  Handling with {$class}.");
                 $c = $class::handleEvent($this->g, $event, $context);
             }
         }
