@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
+use LotGD\Core\LibraryConfiguration;
 
 /**
  * Danerys command to register and initiate any newly installed modules.
