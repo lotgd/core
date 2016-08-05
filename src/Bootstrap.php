@@ -28,6 +28,7 @@ use LotGD\Core\ {
  */
 class Bootstrap
 {
+    private $logger;
     private $game;
     private $libraryConfigurationManager = [];
     private $annotationDirectories = [];
@@ -51,16 +52,18 @@ class Bootstrap
      */
     public function getGame(string $cwd): Game
     {
+        $config = $this->createConfiguration($cwd);
+        $this->logger = $this->createLogger($config, "lotgd");
+        $v = Game::getVersion();
+        $this->logger->info("Bootstrap (Daenerys 🐲{$v}).");
+
         $composer = $this->createComposerManager($cwd);
         $this->libraryConfigurationManager = $this->createLibraryConfigurationManager($composer, $cwd);
-
-        $config = $this->createConfiguration($cwd);
-        $logger = $this->createLogger($config, "lotgd");
 
         $pdo = $this->connectToDatabase($config);
         $entityManager = $this->createEntityManager($pdo);
 
-        $this->game = new Game($config, $logger, $entityManager, $cwd);
+        $this->game = new Game($config, $this->logger, $entityManager, $cwd);
 
         return $this->game;
     }
@@ -131,9 +134,6 @@ class Bootstrap
         // Add lotgd as the prefix for the log filenames.
         $logger->pushHandler(new RotatingFileHandler($config->getLogPath() . DIRECTORY_SEPARATOR . $name, 14));
 
-        $v = Game::getVersion();
-        $logger->info("Bootstrap constructing game (Daenerys 🐲{$v}).");
-
         return $logger;
     }
 
@@ -145,6 +145,10 @@ class Bootstrap
     protected function createEntityManager(\PDO $pdo): EntityManagerInterface
     {
         $this->annotationDirectories = $this->generateAnnotationDirectories();
+        $this->logger->addDebug("Adding annotation directories:");
+        foreach ($this->annotationDirectories as $d) {
+            $this->logger->addDebug("  {$d}");
+        }
         $configuration = Setup::createAnnotationMetadataConfiguration($this->annotationDirectories, true);
 
         // Set a quote
