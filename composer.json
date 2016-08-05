@@ -18,6 +18,7 @@
         "doctrine/orm": "^2.5",
         "monolog/monolog": "^1.12",
         "symfony/console": "^3.0",
+        "symfony/yaml": "^3.0",
         "d11wtq/boris": "^1.0"
     },
     "repositories": [
