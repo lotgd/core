@@ -9,8 +9,8 @@ namespace LotGD\Core;
  */
 class Action
 {
-    private $id;
-    private $destinationSceneId;
+    protected $id;
+    protected $destinationSceneId;
 
     /**
      * Construct a new action with the specified Scene as its destination.
