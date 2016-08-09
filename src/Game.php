@@ -254,7 +254,7 @@ class Game
     {
         $v->setOwner($this->getCharacter());
         $v->changeFromScene($s);
-        $ag = new ActionGroup('lotgd/core/default', '', 'A');
+        $ag = new ActionGroup('lotgd/core/default', '', 0);
         $as = array_map(function ($c) { return new Action($c->getId()); }, $s->getChildren()->toArray());
         $ag->setActions($as);
 

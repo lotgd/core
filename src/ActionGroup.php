@@ -17,9 +17,9 @@ class ActionGroup
      * Create a new ActionGroup, starting with an empty set of actions.
      * @param string $id Unique identifier for this group, in the vendor/module/group format.
      * @param string $title Title to display to the end user. Empty string means no title.
-     * @param string $sortKey Navigation menus are displayed in the order sorted by this string.
+     * @param int $sortKey Navigation menus are displayed in the order sorted by this integer.
      */
-    public function __construct(string $id, string $title, string $sortKey)
+    public function __construct(string $id, string $title, int $sortKey)
     {
         $this->id = $id;
         $this->title = $title;
@@ -48,10 +48,10 @@ class ActionGroup
     /**
      * Returns the sort key for this group. The ordering of the groups in the
      * final menu displayed to users will be sorted by this key. The default
-     * menu's sort key is 'A'.
-     * @return string
+     * menu's sort key is '0'.
+     * @return int
      */
-    public function getSortKey(): string
+    public function getSortKey(): int
     {
         return $this->sortKey;
     }
