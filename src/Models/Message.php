@@ -69,7 +69,7 @@ class Message
     
     /**
      * Constructs the message.
-     * 
+     *
      * This method has been made protected to prevent from accessing it directly. Use
      * the static methods self::send() and self::sendSystemMessage() instead.
      * @param \LotGD\Core\Models\Character $from
@@ -118,15 +118,14 @@ class Message
     {
         if (is_null($this->author)) {
             return SystemCharacter::getInstance();
-        }
-        else {
+        } else {
             return $this->author;
         }
     }
     
     /**
      * Returns the apparant character of the message.
-     * 
+     *
      * If a character sends a system message, this method will return the SystemCharacter message
      * instead of the true author.
      * @return \LotGD\Core\Models\CharacterInterface
@@ -135,8 +134,7 @@ class Message
     {
         if ($this->isSystemMessage()) {
             return SystemCharacter::getInstance();
-        }
-        else {
+        } else {
             return $this->getAuthor();
         }
     }
@@ -161,7 +159,7 @@ class Message
     
     /**
      * Sets the thread this message belongs to, once.
-     * 
+     *
      * A message that belongs to a thread needs to stay there - there is no need for messages to
      * switch the thread and end up in a complete different discussion.
      * @param \LotGD\Core\Models\MessageThread $thread

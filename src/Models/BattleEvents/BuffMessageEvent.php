@@ -16,7 +16,8 @@ class BuffMessageEvent extends BattleEvent
      * Create a new BuffMessageEvent.
      * @param string $message The message from the buff.
      */
-    public function __construct(string $message) {
+    public function __construct(string $message)
+    {
         $this->message = $message;
     }
 

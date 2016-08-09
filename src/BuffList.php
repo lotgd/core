@@ -74,7 +74,7 @@ class BuffList
     public function loadBuffs()
     {
         if ($this->loaded === false) {
-            foreach($this->buffs as $buff) {
+            foreach ($this->buffs as $buff) {
                 $this->buffsBySlot[$buff->getSlot()] = $buff;
             }
         }
@@ -89,8 +89,7 @@ class BuffList
     {
         if ($this->usedBuffs->contains($buff)) {
             $used = true;
-        }
-        else {
+        } else {
             $used = false;
         }
 
@@ -118,8 +117,7 @@ class BuffList
         if ($buff->hasBeenStarted() === false && $used === false) {
             $return = $buff->getStartMessage();
             $buff->setHasBeenStarted();
-        }
-        elseif($used === false) {
+        } elseif ($used === false) {
             $return = $buff->getRoundMessage();
         }
 
@@ -196,7 +194,7 @@ class BuffList
         /* @var $endEvents Collection */
         $endEvents = new ArrayCollection();
 
-        foreach($this->usedBuffs as $buff) {
+        foreach ($this->usedBuffs as $buff) {
             /* @var $roundsLeft int */
             $roundsLeft = $buff->getRounds() - 1;
             $buff->setRounds($roundsLeft);
@@ -304,8 +302,7 @@ class BuffList
             // Only look at buffs that are activated in battle.
             if ($buff->getsActivatedAt(Buff::ACTIVATE_NONE)) {
                 continue;
-            }
-            else {
+            } else {
                 yield $buff;
             }
         }
@@ -451,15 +448,12 @@ class BuffList
                     if ($attacksBoth === true) {
                         if ($game->getDiceBag()->chance(0.5)) {
                             $who = 1;
-                        }
-                        else {
+                        } else {
                             $who = -1;
                         }
-                    }
-                    elseif ($buff->getMinionMaxGoodguyDamage() !== 0 || $buff->getMinionMinGoodguyDamage() !== 0) {
+                    } elseif ($buff->getMinionMaxGoodguyDamage() !== 0 || $buff->getMinionMinGoodguyDamage() !== 0) {
                         $who = 1;
-                    }
-                    else {
+                    } else {
                         $who = -1;
                     }
 
@@ -467,8 +461,7 @@ class BuffList
                         // Minion does damage to the goodguy
                         $damage = $game->getDiceBag()->normal($buff->getMinionMinGoodguyDamage(), $buff->getMinionMaxGoodguyDamage());
                         $target = $goodguy;
-                    }
-                    else {
+                    } else {
                         // Minion does damage to the badguy
                         $damage = $game->getDiceBag()->normal($buff->getMinionMinBadguyDamage(), $buff->getMinionMaxBadguyDamage());
                         $target = $badguy;
@@ -476,11 +469,9 @@ class BuffList
 
                     if ($damage < 0) {
                         $message = $buff->getEffectFailsMessage();
-                    }
-                    elseif ($damage > 0) {
+                    } elseif ($damage > 0) {
                         $message = $buff->getEffectSucceedsMessage();
-                    }
-                    else {
+                    } else {
                         $message = $buff->getNoEffectMessage();
                     }
 
@@ -516,7 +507,7 @@ class BuffList
     ): Collection {
         $events = [];
 
-        foreach($this->activeBuffs[$activation] as $buff) {
+        foreach ($this->activeBuffs[$activation] as $buff) {
             if ($buff->getGoodguyDamageReflection() !== 0.) {
                 if ($damage > 0) {
                     // Damage is > 0, so badguy takes damage. We cannot reflect anything, since this buff
@@ -530,8 +521,7 @@ class BuffList
                     $reflectedDamage = (int)round($buff->getGoodguyDamageReflection() * $damage * -1, 0);
                     if ($reflectedDamage === 0) {
                         $message = $buff->getNoEffectMessage();
-                    }
-                    else {
+                    } else {
                         $message = $buff->getEffectSucceedsMessage();
                     }
                 }
@@ -549,8 +539,7 @@ class BuffList
                     $reflectedDamage = (int)round($buff->getGoodguyDamageReflection() * $damage, 0);
                     if ($reflectedDamage === 0) {
                         $message = $buff->getNoEffectMessage();
-                    }
-                    else {
+                    } else {
                         $message = $buff->getEffectSucceedsMessage();
                     }
                 } elseif ($damage == 0) {
@@ -574,18 +563,15 @@ class BuffList
                     // Damage is > 0, badguy takes damage. Goodguy lifetap works only upon damage to the goodguy.
                     $healAmount = 0;
                     $message = $buff->getEffectFailsMessage();
-                }
-                elseif ($damage < 0) {
+                } elseif ($damage < 0) {
                     // Damage is < 0, goodguy takes damage. We act upon this.
                     $healAmount = (int)round($damage * -$buff->getBadguyLifetap(), 0);
                     if ($healAmount === 0) {
                         $message = $buff->getNoEffectMessage();
-                    }
-                    else {
+                    } else {
                         $message = $buff->getEffectSucceedsMessage();
                     }
-                }
-                else {
+                } else {
                     $healAmount = 0;
                     $message = $buff->getNoEffectMessage();
                 }
@@ -603,17 +589,14 @@ class BuffList
                     $healAmount = (int)round($damage * $buff->getBadguyLifetap(), 0);
                     if ($healAmount === 0) {
                         $message = $buff->getNoEffectMessage();
-                    }
-                    else {
+                    } else {
                         $message = $buff->getEffectSucceedsMessage();
                     }
-                }
-                elseif ($damage < 0) {
+                } elseif ($damage < 0) {
                     // Damage is < 0, goodguy takes damage. Badguy lifetap works only upon damage to the goodguy.
                     $healAmount = 0;
                     $message = $buff->getEffectFailsMessage();
-                }
-                else {
+                } else {
                     $healAmount = 0;
                     $message = $buff->getNoEffectMessage();
                 }

@@ -17,7 +17,8 @@ use LotGD\Core\Console\Command\{
 /**
  * Main execution class for the daenerys tool.
  */
-class Main {
+class Main
+{
     private $application;
     private $bootstrap;
     private $game;

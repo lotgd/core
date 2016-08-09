@@ -14,7 +14,8 @@ use LotGD\Core\{
  * Automatically calculated values based on the fighter's level
  */
 trait AutoScaleFighter
-{   
+{
+
     /**
      * Returns the maximum health based on the fighter's level
      * @return int

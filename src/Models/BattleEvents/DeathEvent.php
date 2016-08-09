@@ -26,7 +26,6 @@ class DeathEvent extends BattleEvent
      */
     public function apply()
     {
-
     }
 
     /**

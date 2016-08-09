@@ -6,6 +6,7 @@ namespace LotGD\Core\Exceptions;
 /**
  * Exception if a scene action is not found.
  */
-class ActionNotFoundException extends CoreException {
+class ActionNotFoundException extends CoreException
+{
 
 }

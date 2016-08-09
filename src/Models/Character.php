@@ -279,7 +279,7 @@ class Character implements CharacterInterface, CreateableInterface
     {
         try {
             $this->getBuffs()->add($buff);
-        } catch(BuffSlotOccupiedException $e) {
+        } catch (BuffSlotOccupiedException $e) {
             $this->getBuffs()->renew($buff);
         }
     }

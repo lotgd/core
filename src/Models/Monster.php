@@ -10,7 +10,7 @@ use LotGD\Core\Tools\Model\AutoScaleFighter;
 
 /**
  * The Monster entity
- * 
+ *
  * @Entity
  * @Table(name="monsters")
  */

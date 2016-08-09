@@ -80,11 +80,9 @@ class DiceBag
 
         if ($min === $max) {
             return (int)round($min/1000, 0);
-        }
-        elseif ($min < $max) {
+        } elseif ($min < $max) {
             return (int)round(mt_rand($min, $max)/1000, 0);
-        }
-        else {
+        } else {
             return (int)round(mt_rand($max, $min)/1000, 0);
         }
     }

@@ -52,8 +52,7 @@ class RegenerationBuffEvent extends BattleEvent
                 $target->getDisplayName(),
                 $this->noEffectMessage
             );
-        }
-        else {
+        } else {
             return str_replace(
                 [
                     "{target}",
@@ -82,17 +81,14 @@ class RegenerationBuffEvent extends BattleEvent
             // Healing
             if ($healthLacking === 0) {
                 $this->regeneration = 0;
-            }
-            elseif ($healthLacking < $this->regeneration) {
+            } elseif ($healthLacking < $this->regeneration) {
                 $this->regeneration = $healthLacking;
             }
-        }
-        else {
+        } else {
             // Damaging
             if ($healthLeft === 0) {
                 $this->regeneration = 0;
-            }
-            elseif ($healthLeft < -1*$this->regeneration) {
+            } elseif ($healthLeft < -1*$this->regeneration) {
                 $this->regeneration = - $healthLeft;
             }
         }

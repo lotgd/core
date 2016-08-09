@@ -13,12 +13,14 @@ use LotGD\Core\Exceptions\{
 /**
  * Provides methods for deleting entities.
  */
-trait Deletor {
+trait Deletor
+{
     /**
      * Deletes the entity
      * @param EntityManagerInterface $em
      */
-    public function delete(EntityManagerInterface $em) {
+    public function delete(EntityManagerInterface $em)
+    {
         $em->remove($this);
         $em->flush();
     }

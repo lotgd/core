@@ -6,6 +6,7 @@ namespace LotGD\Core\Exceptions;
 /**
  * Exception if a character is not found.
  */
-class CharacterNotFoundException extends CoreException {
+class CharacterNotFoundException extends CoreException
+{
 
 }

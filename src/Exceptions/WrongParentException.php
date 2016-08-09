@@ -6,6 +6,7 @@ namespace LotGD\Core\Exceptions;
 /**
  * Exception if a specific, required argument is missing
  */
-class WrongParentException extends CoreException {
+class WrongParentException extends CoreException
+{
     
 }

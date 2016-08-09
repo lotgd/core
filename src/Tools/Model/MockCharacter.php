@@ -16,7 +16,8 @@ use LotGD\Core\Models\CharacterViewpoint;
  */
 trait MockCharacter
 {
-    public function __call($name, $arguments) {
+    public function __call($name, $arguments)
+    {
         throw new IsNullException();
     }
 

@@ -33,7 +33,7 @@ class OneToManyCollection implements Collection
      */
     public function __construct(EntityManagerInterface $entityManager, string $typeClass)
     {
-        if(class_exists($typeClass) === false) {
+        if (class_exists($typeClass) === false) {
             throw new ClassNotFoundException(sprintf("The class %s has not been found.", $typeClass));
         }
 
@@ -69,8 +69,7 @@ class OneToManyCollection implements Collection
 
         if ($this->collection === null) {
             return $this->numberOfRows;
-        }
-        else {
+        } else {
             return count($this->collection);
         }
     }
@@ -121,8 +120,7 @@ class OneToManyCollection implements Collection
     {
         try {
             $this->checkElementType($element);
-        }
-        catch (WrongTypeException $e) {
+        } catch (WrongTypeException $e) {
             return false;
         }
 
@@ -178,8 +176,7 @@ class OneToManyCollection implements Collection
     {
         if (isset($this->collection[$key])) {
             return $this->collection[$key];
-        }
-        else {
+        } else {
             throw new KeyNotFoundException(sprintf("The key %s has not been found within the collection", $key));
         }
     }
@@ -329,28 +326,32 @@ class OneToManyCollection implements Collection
     /**
      * @inheritDoc
      */
-    public function offsetGet($key) {
+    public function offsetGet($key)
+    {
         return $this->get($key);
     }
 
     /**
      * @inheritDoc
      */
-    public function offsetSet($key, $element) {
+    public function offsetSet($key, $element)
+    {
          $this->set($key, $element);
     }
 
     /**
      * @inheritDoc
      */
-    public function offsetUnset($key) {
+    public function offsetUnset($key)
+    {
         $this->remove($key);
     }
 
     /**
      * @inheritDoc
      */
-    public function offsetExists($key) {
+    public function offsetExists($key)
+    {
         return isset($this->collection[$key]);
     }
 }

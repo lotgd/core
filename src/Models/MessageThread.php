@@ -14,7 +14,7 @@ use LotGD\Core\Tools\Model\Saveable;
 
 /**
  * A Thread of messages
- * 
+ *
  * @Entity(repositoryClass="LotGD\Core\Models\Repositories\MessageThreadRepository")
  * @Table(name="message_threads")
  */
@@ -71,7 +71,7 @@ class MessageThread implements SaveableInterface
     }
     
     /**
-     * 
+     *
      * @param \LotGD\Core\Models\Message $message
      * @throws CoreException
      */
@@ -79,8 +79,7 @@ class MessageThread implements SaveableInterface
     {
         if ($this->isReadonly() && $message->getApparantAuthor() instanceof SystemCharacter === false) {
             throw new CoreException("Cannot write a normal message to a readonly thread");
-        }
-        else {
+        } else {
             $this->messages->add($message);
         }
     }
@@ -108,7 +107,7 @@ class MessageThread implements SaveableInterface
      * @param EntityManagerInterface $em
      */
     public function save(EntityManagerInterface $em)
-    {        
+    {
         foreach ($this->participants as $participant) {
             $participantsMessageThreads = $participant->getMessageThreads();
             if ($participantsMessageThreads->contains($this) === false) {

@@ -25,7 +25,7 @@ class Buff
     
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
-    /** 
+    /**
      * @ManyToOne(targetEntity="Character", inversedBy="buffs")
      * @JoinColumn(nullable=True)
      */
@@ -100,7 +100,7 @@ class Buff
     private $expiresAfterBattle = false;
     /**
      * The number of rounds this buff lasts.
-     * 
+     *
      * Gets reduces very round by 1. If the value is < 0, the buff is permament until a new day arises.
      * @var int
      * @Column(type="integer")
@@ -229,7 +229,7 @@ class Buff
     
     /**
      * Allowed buff values and their type
-     * @var array 
+     * @var array
      */
     private $buffArrayTemplate = [
         "slot" => "string",
@@ -268,7 +268,7 @@ class Buff
     
     /**
      * Requried buff values.
-     * @var type 
+     * @var type
      */
     private $required = [
         "slot",
@@ -280,14 +280,15 @@ class Buff
      * @param array $buffArray
      * @throws ArgumentException
      */
-    public function __construct(array $buffArray) {
-        foreach($buffArray as $attribute => $value) {
+    public function __construct(array $buffArray)
+    {
+        foreach ($buffArray as $attribute => $value) {
             // Throw exception if an attribute does not exist (to prevent spelling errors)
             if (!isset($this->buffArrayTemplate[$attribute])) {
                 throw new ArgumentException("{$attribute} is not a valid key for a buff.");
             }
             
-            switch($this->buffArrayTemplate[$attribute]) {
+            switch ($this->buffArrayTemplate[$attribute]) {
                 case "string":
                     if (is_string($value) === false) {
                         throw new ArgumentException("{$attribute} needs to be a string.");
@@ -321,7 +322,7 @@ class Buff
             $this->{$attribute} = $value;
         }
         
-        foreach($this->required as $required) {
+        foreach ($this->required as $required) {
             if (is_null($this->$required)) {
                 throw new ArgumentException("{$required} needs to be inside of the buffArray!");
             }
@@ -333,10 +334,11 @@ class Buff
      * @param \LotGD\Core\Models\Buff $buff
      * @return \LotGD\Core\Models\Buff
      */
-    public static function constructFromTemplate(Buff $buff): Buff {
+    public static function constructFromTemplate(Buff $buff): Buff
+    {
         $buffArray = [];
         
-        foreach($this->buffArrayTemplate as $attribute => $type) {
+        foreach ($this->buffArrayTemplate as $attribute => $type) {
             $buffArray[$attribute] = $buff->$attribute;
         }
         
@@ -460,8 +462,7 @@ class Buff
     {
         if ($flag === self::ACTIVATE_NONE) {
             return $this->activateAt == self::ACTIVATE_NONE ? true : false;
-        }
-        else {
+        } else {
             return ($this->activateAt & $flag) == true;
         }
     }

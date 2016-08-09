@@ -68,22 +68,19 @@ class DamageEvent extends BattleEvent
         if ($this->damage === 0) {
             if ($this->attacker === $game->getCharacter()) {
                 return "You try to hit {$defendersName} but MISS!";
-            }
-            else {
+            } else {
                 return "{$attackersName} tries to hit you but they MISS!";
             }
         } elseif ($this->damage > 0) {
             if ($this->attacker === $game->getCharacter()) {
                 return "You hit {$defendersName} for {$this->damage} points of damage!";
-            }
-            else {
+            } else {
                 return "{$attackersName} hits you for {$this->damage} points of damage!";
             }
         } else {
             if ($this->attacker === $game->getCharacter()) {
                 return "You try to hit {$defendersName} but are RIPOSTED for {$this->damage} points of damage";
-            }
-            else {
+            } else {
                 return "{$attackersName} tries to hit you but you RIPOSTE for {$this->damage} points of damage";
             }
         }

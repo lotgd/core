@@ -47,7 +47,7 @@ class Battle
     
     /**
      * Battle Configuration
-     * @var type 
+     * @var type
      */
     protected $configuration = [
         "riposteEnabled" => true,
@@ -74,7 +74,6 @@ class Battle
      */
     public function getActions()
     {
-        
     }
     
     /**
@@ -82,7 +81,6 @@ class Battle
      */
     public function selectAction()
     {
-        
     }
     
     /**
@@ -271,7 +269,7 @@ class Battle
         $events = new ArrayCollection(array_merge($offenseTurnEvents->toArray(), $defenseTurnEvents->toArray()));
         $eventsToAdd = new ArrayCollection();
 
-        foreach($events as $event) {
+        foreach ($events as $event) {
             $event->apply();
 
             $eventsToAdd->add($event);
@@ -299,7 +297,7 @@ class Battle
         
         $this->events = new ArrayCollection(
             array_merge(
-                $this->events->toArray(), 
+                $this->events->toArray(),
                 $playerBuffStartEvents->toArray(),
                 $monsterBuffStartEvents->toArray(),
                 $eventsToAdd->toArray(),
@@ -324,13 +322,13 @@ class Battle
         $attackersBuffs = $attacker->getBuffs();
         $defendersBuffs = $defender->getBuffs();
         
-        // Adjustement makes fights versus monsters with lower level easier, 
+        // Adjustement makes fights versus monsters with lower level easier,
         // and more difficult if the monster has a higher level by adjusting
         // the monster's defense value.
-        // For example, if a level 10 player attacks a level 9 monster, the 
+        // For example, if a level 10 player attacks a level 9 monster, the
         // defenseAdjustement value for the monster is 0.81, reducing the monster's
         // defense by 20% and making it more likely for the player to land a hit.
-        // On the other hand, the player's defense is increased by ~ 10%, making it 
+        // On the other hand, the player's defense is increased by ~ 10%, making it
         // less likely for the enemy to hit the player.
         $adjustement = 1.0;
         $defenseAdjustement = 1.0;
@@ -339,8 +337,7 @@ class Battle
                 $adjustement = $attacker->getLevel() / $defender->getLevel();
                 $defenseAdjustement = 1. / ($adjustement * $adjustement);
             }
-        }
-        elseif ($defender === $this->player && $this->isLevelAdjustementEnabled()) {
+        } elseif ($defender === $this->player && $this->isLevelAdjustementEnabled()) {
             if ($attacker->getLevel() > 1 && $defender->getLevel() > 1) {
                 $adjustement = $defender->getLevel() / $attacker->getLevel();
                 $defenseAdjustement = $adjustement;
@@ -354,8 +351,8 @@ class Battle
             * $defendersBuffs->getBadguyAttackModifier();
         // It's the opposite for the defender's defense - it needs to take into account the
         // defender's goodguyDefenseModifier as well as the attacker's badguyDefenseModifier.
-        $defendersDefense = $defender->getDefense($this->game) 
-            * $defendersBuffs->getGoodguyDefenseModifier() 
+        $defendersDefense = $defender->getDefense($this->game)
+            * $defendersBuffs->getGoodguyDefenseModifier()
             * $attackersBuffs->getBadguyDefenseModifier()
             * $defenseAdjustement;
         
@@ -376,7 +373,7 @@ class Battle
         $defendersDefRoll = $this->game->getDiceBag()->normal(0, $defendersDefense);
         $damage = $attackersAtkRoll - $defendersDefRoll;
         
-        // If the attacker's attack after modification is bigger than before, 
+        // If the attacker's attack after modification is bigger than before,
         // we call it a critical hit and apply the CriticalHitEvent.
         if ($attackersAttack > $attacker->getAttack($this->game) && $this->isCriticalHitEnabled()) {
             $events->add(new CriticalHitEvent($attacker, $attackersAttack));
@@ -387,7 +384,7 @@ class Battle
             $damage = 0;
         }
         
-        // Here, we take invulnurable buffs into account. There are 4 possible values coming from the 
+        // Here, we take invulnurable buffs into account. There are 4 possible values coming from the
         // 2 buff lists, so we must take care a bit.
         $attackerIsInvulnurable = $attackersBuffs->goodguyIsInvulnurable() || $defendersBuffs->badguyIsInvulnurable();
         $defenderIsInvulnurable = $defendersBuffs->goodguyIsInvulnurable() || $attackersBuffs->badguyIsInvulnurable();
@@ -395,28 +392,25 @@ class Battle
         if ($attackerIsInvulnurable && $defenderIsInvulnurable) {
             // Both are invulnurable, damage is 0.
             $damage = 0;
-        }
-        elseif ($attackerIsInvulnurable) {
+        } elseif ($attackerIsInvulnurable) {
             // Attaker is invulnurable, damage is always > 0 (there is no riposte)
             $damage = abs($damage);
-        }
-        elseif ($defenderIsInvulnurable) {
+        } elseif ($defenderIsInvulnurable) {
             // Defender is invulnurable, damage is always < 0 (defender always ripostes)
             $damage = - abs($damage);
         }
         
         if ($damage < 0) {
-            // If the damage is less then 0, it's a RIPOSTE. They are only half 
+            // If the damage is less then 0, it's a RIPOSTE. They are only half
             // as damaging than normal attacks.
             $damage /= 2;
             
-            // Apply damage modification. It's a RIPOSTE, so the defenders makes the 
-            // damage. Therefore, we take defender's goodguyDamageModifier into account, 
+            // Apply damage modification. It's a RIPOSTE, so the defenders makes the
+            // damage. Therefore, we take defender's goodguyDamageModifier into account,
             // and the attacker's badguyDamageModifier.
             $damage *= $defendersBuffs->getGoodguyDamageModifier()
                 * $attackersBuffs->getBadguyDamageModifier();
-        }
-        else {
+        } else {
             // Apply damage modification. It's a normal attack - meaning the attacker does
             // the damage. Therefore, we take the attacker's goodguyDamageModifier and
             // the defender's badguyDamageModifier into account.

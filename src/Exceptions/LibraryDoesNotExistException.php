@@ -6,6 +6,7 @@ namespace LotGD\Core\Exceptions;
 /**
  * Exception if a Composer library does not exists.
  */
-class LibraryDoesNotExistException extends CoreException {
+class LibraryDoesNotExistException extends CoreException
+{
 
 }

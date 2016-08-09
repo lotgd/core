@@ -6,6 +6,7 @@ namespace LotGD\Core\Exceptions;
 /**
  * Exception if a configuration value is missing or invalid.
  */
-class InvalidConfigurationException extends CoreException {
+class InvalidConfigurationException extends CoreException
+{
 
 }

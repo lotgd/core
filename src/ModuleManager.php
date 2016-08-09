@@ -39,8 +39,7 @@ class ModuleManager
 
             // Minimal scrub to the subscriptions list.
             foreach ($extra['lotgd-subscriptions'] as $s) {
-                if (!is_string($s))
-                {
+                if (!is_string($s)) {
                     $this->g->getLogger()->error("Module {$name} has invalid event subscription: {$s}.");
                     continue;
                 }
@@ -76,8 +75,7 @@ class ModuleManager
             $name = $package->getName();
 
             if (!isset($package->getExtra()['lotgd-namespace']) ||
-                !is_string($package->getExtra()['lotgd-namespace']))
-            {
+                !is_string($package->getExtra()['lotgd-namespace'])) {
                 throw new KeyNotFoundException("Module {$name} is missing a valid 'lotgd-namespace' entry in its extra field.");
             }
 
@@ -145,7 +143,8 @@ class ModuleManager
      * Returns the list of currently registered modules.
      * @return array<Module> Array of modules.
      */
-    public function getModules(): array {
+    public function getModules(): array
+    {
         return $this->g->getEntityManager()->getRepository(ModuleModel::class)->findAll();
     }
 
@@ -180,7 +179,7 @@ class ModuleManager
             $class = $p->getExtra()['lotgd-namespace'] . 'Module';
 
             $expectedSubscriptions = ModuleManager::getPackageSubscriptions($p);
-            $currentSubscriptionsForThisPackage = array_filter($currentSubscriptions, function($s) use ($name) {
+            $currentSubscriptionsForThisPackage = array_filter($currentSubscriptions, function ($s) use ($name) {
                 return $s->getLibrary() === $name;
             });
 
@@ -193,8 +192,7 @@ class ModuleManager
                     // Count the subscriptions for this
                     if ($c->getPattern() === $e &&
                         $c->getClass() === $class &&
-                        $c->getLibrary() === $p->getName())
-                    {
+                        $c->getLibrary() === $p->getName()) {
                         $found = true;
                         break;
                     }

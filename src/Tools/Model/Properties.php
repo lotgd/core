@@ -49,7 +49,8 @@ trait Properties
      * Sets the stored property
      * @param mixed $value
      */
-    public function setValue($value) {
+    public function setValue($value)
+    {
         $this->propertyValue = serialize($value);
     }
 }

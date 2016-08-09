@@ -6,6 +6,7 @@ namespace LotGD\Core\Exceptions;
 /**
  * Exception if a module does not exists.
  */
-class ModuleDoesNotExistException extends CoreException {
+class ModuleDoesNotExistException extends CoreException
+{
 
 }

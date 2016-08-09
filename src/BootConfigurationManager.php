@@ -27,8 +27,7 @@ class BootConfigurationManager
         $packages = $composerManager->getPackages();
         $this->configurations = [];
 
-        foreach($packages as $package)
-        {
+        foreach ($packages as $package) {
             if ($package->getType() === "lotgd-crate" || $package->getType() === "lotgd-module") {
                 $this->configurations[] = new BootConfiguration($composerManager, $package, $cwd);
             }

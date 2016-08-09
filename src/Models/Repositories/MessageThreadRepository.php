@@ -25,14 +25,14 @@ class MessageThreadRepository extends EntityRepository
     {
         // ToDo: Replace array with CharacterCollection
         usort(
-            $listOfCharacters, 
-            function($a, $b) {
+            $listOfCharacters,
+            function ($a, $b) {
                 return $a->getId() <=> $b->getId();
             }
         );
         
         $threadParticipants = "";
-        foreach($listOfCharacters as $character) {
+        foreach ($listOfCharacters as $character) {
             $threadParticipants .= $character->getId() . ".";
         }
         

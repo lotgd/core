@@ -32,11 +32,9 @@ class ComposerManager
             // Search "true" working directory
             if (file_exists(getcwd() . "/composer.json")) {
                 $cwd = getcwd() . "/";
-            }
-            elseif (file_exists(getcwd() . "/../composer.json")) {
+            } elseif (file_exists(getcwd() . "/../composer.json")) {
                 $cwd = getcwd() . "/../";
-            }
-            else {
+            } else {
                 $cwd = getcwd();
                 throw new InvalidConfigurationException("composer.json has neither been found in {$cwd} nor in it's parent directory.");
             }
@@ -59,7 +57,7 @@ class ComposerManager
         $packages = $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages();
         foreach ($packages as $p) {
             if ($p->getName() === $library) {
-               return $p;
+                return $p;
             }
         }
         throw new LibraryDoesNotExistException();
@@ -157,7 +155,7 @@ class ComposerManager
             implode(DIRECTORY_SEPARATOR, [$cwd, "vendor", "autoload.php"]),
             implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "vendor", "autoload.php"]),
             implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "autoload.php"]),
-        ]; 
+        ];
 
         foreach ($order as $path) {
             if (file_exists($path)) {

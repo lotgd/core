@@ -6,6 +6,7 @@ namespace LotGD\Core\Exceptions;
 /**
  * Exception if an event subscription does not exist.
  */
-class SubscriptionNotFoundException extends CoreException {
+class SubscriptionNotFoundException extends CoreException
+{
 
 }

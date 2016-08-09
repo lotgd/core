@@ -44,16 +44,14 @@ class BootConfiguration
         // only lotgd-modules are installed in the vendor directory
         if ($package->getType() === "lotgd-module") {
             $confFile = $installationManager->getInstallPath($package)  . DIRECTORY_SEPARATOR . "lotgd.yml";
-        }
-        else {
+        } else {
             $confFile = $cwd . DIRECTORY_SEPARATOR . "lotgd.yml";
         }
 
         $this->rootNamespace = $this->findRootNamespace($package);
         if (file_exists($confFile)) {
             $this->rawConfig = Yaml::parse(file_get_contents($confFile));
-        }
-        else {
+        } else {
             $name = $package->getName();
             $type = $package->getType();
             throw new \Exception("Package {$name} of type {$type} does not have a lotgd.yml in it's root ($confFile).");
@@ -98,11 +96,10 @@ class BootConfiguration
     {
         $parent = $this->rawConfig;
 
-        foreach ($arguments as $argument){
+        foreach ($arguments as $argument) {
             if (isset($parent[$argument])) {
                 $parent = $parent[$argument];
-            }
-            else {
+            } else {
                 return null;
             }
         }
