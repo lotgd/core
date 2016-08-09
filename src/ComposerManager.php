@@ -30,9 +30,7 @@ class ComposerManager
      */
     public function __construct(string $cwd = null)
     {
-        if ($cwd == null) {
-            $cwd = getcwd();
-        }
+        $cwd = $cwd ?? getcwd();
         $this->cwd = $cwd;
     }
 

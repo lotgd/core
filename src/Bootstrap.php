@@ -100,9 +100,7 @@ class Bootstrap
      */
     protected function createConfiguration(string $cwd = null): Configuration
     {
-        if ($cwd == null) {
-            $cwd = getcwd();
-        }
+        $cwd = $cwd ?? getcwd();
 
         if (empty($configFilePath)) {
             $configFilePath = implode(DIRECTORY_SEPARATOR, [$cwd, "config", "lotgd.yml"]);
