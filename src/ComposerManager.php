@@ -21,6 +21,20 @@ use LotGD\Core\{
 class ComposerManager
 {
     private $composer;
+    private $cwd;
+
+    /**
+     * Construct a manager with an optional working directory where composer.json
+     * lives.
+     * @param string $cwd
+     */
+    public function __construct(string $cwd = null)
+    {
+        if ($cwd == null) {
+            $cwd = getcwd();
+        }
+        $this->cwd = $cwd;
+    }
 
     /**
      * Returns a Composer instance to perform underlying operations on. Be careful.
@@ -29,18 +43,14 @@ class ComposerManager
     public function getComposer(): Composer
     {
         if ($this->composer === null) {
-            // Search "true" working directory
-            if (file_exists(getcwd() . "/composer.json")) {
-                $cwd = getcwd() . "/";
-            } elseif (file_exists(getcwd() . "/../composer.json")) {
-                $cwd = getcwd() . "/../";
-            } else {
-                $cwd = getcwd();
-                throw new InvalidConfigurationException("composer.json has neither been found in {$cwd} nor in it's parent directory.");
+            // Verify location of composer.json.
+            $path = $this->cwd . DIRECTORY_SEPARATOR . "composer.json";
+            if (!file_exists($path)) {
+                throw new InvalidConfigurationException("composer.json cannot be found at {$path}.");
             }
 
             $io = new NullIO();
-            $this->composer = Factory::create($io, $cwd . "composer.json");
+            $this->composer = Factory::create($io, $path);
         }
 
         return $this->composer;
@@ -102,7 +112,7 @@ class ComposerManager
     {
         // Find the directory for this namespace by using the autoloader's
         // classmap.
-        $autoloader = require(ComposerManager::findAutoloader());
+        $autoloader = require($this->findAutoloader());
         $prefixes = $autoloader->getPrefixesPsr4();
 
         // Standardize the namespace to remove any leading \ and add a trailing \
@@ -144,12 +154,12 @@ class ComposerManager
      * Returns a path (could be relative) to the proper autoload.php file in
      * the current setup.
      */
-    public static function findAutoloader(): string
+    public function findAutoloader(): string
     {
         // Dance to find the autoloader.
         // TOOD: change this to open up the Composer config and use $c['config']['vendor-dir'] instead of "vendor"
         $order = [
-            implode(DIRECTORY_SEPARATOR, [getcwd(), "vendor", "autoload.php"]),
+            implode(DIRECTORY_SEPARATOR, [$this->cwd, "vendor", "autoload.php"]),
             implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "vendor", "autoload.php"]),
             implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "autoload.php"]),
         ];

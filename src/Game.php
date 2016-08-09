@@ -31,6 +31,7 @@ class Game
     private $configuration;
     private $character;
     private $diceBag;
+    private $cwd;
 
     /**
      * Construct a game. You probably want to use Bootstrap to do this.
@@ -38,11 +39,13 @@ class Game
     public function __construct(
         Configuration $configuration,
         Logger $logger,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        string $cwd = null
     ) {
         $this->configuration = $configuration;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
+        $this->cwd = $cwd;
     }
 
     /**
@@ -82,7 +85,7 @@ class Game
     public function getComposerManager(): ComposerManager
     {
         if ($this->composerManager === null) {
-            $this->composerManager = new ComposerManager($this->getLogger());
+            $this->composerManager = new ComposerManager($this->cwd);
         }
         return $this->composerManager;
     }

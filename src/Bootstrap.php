@@ -36,19 +36,19 @@ class Bootstrap
      * Create a new Game object, with all the necessary configuration.
      * @return Game The newly created Game object.
      */
-    public static function createGame(): Game
+    public static function createGame(string $cwd = null): Game
     {
         $game = new self();
-        return $game->getGame();
+        return $game->getGame($cwd);
     }
 
     /**
      * Starts the game kernel with the most important classes and returns the object
      * @return Game
      */
-    public function getGame(): Game
+    public function getGame(string $cwd = null): Game
     {
-        $composer = $this->createComposerManager();
+        $composer = $this->createComposerManager($cwd);
         $this->libraryConfigurationManager = $this->createLibraryConfigurationManager($composer);
 
         $config = $this->createConfiguration();
@@ -85,12 +85,11 @@ class Bootstrap
 
     /**
      * Creates and returns an instance of ComposerManager
-     * @param Logger $logger
      * @return ComposerManager
      */
-    protected function createComposerManager(): ComposerManager
+    protected function createComposerManager(string $cwd = null): ComposerManager
     {
-        $composer = new ComposerManager();
+        $composer = new ComposerManager($cwd);
         return $composer;
     }
 
