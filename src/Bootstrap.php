@@ -51,7 +51,7 @@ class Bootstrap
         $composer = $this->createComposerManager($cwd);
         $this->libraryConfigurationManager = $this->createLibraryConfigurationManager($composer);
 
-        $config = $this->createConfiguration();
+        $config = $this->createConfiguration($cwd);
         $logger = $this->createLogger($config, "lotgd");
 
         $pdo = $this->connectToDatabase($config);
@@ -94,16 +94,18 @@ class Bootstrap
     }
 
     /**
-     * Returns a configuration object reading from the file located at the path stored in LOTGD_CONFIG.
+     * Returns a configuration object reading from the file located at the path stored in $cwd/config/lotgd.yml.
      * @return \LotGD\Core\Configuration
      * @throws InvalidConfigurationException
      */
-    protected function createConfiguration(): Configuration
+    protected function createConfiguration(string $cwd = null): Configuration
     {
-        $configFilePath = getenv('LOTGD_CONFIG');
+        if ($cwd == null) {
+            $cwd = getcwd();
+        }
 
         if (empty($configFilePath)) {
-            $configFilePath = implode(DIRECTORY_SEPARATOR, [getcwd(), "config", "lotgd.yml"]);
+            $configFilePath = implode(DIRECTORY_SEPARATOR, [$cwd, "config", "lotgd.yml"]);
         }
 
         if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {

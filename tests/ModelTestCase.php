@@ -31,7 +31,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
     final public function getConnection(): \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
     {
         if ($this->connection === null) {
-            $configFilePath = getcwd() . DIRECTORY_SEPARATOR . getenv('LOTGD_CONFIG');
+            $configFilePath = implode(DIRECTORY_SEPARATOR, [getcwd(), 'config', 'lotgd.yml']);
             if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
                 throw new InvalidConfigurationException("Invalid or missing configuration file: '{$configFilePath}'.");
             }

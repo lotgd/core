@@ -58,7 +58,7 @@ Some technical notes:
 ### Configuration
 The crate is responsible for configuring the game, which is done through
 a configuration file, in the YAML format. The path to the configuration file is
-specified by the environment variable `LOTGD_CONFIG`.
+`config/lotgd.yml`.
 
 Here's the format of the config file:
 
