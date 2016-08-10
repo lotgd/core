@@ -55,7 +55,7 @@ class Main
     {
         // Bootstrap application
         $this->bootstrap = new Bootstrap();
-        $this->game = $this->bootstrap->getGame();
+        $this->game = $this->bootstrap->getGame(getcwd());
 
         // Add commands
         $this->addCommands();
