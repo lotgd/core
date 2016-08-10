@@ -23,7 +23,7 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testTranslateNamespaceToPath()
     {
-        $manager = new ComposerManager();
+        $manager = new ComposerManager(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
 
         $namespace = 'LotGD\\Core\\Tests\\';
         $this->assertEquals(__DIR__, $manager->translateNamespaceToPath($namespace));

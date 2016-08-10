@@ -31,8 +31,9 @@ class LibraryConfiguration
      * Construct a configuration.
      * @param ComposerManager $composerManager
      * @param PackageInterface $package
+     * @param string $cwd
      */
-    public function __construct(ComposerManager $composerManager, PackageInterface $package)
+    public function __construct(ComposerManager $composerManager, PackageInterface $package, string $cwd)
     {
         $this->composerManager = $composerManager;
         $this->package = $package;
@@ -43,8 +44,7 @@ class LibraryConfiguration
             $installationManager = $composerManager->getComposer()->getInstallationManager();
             $path = $installationManager->getInstallPath($package);
         } else {
-            // TODO: this seems dangerous, look at whether we can find out if $package represents the current dir.
-            $path = getcwd();
+            $path = $cwd;
         }
 
         $confFile = $path . DIRECTORY_SEPARATOR . 'lotgd.yml';

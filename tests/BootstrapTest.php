@@ -58,6 +58,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $composerManager = $this->getMockBuilder(ComposerManager::class)
+            ->disableOriginalConstructor()
             ->setMethods(["getPackages", "getComposer", "translateNamespaceToPath"])
             ->getMock();
         $composerManager->method("getPackages")->willReturn([$fakeModulePackage]);
@@ -74,7 +75,7 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $bootstrap->method("createComposerManager")->willReturn($composerManager);
 
         // run tests
-        $game = $bootstrap->getGame();
+        $game = $bootstrap->getGame(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
 
         $user = new UserEntity();
         $user->setName("Monthy");

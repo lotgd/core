@@ -34,22 +34,25 @@ class Bootstrap
 
     /**
      * Create a new Game object, with all the necessary configuration.
+     * @param string $cwd
      * @return Game The newly created Game object.
      */
     public static function createGame(string $cwd = null): Game
     {
         $game = new self();
+        $cwd = $cwd ?? getcwd();
         return $game->getGame($cwd);
     }
 
     /**
      * Starts the game kernel with the most important classes and returns the object
+     * @param string $cwd
      * @return Game
      */
-    public function getGame(string $cwd = null): Game
+    public function getGame(string $cwd): Game
     {
         $composer = $this->createComposerManager($cwd);
-        $this->libraryConfigurationManager = $this->createLibraryConfigurationManager($composer);
+        $this->libraryConfigurationManager = $this->createLibraryConfigurationManager($composer, $cwd);
 
         $config = $this->createConfiguration($cwd);
         $logger = $this->createLogger($config, "lotgd");
@@ -57,7 +60,7 @@ class Bootstrap
         $pdo = $this->connectToDatabase($config);
         $entityManager = $this->createEntityManager($pdo);
 
-        $this->game = new Game($config, $logger, $entityManager);
+        $this->game = new Game($config, $logger, $entityManager, $cwd);
 
         return $this->game;
     }
@@ -65,12 +68,14 @@ class Bootstrap
     /**
      * Creates a library configuration manager
      * @param ComposerManager $composerManager
+     * @param string $cwd
      * @return \LotGD\Core\LibraryConfigurationManager
      */
     protected function createLibraryConfigurationManager(
-        ComposerManager $composerManager
+        ComposerManager $composerManager,
+        string $cwd
     ): LibraryConfigurationManager {
-        return new LibraryConfigurationManager($composerManager);
+        return new LibraryConfigurationManager($composerManager, $cwd);
     }
 
     /**
@@ -85,9 +90,10 @@ class Bootstrap
 
     /**
      * Creates and returns an instance of ComposerManager
+     * @param string $cwd
      * @return ComposerManager
      */
-    protected function createComposerManager(string $cwd = null): ComposerManager
+    protected function createComposerManager(string $cwd): ComposerManager
     {
         $composer = new ComposerManager($cwd);
         return $composer;
@@ -95,13 +101,12 @@ class Bootstrap
 
     /**
      * Returns a configuration object reading from the file located at the path stored in $cwd/config/lotgd.yml.
+     * @param string $cwd
      * @return \LotGD\Core\Configuration
      * @throws InvalidConfigurationException
      */
-    protected function createConfiguration(string $cwd = null): Configuration
+    protected function createConfiguration(string $cwd): Configuration
     {
-        $cwd = $cwd ?? getcwd();
-
         if (empty($configFilePath)) {
             $configFilePath = implode(DIRECTORY_SEPARATOR, [$cwd, "config", "lotgd.yml"]);
         }
@@ -116,7 +121,8 @@ class Bootstrap
 
     /**
      * Returns a logger instance
-     * @param type $name
+     * @param Configuration $config
+     * @param string $name
      * @return LoggerInterface
      */
     protected function createLogger(Configuration $config, string $name): LoggerInterface
@@ -157,7 +163,6 @@ class Bootstrap
 
     /**
      * Is used to get all directories used to generate annotations.
-     * @param array $bootstrapClasses
      * @return array
      */
     protected function generateAnnotationDirectories(): array

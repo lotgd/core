@@ -31,7 +31,7 @@ class ModuleRegisterCommand extends BaseCommand
         $modules = $this->game->getComposerManager()->getModulePackages();
 
         foreach ($modules as $p) {
-            $library = new LibraryConfiguration($this->game->getComposerManager(), $p);
+            $library = new LibraryConfiguration($this->game->getComposerManager(), $p, $this->game->getCWD());
             $name = $library->getName();
 
             try {

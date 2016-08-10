@@ -28,9 +28,8 @@ class ComposerManager
      * lives.
      * @param string $cwd
      */
-    public function __construct(string $cwd = null)
+    public function __construct(string $cwd)
     {
-        $cwd = $cwd ?? getcwd();
         $this->cwd = $cwd;
     }
 

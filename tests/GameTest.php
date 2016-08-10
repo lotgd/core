@@ -62,7 +62,7 @@ class GameTest extends ModelTestCase
         $logger  = new Logger('test');
         $logger->pushHandler(new NullHandler());
 
-        $this->g = new Game(new Configuration(implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'config', 'lotgd.yml'])), $logger, $this->getEntityManager());
+        $this->g = new Game(new Configuration(implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'config', 'lotgd.yml'])), $logger, $this->getEntityManager(), implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
     }
 
     public function testGetCharacterException()

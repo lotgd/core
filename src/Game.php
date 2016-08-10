@@ -40,7 +40,7 @@ class Game
         Configuration $configuration,
         Logger $logger,
         EntityManagerInterface $entityManager,
-        string $cwd = null
+        string $cwd
     ) {
         $this->configuration = $configuration;
         $this->logger = $logger;
@@ -64,6 +64,16 @@ class Game
     public function getConfiguration(): Configuration
     {
         return $this->configuration;
+    }
+
+    /**
+     * Returns the current working directory, or root directory where the
+     * Composer configuration is based.
+     * @return string
+     */
+    public function getCWD(): string
+    {
+        return $this->cwd;
     }
 
     /**

@@ -149,7 +149,7 @@ class ModuleManager
         // TODO: Replace this n^2 algorithm to valiate event subscriptions with something faster. :)
         $currentSubscriptions = $this->g->getEventManager()->getSubscriptions();
         foreach ($packages as $p) {
-            $library = new LibraryConfiguration($this->g->getComposerManager(), $p);
+            $library = new LibraryConfiguration($this->g->getComposerManager(), $p, $this->g->getCWD());
             $name = $library->getName();
             $class = $library->getRootNamespace() . 'Module';
 

@@ -20,14 +20,14 @@ class LibraryConfigurationManager
      * @param ComposerManager $composerManager
      * @param string $cwd
      */
-    public function __construct(ComposerManager $composerManager)
+    public function __construct(ComposerManager $composerManager, string $cwd)
     {
         $packages = $composerManager->getPackages();
         $this->configurations = [];
 
         foreach ($packages as $package) {
             if ($package->getType() === "lotgd-crate" || $package->getType() === "lotgd-module") {
-                $config = new LibraryConfiguration($composerManager, $package);
+                $config = new LibraryConfiguration($composerManager, $package, $cwd);
                 $this->configurations[] = $config;
             }
         }
