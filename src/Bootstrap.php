@@ -86,9 +86,15 @@ class Bootstrap
      * @param \LotGD\Core\Configuration $config
      * @return \PDO
      */
-    protected function connectToDatabase(Configuration $config): \PDO
+    protected function connectToDatabase(Configuration $config, string $cwd): \PDO
     {
-        return new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
+        $dsn = str_replace("%cwd%", $cwd, $config->getDatabaseDSN());
+        
+        return new \PDO(
+            $dsn, 
+            $config->getDatabaseUser(), 
+            $config->getDatabasePassword()
+        );
     }
 
     /**
