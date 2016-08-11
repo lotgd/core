@@ -3,10 +3,29 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
+use LotGD\Core\Action;
+use LotGD\Core\ActionGroup;
+use LotGD\Core\Attachment;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\CharacterViewpoint;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Tests\ModelTestCase;
+
+class SampleAttachment extends Attachment
+{
+    protected $foo;
+
+    public function __construct(string $foo)
+    {
+        parent::__construct('bar');
+        $this->foo = $foo;
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+}
 
 /**
  * Tests the management of CharacterViewpoints
@@ -55,5 +74,55 @@ class CharacterViewpointTest extends ModelTestCase
         $this->assertSame("The Forest", $testCharacter->getViewpoint()->getTitle());
 
         $em->flush();
+    }
+
+    public function testActions()
+    {
+        $em = $this->getEntityManager();
+
+        $ag1 = new ActionGroup('id1', 'title1', 42);
+        $ag1->setActions([
+            new Action(1),
+            new Action(2)
+        ]);
+        $ag2 = new ActionGroup('id2', 'title2', 101);
+        $ag2->setActions([
+            new Action(3)
+        ]);
+
+        $actionGroups = [
+            $ag1,
+            $ag2
+        ];
+
+        $input = $em->getRepository(CharacterViewpoint::class)->find(2);
+        $input->setActions($actionGroups);
+        $input->save($em);
+
+        $em->clear();
+
+        $output = $em->getRepository(CharacterViewpoint::class)->find(2);
+        $this->assertEquals($actionGroups, $output->getActions());
+    }
+
+    public function testAttachments()
+    {
+        $em = $this->getEntityManager();
+
+        $a1 = new SampleAttachment('baz');
+        $a2 = new SampleAttachment('fiz');
+
+        $attachments = [$a1, $a2];
+
+        $input = $em->getRepository(CharacterViewpoint::class)->find(2);
+        $input->setAttachments($attachments);
+        $input->save($em);
+
+        $em->clear();
+
+        $output = $em->getRepository(CharacterViewpoint::class)->find(2);
+        $this->assertEquals($attachments, $output->getAttachments());
+        $this->assertEquals('baz', $output->getAttachments()[0]->getFoo());
+        $this->assertEquals('fiz', $output->getAttachments()[1]->getFoo());
     }
 }
