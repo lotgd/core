@@ -9,6 +9,7 @@ use Monolog\Logger;
 use Monolog\Handler\NullHandler;
 
 use LotGD\Core\Configuration;
+use LotGD\Core\Exceptions\InvalidConfigurationException;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,6 +46,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(strpos($s, 'some_password'));
     }
     
+    /**
+     * Returns a Mocked Configuration instance using default values that does not relay
+     * on a file.
+     * @param array $config configuration that is merged to the default configuration
+     * @return Configuration Mocked Configuration class
+     */
     private function getPseudoConfiguration(array $config)
     {
         $basicConfig = [
@@ -94,5 +101,139 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         
         $this->assertNotSame($rawDSN, $dsn);
         $this->assertSame("sqlite:/home/web/sqlite/db.db3", $dsn);
-     }
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfDatabaseDSNIsMissing()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Invalid or missing data source name: ");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "database" => [
+                "user" => "some_user",
+                "password" => "some_password",
+                "name" => "some_name"
+            ],
+        ]);
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfDatabaseDSNIsFalse()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Invalid or missing data source name: ");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "database" => [
+                "dsn" => false,
+                "user" => "some_user",
+                "password" => "some_password",
+                "name" => "some_name"
+            ],
+        ]);
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfDatabaseUserIsMissing()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Invalid or missing database user: ");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "database" => [
+                "dsn" => "some_dsn",
+                "password" => "some_password",
+                "name" => "some_name"
+            ],
+        ]);
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfDatabaseUserIsFalse()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Invalid or missing database user: ");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "database" => [
+                "dsn" => "some_dsn",
+                "user" => false,
+                "password" => "some_password",
+                "name" => "some_name"
+            ],
+        ]);
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfDatabasePasswordIsFalse()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Invalid or missing database password: ");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "database" => [
+                "dsn" => "some_dsn",
+                "user" => "some_user",
+                "password" => false,
+                "name" => "some_name"
+            ],
+        ]);
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfDatabaseNameIsFalse()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage("Invalid or missing database name: ");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "database" => [
+                "dsn" => "some_dsn",
+                "user" => "some_user",
+                "password" => "some_password",
+                "name" => false,
+            ],
+        ]);
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfEpochIsInFuture()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        
+        $now = new DateTime();
+        $timestamp = $now->getTimestamp() + 3600;
+        
+        $this->expectExceptionMessage("Game epoch is set in the future: {$timestamp}");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "game" => [
+                "epoch" => $timestamp,
+                "offsetSeconds" => 32,
+                "daysPerDay" => 2
+            ],
+        ]);
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfOffsetSecondsAreNegative()
+    {
+        $this->expectException(InvalidConfigurationException::class);        
+        $this->expectExceptionMessage("Game offset (in seconds) cannot be negative: -32");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "game" => [
+                "epoch" => 1467334861,
+                "offsetSeconds" => -32,
+                "daysPerDay" => 2
+            ],
+        ]);
+    }
+    
+    public function testIfInvalidConfigurationExceptionIsThrownIfDaysPerDayIsNegative()
+    {
+        $this->expectException(InvalidConfigurationException::class);        
+        $this->expectExceptionMessage("Game days per day cannot be negative: -2");
+        
+        $configuration = $this->getPseudoConfiguration([
+            "game" => [
+                "epoch" => 1467334861,
+                "offsetSeconds" => 32,
+                "daysPerDay" => -2
+            ],
+        ]);
+    }
 }
