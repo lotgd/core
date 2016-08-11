@@ -109,7 +109,7 @@ class Configuration
     public function getDatabaseConnectionDetails(string $cwd = ""): array
     {
         return [
-            str_replace("%cwd%", $cwd, $this->getDatabaseDSN()),
+            str_replace("%cwd%", $cwd . DIRECTORY_SEPARATOR, $this->getDatabaseDSN()),
             $this->getDatabaseUser(),
             $this->getDatabasePassword(),
         ];

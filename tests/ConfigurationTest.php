@@ -47,10 +47,31 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     
     private function getPseudoConfiguration(array $config)
     {
+        $basicConfig = [
+            "database" => [
+                "dsn" => "some_dsn",
+                "user" => "some_user",
+                "password" => "some_password",
+                "name" => "some_name"
+            ],
+            "game" => [
+                "epoch" => 1467334861,
+                "offsetSeconds" => 32,
+                "daysPerDay" => 2
+            ],
+            "logs" => [
+                "path" => "./"
+            ]
+        ];
+        
+        $config = array_merge($basicConfig, $config);
+        
         $configuration = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->setMethods(["retrieveRawConfig"])
             ->getMock();
+        
+        $configuration->method("retrieveRawConfig")->willReturn($config);
         
         $configuration->__construct("dummy");
         return $configuration;
@@ -58,11 +79,20 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     
     public function testCWDParsingForSQLiteDatabaseDSN()
     {
+        $rawDSN = "sqlite:%cwd%db.db3";
+                
         $configuration = $this->getPseudoConfiguration([
-            "dsn" => "sqlite:%cwd%db.db3",
-            "user" => "daenerys",
-            "password" => "",
-            "name" => "daenerys"
+            "database" => [
+                "dsn" => $rawDSN,
+                "user" => "some_user",
+                "password" => "some_password",
+                "name" => "some_name"
+            ],
         ]);
-    }
+        
+        list($dsn, $user, $password) = $configuration->getDatabaseConnectionDetails("/home/web/sqlite");
+        
+        $this->assertNotSame($rawDSN, $dsn);
+        $this->assertSame("sqlite:/home/web/sqlite/db.db3", $dsn);
+     }
 }
