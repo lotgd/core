@@ -33,7 +33,7 @@ class Configuration
     public function __construct(string $configFilePath)
     {
         try {
-            $rawConfig = Yaml::parse(file_get_contents($configFilePath));
+            $rawConfig = $this->retrieveRawConfig($configFilePath);
         } catch (ParseException $e) {
             $m = $e->getMessage();
             throw new InvalidConfigurationException("Unable to parse configuration file at {$configFilePath}: {$m}");
@@ -97,6 +97,30 @@ class Configuration
         $this->gameEpoch = (new DateTime())->setTimestamp($gameEpoch);
         $this->gameOffsetSeconds = $gameOffsetSeconds;
         $this->gameDaysPerDay = $gameDaysPerDay;
+    }
+    
+    protected function retrieveRawConfig(string $configFilePath): array
+    {
+        return Yaml::parse(file_get_contents($configFilePath));
+    }
+    
+    /**
+     * Returns database connection details needed for pdo to establish a connection.
+     * 
+     * This function takes optionally replaces the string %cwd% in the database dsn and
+     * replaces it with the first parameter. This is important to normalize the database location
+     * across different working directories. Alternatively, SQLite databse names can also directly
+     * be given as an absolute path instead of a relative one.
+     * @param string $cwd Current working directory
+     * @return array A list containing the following details: dsn, user, password.
+     */
+    public function getDatabaseConnectionDetails(string $cwd = ""): array
+    {
+        return [
+            str_replace("%cwd%", $cwd, $this->getDatabaseDSN()),
+            $this->getDatabaseUser(),
+            $this->getDatabasePassword(),
+        ];
     }
 
     /**

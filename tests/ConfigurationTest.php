@@ -44,4 +44,25 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse(strpos($s, 'some_password'));
     }
+    
+    private function getPseudoConfiguration(array $config)
+    {
+        $configuration = $this->getMockBuilder(Configuration::class)
+            ->disableOriginalConstructor()
+            ->setMethods(["retrieveRawConfig"])
+            ->getMock();
+        
+        $configuration->__construct("dummy");
+        return $configuration;
+    }
+    
+    public function testCWDParsingForSQLiteDatabaseDSN()
+    {
+        $configuration = $this->getPseudoConfiguration([
+            "dsn" => "sqlite:%cwd%db.db3",
+            "user" => "daenerys",
+            "password" => "",
+            "name" => "daenerys"
+        ]);
+    }
 }

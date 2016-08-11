@@ -60,7 +60,8 @@ class Bootstrap
         $composer = $this->createComposerManager($cwd);
         $this->libraryConfigurationManager = $this->createLibraryConfigurationManager($composer, $cwd);
 
-        $pdo = $this->connectToDatabase($config);
+        list($dsn, $user, $password) = $config->getDatabaseConnectionDetails($cwd);
+        $pdo = $this->connectToDatabase($dsn, $user, $password);
         $entityManager = $this->createEntityManager($pdo);
 
         $this->game = new Game($config, $this->logger, $entityManager, $cwd);
@@ -86,15 +87,9 @@ class Bootstrap
      * @param \LotGD\Core\Configuration $config
      * @return \PDO
      */
-    protected function connectToDatabase(Configuration $config, string $cwd): \PDO
+    protected function connectToDatabase(string $dsn, string $user, string $password): \PDO
     {
-        $dsn = str_replace("%cwd%", $cwd, $config->getDatabaseDSN());
-        
-        return new \PDO(
-            $dsn, 
-            $config->getDatabaseUser(), 
-            $config->getDatabasePassword()
-        );
+        return new \PDO($dsn, $user, $password);
     }
 
     /**
