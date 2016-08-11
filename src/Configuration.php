@@ -91,6 +91,11 @@ class Configuration
         $this->gameDaysPerDay = $gameDaysPerDay;
     }
     
+    /**
+     * Retrieves raw config via Yaml::parse from a given file.
+     * @param string $configFilePath File used to parse with Yaml
+     * @return array Raw config
+     */
     protected function retrieveRawConfig(string $configFilePath): array
     {
         return Yaml::parse(file_get_contents($configFilePath));
