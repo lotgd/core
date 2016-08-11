@@ -53,23 +53,15 @@ class Configuration
         $name = $rawConfig['database']['name'] ?? '';
 
         if ($dsn === false || strlen($dsn) == 0) {
-            $m = "Invalid or missing data source name: {$dsn}";
-            $logger->critical($m);
-            throw new InvalidConfigurationException($m);
+            throw new InvalidConfigurationException("Invalid or missing data source name: {$dsn}");
         }
         if ($user === false || strlen($user) == 0) {
-            $m = "Invalid or missing database user: {$user}";
-            $logger->critical($m);
             throw new InvalidConfigurationException("Invalid or missing database user: {$user}");
         }
         if ($passwd === false) {
-            $m = "Invalid or missing database password: {$passwd}";
-            $logger->critical($m);
             throw new InvalidConfigurationException("Invalid or missing database password: {$passwd}");
         }
         if ($name === false) {
-            $m = "Invalid or missing database name: {$name}";
-            $logger->critical($m);
             throw new InvalidConfigurationException("Invalid or missing database name: {$name}");
         }
 
