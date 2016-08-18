@@ -25,30 +25,31 @@ class Scene implements CreateableInterface
     use Creator;
     use Deletor;
     use SceneBasics;
-    
+
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
-    
+
     /**
      * @ManyToOne(targetEntity="Scene")
      * @JoinColumn(name="parent", referencedColumnName="id", nullable=true)
      */
     private $parent = null;
-    
+
     /**
      * @OneToMany(targetEntity="Scene", mappedBy="parent")
      */
     private $children = [];
-    
+
     /**
      * @var array
      */
     private static $fillable = [
         "title",
         "description",
-        "parent"
+        "parent",
+        "template"
     ];
-    
+
     /**
      * Constructor
      */
@@ -56,7 +57,7 @@ class Scene implements CreateableInterface
     {
         $this->children = ArrayCollection();
     }
-    
+
     /**
      * Returns primary id
      * @return int
@@ -65,7 +66,7 @@ class Scene implements CreateableInterface
     {
         return $this->id;
     }
-    
+
     /**
      * Sets or removes the parent of this scene.
      * @param \LotGD\Core\Models\Scene $parent The new parent or NULL
@@ -78,14 +79,14 @@ class Scene implements CreateableInterface
             $oldParent->removeChild($this);
             $this->parent = null;
         }
-        
+
         // New parent is not null
         if ($parent !== null) {
             $this->parent = $parent;
             $parent->addChild($this);
         }
     }
-    
+
     /**
      * Returns the parent of this scene
      * @return \LotGD\Core\Models\Scene
@@ -96,10 +97,10 @@ class Scene implements CreateableInterface
         if ($this->parent === null) {
             throw new NoParentSetException("This child does not have a parent set to return. Check with hasParent first.");
         }
-        
+
         return $this->parent;
     }
-    
+
     /**
      * Returns true if this entity has a parent
      * @return bool
@@ -108,7 +109,7 @@ class Scene implements CreateableInterface
     {
         return !(empty($this->parent));
     }
-    
+
     /**
      * Returns a list of all children registered for this entity
      * @return Collection
@@ -117,7 +118,7 @@ class Scene implements CreateableInterface
     {
         return $this->children;
     }
-    
+
     /**
      * Returns true if the number of children registered for this entitiy is > 0
      * @return bool
@@ -126,7 +127,7 @@ class Scene implements CreateableInterface
     {
         return count($this->children) > 0 ? true : false;
     }
-    
+
     /**
      * Registers a child for this entity.
      * @param \LotGD\Core\Models\Scene $child
@@ -135,7 +136,7 @@ class Scene implements CreateableInterface
     {
         $this->children->add($child);
     }
-    
+
     /**
      * Removes a child from this entity.
      * @param \LotGD\Core\Models\Scene $child
@@ -146,7 +147,7 @@ class Scene implements CreateableInterface
         if ($child->getParent() !== $this) {
             throw new WrongParentException("This Scene is not the parent of the given child.");
         }
-        
+
         $this->children->removeElement($child);
     }
 }
