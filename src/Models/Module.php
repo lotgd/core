@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
+use LotGD\Core\Tools\Model\PropertyManager;
 
 /**
  * An installed module in the system. Note that module metadata is stored in
@@ -20,12 +21,16 @@ class Module implements SaveableInterface
 {
     use Creator;
     use Deletor;
+    use PropertyManager;
 
     /** @Id @Column(type="string", unique=true); */
     private $library;
 
     /** @Column(type="datetime") */
     private $createdAt;
+
+    /** @OneToMany(targetEntity="ModuleProperty", mappedBy="owner", cascade={"persist"}) */
+    private $properties;
 
     /**
      * Construct a new module entry.
