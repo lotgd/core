@@ -2,6 +2,8 @@
 
 namespace LotGD\Core;
 
+use LotGD\Core\Models\Module as ModuleModel;
+
 /**
  * Classes which provide module functionality should implement this interface.
  */
@@ -13,7 +15,7 @@ interface Module extends EventHandler
      * to the database.
      * @param Game $g The game.
      */
-    public static function onRegister(Game $g);
+    public static function onRegister(Game $g, ModuleModel $module);
 
     /**
      * Lifecycle method called when this module is uninstalled. Use this method
@@ -21,5 +23,5 @@ interface Module extends EventHandler
      * during registration.
      * @param Game $g The game.
      */
-    public static function onUnregister(Game $g);
+    public static function onUnregister(Game $g, ModuleModel $module);
 }

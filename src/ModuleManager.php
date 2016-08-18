@@ -73,7 +73,7 @@ class ModuleManager
             }
 
             // Run the module's onRegister handler.
-            $class::onRegister($this->g);
+            $class::onRegister($this->g, $m);
         }
     }
 
@@ -93,9 +93,6 @@ class ModuleManager
         if (!$m) {
             throw new ModuleDoesNotExistException($name);
         } else {
-            // TODO: handle error cases here.
-            $m->delete($this->g->getEntityManager());
-
             $class = $library->getRootNamespace() . 'Module';
 
             // Unsubscribe the module's events.
@@ -109,7 +106,10 @@ class ModuleManager
             }
 
             // Run the module's onUnregister handler.
-            $class::onUnregister($this->g);
+            $class::onUnregister($this->g, $m);
+
+            // TODO: handle error cases here.
+            $m->delete($this->g->getEntityManager());
         }
     }
 
