@@ -242,6 +242,7 @@ class Game
             // a different scene, by setting $context['redirect'] to a new action.
             $context = [
                 'viewpoint' => $v,
+                'scene' => $nextScene,
                 'redirect' => null
             ];
             $this->getEventManager()->publish('h/lotgd/core/navigate-to/' . $nextScene->getTemplate(), $context);
