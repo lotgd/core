@@ -190,7 +190,7 @@ class Bootstrap
         foreach ($this->libraryConfigurationManager->getConfigurations() as $config) {
             $commands = $config->getDaenerysCommands();
             foreach ($commands as $command) {
-                $application->add(new $command($game));
+                $application->add(new $command($this->game));
             }
         }
     }

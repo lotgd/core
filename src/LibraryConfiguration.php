@@ -210,7 +210,7 @@ class LibraryConfiguration
         $this->daenerysCommands = [];
 
         foreach ($list as $command) {
-            $this->daenerysCommands = $this->rootNamespace . $command;
+            $this->daenerysCommands[] = $this->rootNamespace . $command;
         }
     }
 
