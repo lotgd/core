@@ -50,6 +50,12 @@ class ModuleManagerTest extends ModelTestCase
         $this->mm->register($library);
     }
 
+    public function testGetModule()
+    {
+        $m = $this->mm->getModule('lotgd/tests');
+        $this->assertEquals('lotgd/tests', $m->getLibrary());
+    }
+
     public function testGetModules()
     {
         $modules = $this->mm->getModules();

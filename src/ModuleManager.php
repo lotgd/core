@@ -123,6 +123,16 @@ class ModuleManager
     }
 
     /**
+     * Returns the module with the specified library name, in vendor/module format.
+     * @param string $library
+     * @return Module
+     */
+    public function getModule(string $library): ModuleModel
+    {
+        return $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($library);
+    }
+
+    /**
      * Validate that all modules are installed correctly. Currently checks for
      * all the proper event subscriptions.
      * @return array of strings describing issues. An empty array is returned
