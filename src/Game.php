@@ -243,6 +243,7 @@ class Game
             $context = [
                 'viewpoint' => $v,
                 'scene' => $nextScene,
+                'parameters' => $parameters,
                 'redirect' => null
             ];
             $this->getEventManager()->publish('h/lotgd/core/navigate-to/' . $nextScene->getTemplate(), $context);
