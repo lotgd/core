@@ -14,6 +14,7 @@ interface Module extends EventHandler
      * this method to perform one-time setup operations like adding tables
      * to the database.
      * @param Game $g The game.
+     * @param ModuleModel $module The database model for this module.
      */
     public static function onRegister(Game $g, ModuleModel $module);
 
@@ -22,6 +23,7 @@ interface Module extends EventHandler
      * to tear down any module-specific additions, like database tables added
      * during registration.
      * @param Game $g The game.
+     * @param ModuleModel $module The database model for this module.
      */
     public static function onUnregister(Game $g, ModuleModel $module);
 }
