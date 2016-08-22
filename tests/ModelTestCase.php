@@ -10,6 +10,8 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
 
 use LotGD\Core\Configuration;
+use LotGD\Core\ComposerManager;
+use LotGD\Core\LibraryConfigurationManager;
 use LotGD\Core\Exceptions\InvalidConfigurationException;
 
 /**
@@ -31,7 +33,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
     final public function getConnection(): \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
     {
         if ($this->connection === null) {
-            $configFilePath = implode(DIRECTORY_SEPARATOR, [getcwd(), 'config', 'lotgd.yml']);
+            $configFilePath = getenv('LOTGD_TESTS_CONFIG_PATH');
             if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
                 throw new InvalidConfigurationException("Invalid or missing configuration file: '{$configFilePath}'.");
             }
@@ -41,7 +43,13 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
                 self::$pdo = new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
 
                 // Read db annotations from model files
-                $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
+                $composerManager = new ComposerManager(getcwd());
+                $libraryConfigurationManager = new LibraryConfigurationManager($composerManager, getcwd());
+                $directories = $libraryConfigurationManager->getEntityDirectories();
+                $directories[] = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'src', 'Models']);
+
+                // Read db annotations from model files
+                $configuration = Setup::createAnnotationMetadataConfiguration($directories, true);
                 $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
 
                 self::$em = EntityManager::create(["pdo" => self::$pdo], $configuration);
@@ -56,17 +64,6 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
         }
 
         return $this->connection;
-    }
-
-    /**
-     * Returns a .yml dataset under this name
-     * @return \PHPUnit_Extensions_Database_DataSet_YamlDataSet
-     */
-    protected function getDataSet(): \PHPUnit_Extensions_Database_DataSet_YamlDataSet
-    {
-        return new \PHPUnit_Extensions_Database_DataSet_YamlDataSet(
-            __DIR__."/datasets/".$this->dataset.".yml"
-        );
     }
 
     /**

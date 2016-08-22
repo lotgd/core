@@ -1,4 +1,7 @@
 <phpunit bootstrap="bootstrap/bootstrap.php">
+    <php>
+        <env name="LOTGD_TESTS_CONFIG_PATH" value="./config/lotgd.yml"/>
+    </php>
     <testsuites>
         <testsuite name="All">
             <directory>tests</directory>

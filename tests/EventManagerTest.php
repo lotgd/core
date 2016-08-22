@@ -10,7 +10,7 @@ use LotGD\Core\Exceptions\WrongTypeException;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\SubscriptionNotFoundException;
 use LotGD\Core\Models\EventSubscription;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 use LotGD\Core\Tests\FakeModule\Module as FakeModule;
 
 class EventManagerTestInvalidSubscriber
@@ -23,7 +23,7 @@ class EventManagerTestSubscriber implements EventHandler
     public static function handleEvent(Game $g, string $event, array &$context) {}
 }
 
-class EventManagerTest extends ModelTestCase
+class EventManagerTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "eventManager";

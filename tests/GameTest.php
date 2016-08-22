@@ -21,7 +21,7 @@ use LotGD\Core\Exceptions\ {
     CharacterNotFoundException,
     InvalidConfigurationException
 };
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 
 class DefaultSceneProvider implements EventHandler
 {
@@ -48,7 +48,7 @@ class DefaultSceneProvider implements EventHandler
     }
 }
 
-class GameTest extends ModelTestCase
+class GameTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "game";
@@ -62,7 +62,7 @@ class GameTest extends ModelTestCase
         $logger  = new Logger('test');
         $logger->pushHandler(new NullHandler());
 
-        $this->g = new Game(new Configuration(implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'config', 'lotgd.yml'])), $logger, $this->getEntityManager(), implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
+        $this->g = new Game(new Configuration(getenv('LOTGD_TESTS_CONFIG_PATH')), $logger, $this->getEntityManager(), implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
     }
 
     public function testGetCharacterException()

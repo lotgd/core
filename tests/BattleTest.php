@@ -24,172 +24,169 @@ use LotGD\Core\Models\BattleEvents\{
     RegenerationBuffEvent
 };
 
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 
-/**
- * Tests the management of Characters
- */
-class BattleTest extends ModelTestCase
+class BattleTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "battle";
-    
+
     public function getMockGame(Character $character): Game
     {
         $game = $this->getMockBuilder(Game::class)
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         $game->method('getEntityManager')->willReturn($this->getEntityManager());
         $game->method('getDiceBag')->willReturn(new DiceBag());
         $game->method('getCharacter')->willReturn($character);
-        
+
         return $game;
     }
-    
+
     /**
      * Tests basic monster functionality
      */
     public function testBasicMonster()
     {
         $em = $this->getEntityManager();
-        
+
         $character = $em->getRepository(Character::class)->find(1);
         $monster = $em->getRepository(Monster::class)->find(1);
-        
+
         $this->assertSame(5, $monster->getLevel());
         $this->assertSame(52, $monster->getMaxHealth());
         $this->assertSame(9, $monster->getAttack($this->getMockGame($character)));
         $this->assertSame(7, $monster->getDefense($this->getMockGame($character)));
         $this->assertSame($monster->getMaxHealth(), $monster->getHealth());
     }
-    
+
     /**
      * Tests a fair fight between a monster and a player.
      */
     public function testFairBattle()
     {
         $em = $this->getEntityManager();
-        
+
         $character = $em->getRepository(Character::class)->find(1);
         $monster = $em->getRepository(Monster::class)->find(1);
-        
+
         $battle = new Battle($this->getMockGame($character), $character, $monster);
-        
+
         for ($n = 0; $n < 99; $n++) {
             $oldPlayerHealth = $character->getHealth();
             $oldMonsterHealth = $monster->getHealth();
-            
+
             $battle->fightNRounds(1);
-            
+
             $this->assertLessThanOrEqual($oldPlayerHealth, $character->getHealth());
             $this->assertLessThanOrEqual($oldMonsterHealth, $monster->getHealth());
-            
+
             if ($battle->isOver()) {
                 break;
             }
         }
-        
+
         $this->assertTrue($battle->isOver());
         $this->assertTrue($character->isAlive() xor $monster->isAlive());
     }
-    
+
     /**
      * Tests a fight which the player has to win (lvl 100 vs lvl 1)
      */
     public function testPlayerWinBattle()
     {
         $em = $this->getEntityManager();
-        
+
         $highLevelPlayer = $em->getRepository(Character::class)->find(2);
         $lowLevelMonster = $em->getRepository(Monster::class)->find(3);
-        
+
         $battle = new Battle($this->getMockGame($highLevelPlayer), $highLevelPlayer, $lowLevelMonster);
-        
+
         for ($n = 0; $n < 99; $n++) {
             $oldPlayerHealth = $highLevelPlayer->getHealth();
             $oldMonsterHealth = $lowLevelMonster->getHealth();
-            
+
             $battle->fightNRounds(1);
-            
+
             $this->assertLessThanOrEqual($oldPlayerHealth, $highLevelPlayer->getHealth());
             $this->assertLessThanOrEqual($oldMonsterHealth, $lowLevelMonster->getHealth());
-            
+
             if ($battle->isOver()) {
                 break;
             }
         }
-        
+
         $this->assertTrue($highLevelPlayer->isAlive());
         $this->assertFalse($lowLevelMonster->isAlive());
-        
+
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getWinner(), $highLevelPlayer);
     }
-    
+
     /**
      * Tests a fight which the player has to lose (lvl 1 vs lvl 100)
      */
     public function testPlayerLoseBattle()
     {
         $em = $this->getEntityManager();
-        
+
         $lowLevelPlayer = $em->getRepository(Character::class)->find(3);
         $highLevelMonster = $em->getRepository(Monster::class)->find(2);
-        
+
         $battle = new Battle($this->getMockGame($lowLevelPlayer), $lowLevelPlayer, $highLevelMonster);
-        
+
         for ($n = 0; $n < 99; $n++) {
             $oldPlayerHealth = $lowLevelPlayer->getHealth();
             $oldMonsterHealth = $highLevelMonster->getHealth();
-            
+
             $battle->fightNRounds(1);
-            
+
             $this->assertLessThanOrEqual($oldPlayerHealth, $lowLevelPlayer->getHealth());
             $this->assertLessThanOrEqual($oldMonsterHealth, $highLevelMonster->getHealth());
-            
+
             if ($battle->isOver()) {
                 break;
             }
         }
-        
+
         $this->assertFalse($lowLevelPlayer->isAlive());
         $this->assertTrue($highLevelMonster->isAlive());
-        
+
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getWinner(), $highLevelMonster);
     }
-    
+
     /**
      * @expectedException LotGD\Core\Exceptions\BattleNotOverException
      */
     public function testBattleNotOverExceptionFromWinner()
     {
         $em = $this->getEntityManager();
-        
+
         $character = $em->getRepository(Character::class)->find(1);
         $monster = $em->getRepository(Monster::class)->find(1);
-        
+
         $battle = new Battle($this->getMockGame($character), $character, $monster);
-        
+
         $battle->getWinner();
     }
-    
+
     /**
      * @expectedException LotGD\Core\Exceptions\BattleNotOverException
      */
     public function testBattleNotOverExceptionFromLoser()
     {
         $em = $this->getEntityManager();
-        
+
         $character = $em->getRepository(Character::class)->find(1);
         $monster = $em->getRepository(Monster::class)->find(1);
-        
+
         $battle = new Battle($this->getMockGame($character), $character, $monster);
-        
+
         $battle->getLoser();
     }
-    
+
     /**
      * Tests if the BattleIsOverException gets thrown.
      * @expectedException LotGD\Core\Exceptions\BattleIsOverException
@@ -197,24 +194,24 @@ class BattleTest extends ModelTestCase
     public function testBattleIsOverException()
     {
         $em = $this->getEntityManager();
-        
+
         $character = $em->getRepository(Character::class)->find(1);
         $monster = $em->getRepository(Monster::class)->find(1);
-        
+
         $battle = new Battle($this->getMockGame($character), $character, $monster);
-        
+
         // Fighting for 99 rounds should be enough for determining a loser - and to
         // throw the exception.
         for ($n = 0; $n < 99; $n++) {
             $battle->fightNRounds(1);
         }
     }
-    
+
     private function provideBuffBattleParticipants(Buff $buff, int $participantsType): Battle
     {
         $em = $this->getEntityManager();
         $em->clear();
-        
+
         switch ($participantsType) {
             default:
             case 0:
@@ -238,12 +235,12 @@ class BattleTest extends ModelTestCase
                 $monster = $em->getRepository(Monster::class)->find(13);
                 break;
         }
-        
+
         $character->addBuff($buff);
-        
+
         return new Battle($this->getMockGame($character), $character, $monster);
     }
-    
+
     /**
      * Asserts that a certain BuffMessageEvent with a specific text is contained in the lst of events
      * @param Collection $events The list of events
@@ -252,9 +249,9 @@ class BattleTest extends ModelTestCase
      * @param int? $timesAtMax Maximum number of times the message is expected to be in the event list, or $timesAtLeast if null.
      */
     protected function assertBuffEventMessageExists(
-        Collection $events, 
-        string $battleEventText, 
-        int $timesAtLeast = 1, 
+        Collection $events,
+        string $battleEventText,
+        int $timesAtLeast = 1,
         int $timesAtMax = null
     ) {
         $eventCounter = 0;
@@ -265,17 +262,17 @@ class BattleTest extends ModelTestCase
                 }
             }
         }
-        
+
         if ($timesAtMax === null) {
             $timesAtMax = $timesAtLeast;
         }
-        
+
         $this->assertGreaterThanOrEqual($timesAtLeast, $eventCounter);
         $this->assertLessThanOrEqual($timesAtMax, $eventCounter);
     }
-    
+
     /**
-     * Tests normal buff messages - message upon start of the buff, message every 
+     * Tests normal buff messages - message upon start of the buff, message every
      * round (except when it's started), and the message displayed if the buff expires.
      */
     public function testBattleBuffMessages()
@@ -288,14 +285,14 @@ class BattleTest extends ModelTestCase
             "endMessage" => "The buff is ending.",
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 1);
-        
+
         // We fight for 5 rounds - this ensures that the buff is started and expired.
         $battle->fightNRounds(5);
-        
+
         $this->assertBuffEventMessageExists($battle->getEvents(), "And this buff starts!", 1);
         $this->assertBuffEventMessageExists($battle->getEvents(), "The buff is ending.", 1);
         $this->assertBuffEventMessageExists($battle->getEvents(), "The buff is still activate", 1, 2);
-        
+
         $expectedEvents = [
             BuffMessageEvent::class, // Activation round
             DamageEvent::class, // Round 1
@@ -312,13 +309,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class, // Round 5
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($battle->getEvents());
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleRegenerationBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -328,15 +325,15 @@ class BattleTest extends ModelTestCase
             "badguyRegeneration" => 100,
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(1);
         $battle->getMonster()->setHealth(1);
-        
+
         $battle->fightNRounds(3);
-        
+
         $this->assertGreaterThan(1, $battle->getPlayer()->getHealth());
         $this->assertGreaterThan(1, $battle->getPlayer()->getHealth());
-        
+
         $expectedEvents = [
             RegenerationBuffEvent::class, // Round 1, offense
             RegenerationBuffEvent::class,
@@ -353,13 +350,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class, // Round 3, offense
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleDegenerationBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -369,16 +366,16 @@ class BattleTest extends ModelTestCase
             "badguyRegeneration" => -250,
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(2000);
         $battle->getMonster()->setHealth(2000);
-        
+
         $battle->fightNRounds(3);
-        
+
         // Test that the difference is, indeed, -250 per turn, resulting in 1000 lost.
         $this->assertLessThanOrEqual(1000, $battle->getPlayer()->getHealth());
         $this->assertLessThanOrEqual(1000, $battle->getPlayer()->getHealth());
-        
+
         $expectedEvents = [
             RegenerationBuffEvent::class, // Round 1, offense
             RegenerationBuffEvent::class,
@@ -395,16 +392,16 @@ class BattleTest extends ModelTestCase
             DamageEvent::class, // Round 3, offense
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleDegenerationBuffDoubleKO()
     {
-        
+
         // What happens at a tie?
         $battle = $this->provideBuffBattleParticipants(new Buff([
             "slot" => "test",
@@ -413,18 +410,18 @@ class BattleTest extends ModelTestCase
             "badguyRegeneration" => -250,
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(1000);
         $battle->getMonster()->setHealth(1000);
-        
+
         $numOfRounds = $battle->fightNRounds(3);
-        
+
         $this->assertSame(2, $numOfRounds);
         $this->assertSame($battle->getPlayer(), $battle->getLoser());
         $this->assertSame($battle->getMonster(), $battle->getWinner());
         $this->assertTrue($battle->isOver());
     }
-    
+
     public function testBattleMinionGoodguyDamageBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -438,15 +435,15 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "The Minion does nothing.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(2000);
         $battle->getMonster()->setHealth(2000);
-        
+
         $battle->fightNRounds(3);
-        
+
         $this->assertLessThanOrEqual(2000 - 800, $battle->getPlayer()->getHealth());
         $this->assertGreaterThan(2000 - 800, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1, offense
             MinionDamageEvent::class,
@@ -468,13 +465,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleMinionGoodguyHealBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -488,15 +485,15 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "The Minion does nothing.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(2000);
         $battle->getMonster()->setHealth(2000);
-        
+
         $battle->fightNRounds(3);
-        
+
         $this->assertGreaterThanOrEqual(2000, $battle->getPlayer()->getHealth());
         $this->assertLessThanOrEqual(2000, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1, offense
             MinionDamageEvent::class,
@@ -518,13 +515,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleMinionBadguyDamageBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -538,15 +535,15 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "The Minion does nothing.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(2000);
         $battle->getMonster()->setHealth(2000);
-        
+
         $battle->fightNRounds(3);
-        
+
         $this->assertLessThanOrEqual(2000 - 800, $battle->getMonster()->getHealth());
         $this->assertGreaterThan(2000 - 800, $battle->getPlayer()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1, offense
             MinionDamageEvent::class,
@@ -568,13 +565,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleMinionBadguyHealBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -588,15 +585,15 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "The Minion does nothing.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(2000);
         $battle->getMonster()->setHealth(2000);
-        
+
         $battle->fightNRounds(3);
-        
+
         $this->assertGreaterThanOrEqual(2000, $battle->getMonster()->getHealth());
         $this->assertLessThanOrEqual(2000, $battle->getPlayer()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1, offense
             MinionDamageEvent::class,
@@ -618,13 +615,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleMinionBothAndBoth()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -640,17 +637,17 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "The Minion does nothing.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
-        
+
         $battle->fightNRounds(3);
-        
+
         $this->assertGreaterThanOrEqual(10000 - 100*20, $battle->getPlayer()->getHealth());
         $this->assertGreaterThanOrEqual(10000 - 100*20, $battle->getMonster()->getHealth());
         $this->assertLessThanOrEqual(10000 + 100*20, $battle->getPlayer()->getHealth());
         $this->assertLessThanOrEqual(10000 + 100*20, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1, offense
             MinionDamageEvent::class,
@@ -684,13 +681,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleGoodguyDamageReflectionBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -702,16 +699,16 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "There is no damage to reflect.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
         $battle->disableCriticalHit();
-        
+
         $battle->fightNRounds(5);
-        
+
         $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
         $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1
             DamageEvent::class,
@@ -739,13 +736,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageReflectionEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleGoodguyDamageReflectionBuffNegative()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -757,17 +754,17 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "There is no damage to reflect.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 3);
-        
+
         $battle->disableCriticalHit();
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
-        
+
         $battle->fightNRounds(5);
-        
+
         $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
         $this->assertGreaterThanOrEqual(10000, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1
             DamageEvent::class,
@@ -795,13 +792,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageReflectionEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleBadguyDamageReflectionBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -813,16 +810,16 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "There is no damage to reflect.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
         $battle->disableCriticalHit();
-        
+
         $battle->fightNRounds(5);
-        
+
         $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
         $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1
             DamageEvent::class,
@@ -850,13 +847,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageReflectionEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleBadguyDamageReflectionBuffNegative()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -868,17 +865,17 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "There is no damage to reflect.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 4);
-        
+
         $battle->disableCriticalHit();
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
-        
+
         $battle->fightNRounds(5);
-        
+
         $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
         $this->assertGreaterThanOrEqual(10000, $battle->getPlayer()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1
             DamageEvent::class,
@@ -906,13 +903,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageReflectionEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleGoodguyDamageLifetapBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -924,16 +921,16 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "There is no damage to reflect.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 3);
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
         $battle->disableCriticalHit();
-        
+
         $battle->fightNRounds(5);
-        
+
         $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
         $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1
             DamageEvent::class,
@@ -961,13 +958,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageLifetapEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleGoodguyDamageLifetapBuffNegative()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -979,17 +976,17 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "There is no damage to reflect.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->disableCriticalHit();
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
-        
+
         $battle->fightNRounds(5);
-        
+
         $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
         $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1
             DamageEvent::class,
@@ -1017,13 +1014,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageLifetapEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleBadguyDamageLifetapBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -1035,16 +1032,16 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "There is no damage to reflect.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 4);
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
         $battle->disableCriticalHit();
-        
+
         $battle->fightNRounds(5);
-        
+
         $this->assertGreaterThanOrEqual(10000, $battle->getPlayer()->getHealth());
         $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1
             DamageEvent::class,
@@ -1072,13 +1069,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageLifetapEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleBadguyDamageLifetapBuffNegative()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -1090,17 +1087,17 @@ class BattleTest extends ModelTestCase
             "noEffectMessage" => "There is no damage to reflect.",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]), 1);
-        
+
         $battle->disableCriticalHit();
-        
+
         $battle->getPlayer()->setHealth(10000);
         $battle->getMonster()->setHealth(10000);
-        
+
         $battle->fightNRounds(5);
-        
+
         $this->assertLessThanOrEqual(10000, $battle->getMonster()->getHealth());
         $this->assertLessThanOrEqual(10000, $battle->getPlayer()->getHealth());
-        
+
         $expectedEvents = [
             // Round 1
             DamageEvent::class,
@@ -1128,13 +1125,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class,
             DamageLifetapEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-    
+
     public function testBattleInfiniteBuff()
     {
         $battle = $this->provideBuffBattleParticipants(new Buff([
@@ -1145,13 +1142,13 @@ class BattleTest extends ModelTestCase
             "endMessage" => "Infinite Buff should never end",
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 1);
-        
+
         $battle->fightNRounds(3);
-        
+
         $this->assertBuffEventMessageExists($battle->getEvents(), "Infinite Buff starts", 1);
         $this->assertBuffEventMessageExists($battle->getEvents(), "Infinite Buff is still active", 2);
         $this->assertBuffEventMessageExists($battle->getEvents(), "Infinite Buff should never end", 0, 0);
-        
+
         $expectedEvents = [
             BuffMessageEvent::class, // Activation round
             DamageEvent::class, // Round 1
@@ -1163,13 +1160,13 @@ class BattleTest extends ModelTestCase
             DamageEvent::class, // Round 3
             DamageEvent::class,
         ];
-        
+
         $numOfEvents = count($expectedEvents);
         for ($i = 0; $i < $numOfEvents; $i++) {
             $this->assertInstanceOf($expectedEvents[$i], $battle->getEvents()[$i]);
         }
     }
-            
+
     public function testBattleBuffPlayerGoodguyModifier()
     {
         // Get a battle ready
@@ -1180,12 +1177,12 @@ class BattleTest extends ModelTestCase
             "goodguyDefenseModifier" => 0.0,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 2);
-        
+
         $rounds = $battle->fightNRounds(99);
-        
+
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getPlayer(), $battle->getLoser());
-        
+
         // Get a battle that the player should lose and apply a buff that the player forces to win
         $battle = $this->provideBuffBattleParticipants(new Buff([
             "slot" => "test",
@@ -1194,13 +1191,13 @@ class BattleTest extends ModelTestCase
             "goodguyDefenseModifier" => 2,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 3);
-        
+
         $battle->fightNRounds(99);
-        
+
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getPlayer(), $battle->getWinner());
     }
-    
+
     public function testBattleBuffPlayerBadguyModifier()
     {
         // Get a battle that the player should win and apply a buff that the player forces to lose.
@@ -1211,12 +1208,12 @@ class BattleTest extends ModelTestCase
             "badguyDefenseModifier" => 10,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 2);
-        
+
         $rounds = $battle->fightNRounds(99);
-        
+
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getPlayer(), $battle->getLoser());
-        
+
         // Get a battle that the player should lose and apply a buff that the player forces to win
         $battle = $this->provideBuffBattleParticipants(new Buff([
             "slot" => "test",
@@ -1225,13 +1222,13 @@ class BattleTest extends ModelTestCase
             "badguyDefenseModifier" => 0,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 3);
-        
+
         $battle->fightNRounds(99);
-        
+
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getPlayer(), $battle->getWinner());
     }
-    
+
     public function testBattleBuffPlayerDamageModifier()
     {
         // Get a battle that the player should win and apply a buff that the player forces to lose
@@ -1241,11 +1238,11 @@ class BattleTest extends ModelTestCase
             "goodguyDamageModifier" => 0.0,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 0);
-        
+
         $rounds = $battle->fightNRounds(10);
-        
+
         $this->assertSame($battle->getMonster()->getMaxHealth(), $battle->getMonster()->getHealth());
-        
+
         // Get a battle that the player should lose and apply a buff that the player forces to win
         $battle = $this->provideBuffBattleParticipants(new Buff([
             "slot" => "test",
@@ -1253,12 +1250,12 @@ class BattleTest extends ModelTestCase
             "badguyDamageModifier" => 0.0,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 0);
-        
+
         $battle->fightNRounds(10);
-        
+
         $this->assertSame($battle->getPlayer()->getMaxHealth(), $battle->getPlayer()->getHealth());
     }
-    
+
     public function testBattleBuffPlayerInvulnurability()
     {
         // Get a battle that the player should win and apply a buff that the player forces to lose
@@ -1268,13 +1265,13 @@ class BattleTest extends ModelTestCase
             "badguyInvulnurable" => true,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 0);
-        
+
         $rounds = $battle->fightNRounds(99);
-        
+
         $this->assertSame($battle->getMonster()->getMaxHealth(), $battle->getMonster()->getHealth());
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getMonster(), $battle->getWinner());
-        
+
         // Get a battle that the player should lose and apply a buff that the player forces to win
         $battle = $this->provideBuffBattleParticipants(new Buff([
             "slot" => "test",
@@ -1282,20 +1279,20 @@ class BattleTest extends ModelTestCase
             "goodguyInvulnurable" => true,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 0);
-        
+
         $rounds = $battle->fightNRounds(99);
-        
+
         $this->assertSame($battle->getPlayer()->getMaxHealth(), $battle->getPlayer()->getHealth());
         $this->assertTrue($battle->isOver());
         $this->assertSame($battle->getPlayer(), $battle->getWinner());
     }
-    
+
     public function testBufflistGoodguyAttackModifier()
     {
         $em = $this->getEntityManager();
         $player = $em->getRepository(Character::class)->find(1);
         $game = $this->getMockGame($player);
-        
+
         $player->addBuff(new Buff([
             "slot" => "test1",
             "rounds" => 1,
@@ -1318,13 +1315,13 @@ class BattleTest extends ModelTestCase
         $modifier = $player->getBuffs()->getGoodguyAttackModifier();
         $this->assertEquals(0.15498, $modifier, '', 0.001);
     }
-    
+
     public function testBufflistGoodguyDefenseModifier()
     {
         $em = $this->getEntityManager();
         $player = $em->getRepository(Character::class)->find(1);
         $game = $this->getMockGame($player);
-        
+
         $player->addBuff(new Buff([
             "slot" => "test1",
             "rounds" => 1,
@@ -1347,13 +1344,13 @@ class BattleTest extends ModelTestCase
         $modifier = $player->getBuffs()->getGoodguyDefenseModifier();
         $this->assertEquals(7.2408, $modifier, '', 0.001);
     }
-    
+
     public function testBufflistGoodguyDamageModifier()
     {
         $em = $this->getEntityManager();
         $player = $em->getRepository(Character::class)->find(1);
         $game = $this->getMockGame($player);
-        
+
         $player->addBuff(new Buff([
             "slot" => "test1",
             "rounds" => 1,
@@ -1376,13 +1373,13 @@ class BattleTest extends ModelTestCase
         $modifier = $player->getBuffs()->getGoodguyDamageModifier();
         $this->assertEquals(2.5, $modifier, '', 0.001);
     }
-    
+
     public function testBufflistBadguyAttackModifier()
     {
         $em = $this->getEntityManager();
         $player = $em->getRepository(Character::class)->find(1);
         $game = $this->getMockGame($player);
-        
+
         $player->addBuff(new Buff([
             "slot" => "test1",
             "rounds" => 1,
@@ -1405,13 +1402,13 @@ class BattleTest extends ModelTestCase
         $modifier = $player->getBuffs()->getBadguyAttackModifier();
         $this->assertEquals(0.15498, $modifier, '', 0.001);
     }
-    
+
     public function testBufflistBadguyDefenseModifier()
     {
         $em = $this->getEntityManager();
         $player = $em->getRepository(Character::class)->find(1);
         $game = $this->getMockGame($player);
-        
+
         $player->addBuff(new Buff([
             "slot" => "test1",
             "rounds" => 1,
@@ -1434,13 +1431,13 @@ class BattleTest extends ModelTestCase
         $modifier = $player->getBuffs()->getBadguyDefenseModifier();
         $this->assertEquals(7.2408, $modifier, '', 0.001);
     }
-    
+
     public function testBufflistBadguyDamageModifier()
     {
         $em = $this->getEntityManager();
         $player = $em->getRepository(Character::class)->find(1);
         $game = $this->getMockGame($player);
-        
+
         $player->addBuff(new Buff([
             "slot" => "test1",
             "rounds" => 1,
@@ -1463,14 +1460,14 @@ class BattleTest extends ModelTestCase
         $modifier = $player->getBuffs()->getBadguyDamageModifier();
         $this->assertEquals(2.5, $modifier, '', 0.001);
     }
-    
+
     public function testBuffActivatedAt()
     {
         $buff = new Buff([
             "slot" => "test",
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]);
-        
+
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
@@ -1478,12 +1475,12 @@ class BattleTest extends ModelTestCase
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
-        
+
         $buff = new Buff([
             "slot" => "test",
             "activateAt" => Buff::ACTIVATE_OFFENSE,
         ]);
-        
+
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
@@ -1491,12 +1488,12 @@ class BattleTest extends ModelTestCase
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
-        
+
         $buff = new Buff([
             "slot" => "test",
             "activateAt" => Buff::ACTIVATE_DEFENSE,
         ]);
-        
+
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
@@ -1504,12 +1501,12 @@ class BattleTest extends ModelTestCase
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
-        
+
         $buff = new Buff([
             "slot" => "test",
             "activateAt" => Buff::ACTIVATE_ROUNDEND,
         ]);
-        
+
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
@@ -1517,12 +1514,12 @@ class BattleTest extends ModelTestCase
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
-        
+
         $buff = new Buff([
             "slot" => "test",
             "activateAt" => Buff::ACTIVATE_WHILEROUND,
         ]);
-        
+
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
@@ -1530,12 +1527,12 @@ class BattleTest extends ModelTestCase
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDEND));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ANY));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_WHILEROUND));
-        
+
         $buff = new Buff([
             "slot" => "test",
             "activateAt" => Buff::ACTIVATE_ANY,
         ]);
-        
+
         $this->assertFalse($buff->getsActivatedAt(Buff::ACTIVATE_NONE));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_ROUNDSTART));
         $this->assertTrue($buff->getsActivatedAt(Buff::ACTIVATE_OFFENSE));
