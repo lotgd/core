@@ -7,12 +7,12 @@ use LotGD\Core\Models\Character;
 use LotGD\Core\Models\MessageThread;
 use LotGD\Core\Models\Message;
 use LotGD\Core\Models\Repositories\CharacterRepository;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 
 /**
  * Tests the management of Characters
  */
-class MessageModelTest extends ModelTestCase
+class MessageModelTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "messages";

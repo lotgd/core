@@ -9,7 +9,7 @@ use LotGD\Core\Attachment;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\CharacterViewpoint;
 use LotGD\Core\Models\Scene;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 
 class SampleAttachment extends Attachment
 {
@@ -30,7 +30,7 @@ class SampleAttachment extends Attachment
 /**
  * Tests the management of CharacterViewpoints
  */
-class CharacterViewpointTest extends ModelTestCase
+class CharacterViewpointTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "characterViewpoints";

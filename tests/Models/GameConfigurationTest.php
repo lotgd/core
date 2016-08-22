@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\GameConfiguration;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 
 /**
  * Tests the management of CharacterScenes
  */
-class GameConfigurationTest extends ModelTestCase
+class GameConfigurationTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "gameConfiguration";

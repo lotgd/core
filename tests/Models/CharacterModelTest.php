@@ -5,13 +5,13 @@ namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\CharacterProperty;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 use LotGD\Core\Models\Repositories\CharacterRepository;
 
 /**
  * Tests the management of Characters
  */
-class CharacterModelTest extends ModelTestCase
+class CharacterModelTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "character";

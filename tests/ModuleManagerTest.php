@@ -16,10 +16,10 @@ use LotGD\Core\ModuleManager;
 use LotGD\Core\Module;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 use LotGD\Core\Tests\FakeModule\Module as FakeModule;
 
-class ModuleManagerTest extends ModelTestCase
+class ModuleManagerTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "module";
