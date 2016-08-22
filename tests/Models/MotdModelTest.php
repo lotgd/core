@@ -5,12 +5,12 @@ namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\MotD;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 
 /**
  * Tests the management of Characters
  */
-class MotDModelTest extends ModelTestCase
+class MotDModelTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "motd";

@@ -1,4 +1,10 @@
 <phpunit bootstrap="bootstrap/bootstrap.php">
+    <php>
+        <env name="LOTGD_TESTS_DATABASE_DSN" value="sqlite::memory:"/>
+        <env name="LOTGD_TESTS_DATABASE_USER" value="root"/>
+        <env name="LOTGD_TESTS_DATABASE_PASSWORD" value=""/>
+        <env name="LOTGD_TESTS_DATABASE_NAME" value="daenerys"/>
+    </php>
     <testsuites>
         <testsuite name="All">
             <directory>tests</directory>

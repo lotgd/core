@@ -5,12 +5,12 @@ namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\Module;
 use LotGD\Core\Models\ModuleProperty;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 
 /**
  * Tests for module management.
  */
-class ModuleTest extends ModelTestCase
+class ModuleTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "module";

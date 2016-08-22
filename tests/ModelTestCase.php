@@ -9,7 +9,8 @@ use Doctrine\ORM\Mapping\AnsiQuoteStrategy;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
 
-use LotGD\Core\Configuration;
+use LotGD\Core\ComposerManager;
+use LotGD\Core\LibraryConfigurationManager;
 use LotGD\Core\Exceptions\InvalidConfigurationException;
 
 /**
@@ -31,17 +32,34 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
     final public function getConnection(): \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
     {
         if ($this->connection === null) {
-            $configFilePath = implode(DIRECTORY_SEPARATOR, [getcwd(), 'config', 'lotgd.yml']);
-            if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
-                throw new InvalidConfigurationException("Invalid or missing configuration file: '{$configFilePath}'.");
+            $dsn = getenv('LOTGD_TESTS_DATABASE_DSN');
+            $user = getenv('LOTGD_TESTS_DATABASE_USER');
+            $password = getenv('LOTGD_TESTS_DATABASE_PASSWORD');
+            $database = getenv('LOTGD_TESTS_DATABASE_NAME');
+
+            if ($dsn === false || strlen($dsn) == 0) {
+                throw new InvalidConfigurationException("Invalid or missing configuration environment variable: LOTGD_TESTS_DATABASE_DSN.");
             }
-            $config = new Configuration($configFilePath);
+            if ($user === false || strlen($user) == 0) {
+                throw new InvalidConfigurationException("Invalid or missing configuration environment variable: LOTGD_TESTS_DATABASE_USER.");
+            }
+            if ($password === false) {
+                throw new InvalidConfigurationException("Invalid or missing configuration environment variable: LOTGD_TESTS_DATABASE_PASSWORD.");
+            }
+            if ($database  === false || strlen($database) == 0) {
+                throw new InvalidConfigurationException("Invalid or missing configuration environment variable: LOTGD_TESTS_DATABASE_NAME.");
+            }
 
             if (self::$pdo === null) {
-                self::$pdo = new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
+                self::$pdo = new \PDO($dsn, $user, $password);
+
+                $composerManager = new ComposerManager(getcwd());
+                $libraryConfigurationManager = new LibraryConfigurationManager($composerManager, getcwd());
+                $directories = $libraryConfigurationManager->getEntityDirectories();
+                $directories[] = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'src', 'Models']);
 
                 // Read db annotations from model files
-                $configuration = Setup::createAnnotationMetadataConfiguration(["src/Models"], true);
+                $configuration = Setup::createAnnotationMetadataConfiguration($directories, true);
                 $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
 
                 self::$em = EntityManager::create(["pdo" => self::$pdo], $configuration);
@@ -52,21 +70,10 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
                 $schemaTool->updateSchema($metaData);
             }
 
-            $this->connection = $this->createDefaultDBConnection(self::$pdo, $config->getDatabaseName());
+            $this->connection = $this->createDefaultDBConnection(self::$pdo, $database);
         }
 
         return $this->connection;
-    }
-
-    /**
-     * Returns a .yml dataset under this name
-     * @return \PHPUnit_Extensions_Database_DataSet_YamlDataSet
-     */
-    protected function getDataSet(): \PHPUnit_Extensions_Database_DataSet_YamlDataSet
-    {
-        return new \PHPUnit_Extensions_Database_DataSet_YamlDataSet(
-            __DIR__."/datasets/".$this->dataset.".yml"
-        );
     }
 
     /**

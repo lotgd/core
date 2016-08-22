@@ -21,7 +21,7 @@ use LotGD\Core\Exceptions\ {
     CharacterNotFoundException,
     InvalidConfigurationException
 };
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 
 class DefaultSceneProvider implements EventHandler
 {
@@ -48,7 +48,7 @@ class DefaultSceneProvider implements EventHandler
     }
 }
 
-class GameTest extends ModelTestCase
+class GameTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "game";

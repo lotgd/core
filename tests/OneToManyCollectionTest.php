@@ -7,13 +7,13 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use LotGD\Core\Models\GameConfigurationElement;
 use LotGD\Core\Tools\OneToManyCollection;
-use LotGD\Core\Tests\ModelTestCase;
+use LotGD\Core\Tests\CoreModelTestCase;
 use LotGD\Core\Exceptions\WrongTypeException;
 
 /**
  * Tests for creating scenes and moving them around.
  */
-class OneToManyCollectionTest extends ModelTestCase
+class OneToManyCollectionTest extends CoreModelTestCase
 {
     /** @var string default data set */
     protected $dataset = "gameConfiguration";
