@@ -38,12 +38,17 @@ class LibraryConfiguration
         $this->composerManager = $composerManager;
         $this->package = $package;
 
-        // Only lotgd-modules are installed in the vendor directory
         $path = '';
-        if ($package->getType() === "lotgd-module") {
+        $basePackage = $composerManager->getComposer()->getPackage();
+        if ($basePackage && $basePackage->getName() === $package->getName()) {
+            // Whatever the base package is in this repo is at $cwd.
+            $path = $cwd;
+        } else if ($package->getType() === "lotgd-module") {
+            // lotgd-modules are installed in the vendor directory.
             $installationManager = $composerManager->getComposer()->getInstallationManager();
             $path = $installationManager->getInstallPath($package);
         } else {
+            // Not sure what it is honestly, just use $cwd.
             $path = $cwd;
         }
 
