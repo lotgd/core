@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
+use Doctrine\ORM\EntityManager;
+
 use Monolog\Logger;
 use Monolog\Handler\NullHandler;
 
@@ -10,9 +12,13 @@ use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
 use LotGD\Core\Bootstrap;
 use LotGD\Core\Configuration;
+use LotGD\Core\ComposerManager;
+use LotGD\Core\DiceBag;
 use LotGD\Core\EventHandler;
 use LotGD\Core\EventManager;
 use LotGD\Core\Game;
+use LotGD\Core\TimeKeeper;
+use LotGD\Core\ModuleManager;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\CharacterViewpoint;
 use LotGD\Core\Models\Scene;
@@ -63,6 +69,33 @@ class GameTest extends CoreModelTestCase
         $logger->pushHandler(new NullHandler());
 
         $this->g = new Game(new Configuration(getenv('LOTGD_TESTS_CONFIG_PATH')), $logger, $this->getEntityManager(), implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
+    }
+
+    public function testBasicInjection()
+    {
+        $r = $this->g->getTimeKeeper();
+        $this->assertInstanceOf(TimeKeeper::class, $r);
+
+        $r = $this->g->getEventManager();
+        $this->assertInstanceOf(EventManager::class, $r);
+
+        $r = $this->g->getEntityManager();
+        $this->assertInstanceOf(EntityManager::class, $r);
+
+        $r = $this->g->getComposerManager();
+        $this->assertInstanceOf(ComposerManager::class, $r);
+
+        $r = $this->g->getModuleManager();
+        $this->assertInstanceOf(ModuleManager::class, $r);
+
+        $r = $this->g->getLogger();
+        $this->assertInstanceOf(Logger::class, $r);
+
+        $r = $this->g->getConfiguration();
+        $this->assertInstanceOf(Configuration::class, $r);
+
+        $r = $this->g->getDiceBag();
+        $this->assertInstanceOf(DiceBag::class, $r);
     }
 
     public function testGetCharacterException()

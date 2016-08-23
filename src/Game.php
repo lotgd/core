@@ -32,6 +32,7 @@ class Game
     private $character;
     private $diceBag;
     private $cwd;
+    private $timeKeeper;
 
     /**
      * Construct a game. You probably want to use Bootstrap to do this.
