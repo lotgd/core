@@ -180,8 +180,10 @@ class LibraryConfiguration
         if (is_null($entityNamespace) === false) {
             $entityDirectory = $this->composerManager->translateNamespaceToPath($entityNamespace);
 
-            if (is_dir($entityDirectory) === false) {
-                throw new \Exception("{$entityDirectory}, generated from {$entityNamespace}, is not a valid directory.");
+            if ($entityDirectory === null) {
+                throw new \Exception("Could not translate namespace {$entityNamespace} into a directory.");
+            } else if (is_dir($entityDirectory) === false) {
+                throw new \Exception("Path {$entityDirectory}, translated from namespace {$entityNamespace}, is not a valid directory.");
             }
 
             $this->entityDirectory = $entityDirectory;
