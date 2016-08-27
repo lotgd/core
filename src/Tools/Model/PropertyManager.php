@@ -9,33 +9,33 @@ namespace LotGD\Core\Tools\Model;
 trait PropertyManager
 {
     private $propertyStorage = null;
-    
+
     public function loadProperties()
     {
         if ($this->propertyStorage !== null) {
             return;
         }
-        
+
         foreach ($this->properties as $property) {
             $this->propertyStorage[$property->getName()] = $property;
         }
     }
-    
+
     public function getProperty(string $name, $default = null)
     {
         $this->loadProperties();
-        
+
         if (isset($this->propertyStorage[$name])) {
             return $this->propertyStorage[$name]->getValue();
         } else {
             return $default;
         }
     }
-    
+
     public function setProperty(string $name, $value)
     {
         $this->loadProperties();
-        
+
         if (isset($this->propertyStorage[$name])) {
             $this->propertyStorage[$name]->setValue($value);
         } else {
@@ -46,7 +46,7 @@ trait PropertyManager
             }
             $property->setName($name);
             $property->setValue($value);
-            
+
             $this->propertyStorage[$name] = $property;
             $this->properties->add($property);
         }
