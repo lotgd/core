@@ -8,6 +8,8 @@ namespace LotGD\Core;
  */
 class ActionGroup
 {
+    const DefaultGroup = 'lotgd/core/default';
+    
     private $id;
     private $title;
     private $sortKey;
