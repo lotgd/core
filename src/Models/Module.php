@@ -5,6 +5,7 @@ namespace LotGD\Core\Models;
 
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Tools\Model\Creator;
@@ -37,6 +38,7 @@ class Module implements SaveableInterface
      */
     public function __construct(string $library)
     {
+        $this->properties = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->library = $library;
     }
