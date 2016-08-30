@@ -55,7 +55,7 @@ class Scene implements CreateableInterface
      */
     public function __construct()
     {
-        $this->children = ArrayCollection();
+        $this->children = new ArrayCollection();
     }
 
     /**
