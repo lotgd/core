@@ -31,7 +31,7 @@ use LotGD\Core\Tests\CoreModelTestCase;
 
 class DefaultSceneProvider implements EventHandler
 {
-    public static $actions = ['actions'];
+    public static $actions;
     public static $attachments = ['actions'];
     public static $data = ['data'];
 
@@ -44,9 +44,16 @@ class DefaultSceneProvider implements EventHandler
                 }
                 $context['scene'] = $g->getEntityManager()->getRepository(Scene::class)->find(1);
                 break;
-            case 'h/lotgd/core/viewpoint-for/lotgd/tests/village':
+            case 'h/lotgd/core/navigate-to/lotgd/tests/village':
                 $v = $context['viewpoint'];
+
+                self::$actions = [new ActionGroup('default', 'Title', 0)];
+                self::$actions[0]->setActions([
+                    new Action(2), // This is a real sceneId in game.yml
+                    new Action(101),
+                ]);
                 $v->setActions(self::$actions);
+
                 $v->setAttachments(self::$attachments);
                 $v->setData(self::$data);
                 break;
@@ -136,7 +143,7 @@ class GameTest extends CoreModelTestCase
         $this->g->setCharacter($c);
 
         $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/default-scene/', DefaultSceneProvider::class, 'lotgd/core/tests');
-        $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/viewpoint-for\/.*/', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/navigate-to\/.*/', DefaultSceneProvider::class, 'lotgd/core/tests');
 
         $v = $this->g->getViewpoint();
         // Run it twice to make sure no additional DB operations happen.
@@ -144,12 +151,11 @@ class GameTest extends CoreModelTestCase
         $this->assertEquals('lotgd/tests/village', $v->getTemplate());
 
         // Validate the changes made by the hook.
-        $actions = serialize(DefaultSceneProvider::$actions);
-        $attachments = serialize(DefaultSceneProvider::$attachments);
-        $data = serialize(DefaultSceneProvider::$data);
-        $this->assertEquals('lotgd/tests/village', $v->getTemplate());
+        $this->assertSame(DefaultSceneProvider::$actions, $v->getActions());
+        $this->assertSame(DefaultSceneProvider::$attachments, $v->getAttachments());
+        $this->assertSame(DefaultSceneProvider::$data, $v->getData());
 
-        $this->g->getEventManager()->unsubscribe('/h\/lotgd\/core\/viewpoint-for\/.*/', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->g->getEventManager()->unsubscribe('/h\/lotgd\/core\/navigate-to\/.*/', DefaultSceneProvider::class, 'lotgd/core/tests');
     }
 
     public function testTakeActionNonExistant()
