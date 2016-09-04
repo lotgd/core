@@ -23,7 +23,7 @@ class CharacterViewpoint implements CreateableInterface
     /** @Id @OneToOne(targetEntity="Character", inversedBy="viewpoint", cascade="persist") */
     private $owner;
     /** @Column(type="array") */
-    private $actions = [];
+    private $actionGroups = [];
     /** @Column(type="array") */
     private $attachments = [];
     /** @Column(type="array") */
@@ -65,7 +65,7 @@ class CharacterViewpoint implements CreateableInterface
         $this->setTemplate($scene->getTemplate());
         $this->setScene($scene);
 
-        $this->setActions([]);
+        $this->setActionGroups([]);
         $this->setAttachments([]);
         $this->setData([]);
     }
@@ -89,21 +89,21 @@ class CharacterViewpoint implements CreateableInterface
     }
 
     /**
-     * Returns all actions
+     * Returns all action groups.
      * @return array
      */
-    public function getActions(): array
+    public function getActionGroups(): array
     {
-        return $this->actions;
+        return $this->actionGroups;
     }
 
     /**
-     * Sets actions
-     * @param array $actions
+     * Sets action groups.
+     * @param array $actionGroups
      */
-    public function setActions(array $actions)
+    public function setActionGroups(array $actionGroups)
     {
-        $this->actions = $actions;
+        $this->actionGroups = $actionGroups;
     }
 
     /**
@@ -117,7 +117,7 @@ class CharacterViewpoint implements CreateableInterface
 
     /**
      * Sets attachments.
-     * @param array $actions
+     * @param array $attachments
      */
     public function setAttachments(array $attachments)
     {
@@ -168,7 +168,7 @@ class CharacterViewpoint implements CreateableInterface
      */
     public function findActionById(string $id)
     {
-        foreach ($this->getActions() as $group) {
+        foreach ($this->getActionGroups() as $group) {
             foreach ($group->getActions() as $a) {
                 if ($a->getId() == $id) {
                     return $a;

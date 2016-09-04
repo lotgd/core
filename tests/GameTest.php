@@ -31,7 +31,7 @@ use LotGD\Core\Tests\CoreModelTestCase;
 
 class DefaultSceneProvider implements EventHandler
 {
-    public static $actions;
+    public static $actionGroups;
     public static $attachments = ['actions'];
     public static $data = ['data'];
 
@@ -47,12 +47,12 @@ class DefaultSceneProvider implements EventHandler
             case 'h/lotgd/core/navigate-to/lotgd/tests/village':
                 $v = $context['viewpoint'];
 
-                self::$actions = [new ActionGroup('default', 'Title', 0)];
-                self::$actions[0]->setActions([
+                self::$actionGroups = [new ActionGroup('default', 'Title', 0)];
+                self::$actionGroups[0]->setActions([
                     new Action(2), // This is a real sceneId in game.yml
                     new Action(101),
                 ]);
-                $v->setActions(self::$actions);
+                $v->setActionGroups(self::$actionGroups);
 
                 $v->setAttachments(self::$attachments);
                 $v->setData(self::$data);
@@ -151,7 +151,7 @@ class GameTest extends CoreModelTestCase
         $this->assertEquals('lotgd/tests/village', $v->getTemplate());
 
         // Validate the changes made by the hook.
-        $this->assertSame(DefaultSceneProvider::$actions, $v->getActions());
+        $this->assertSame(DefaultSceneProvider::$actionGroups, $v->getActionGroups());
         $this->assertSame(DefaultSceneProvider::$attachments, $v->getAttachments());
         $this->assertSame(DefaultSceneProvider::$data, $v->getData());
 
@@ -179,7 +179,7 @@ class GameTest extends CoreModelTestCase
         // For now, I cant seem to serialize a proper ActionGroup to store in
         // the yaml for this test suite, so build one naturally :)
         $v = $this->g->getViewpoint();
-        $a = $v->getActions()[0]->getActions()[0];
+        $a = $v->getActionGroups()[0]->getActions()[0];
         $this->assertNotNull($a);
 
         $s = $this->getEntityManager()->find(Scene::class, $a->getDestinationSceneId());

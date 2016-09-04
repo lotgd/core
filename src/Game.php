@@ -237,7 +237,7 @@ class Game
             }, $scene->getChildren()->toArray());
             $ag->setActions($as);
 
-            $viewpoint->setActions([$ag]);
+            $viewpoint->setActionGroups([$ag]);
 
             // Let and installed listeners (ie modules) make modifications to the
             // new viewpoint, including the ability to redirect the user to
