@@ -28,6 +28,8 @@ class CharacterViewpoint implements CreateableInterface
     private $attachments = [];
     /** @Column(type="array") */
     private $data = [];
+    /** @OneToOne(targetEntity="Scene") */
+    private $scene;
 
     /** @var array */
     private static $fillable = [
@@ -61,10 +63,29 @@ class CharacterViewpoint implements CreateableInterface
         $this->setTitle($scene->getTitle());
         $this->setDescription($scene->getDescription());
         $this->setTemplate($scene->getTemplate());
+        $this->setScene($scene);
 
         $this->setActions([]);
         $this->setAttachments([]);
         $this->setData([]);
+    }
+
+    /**
+     * Sets the template scene used to create this viewpoint.
+     * @param Scene $scene
+     */
+    public function setScene(Scene $scene)
+    {
+        $this->scene = $scene;
+    }
+
+    /**
+     * Returns the template scene used to create this viewpoint.
+     * @return Scene
+     */
+    public function getScene()
+    {
+        return $this->scene;
     }
 
     /**

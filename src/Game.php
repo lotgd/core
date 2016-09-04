@@ -200,13 +200,63 @@ class Game
             if ($s === null) {
                 throw new InvalidConfigurationException("No subscriber to h/lotgd/core/default-scene returned a scene.");
             }
+
             $v = new CharacterViewpoint();
-            $this->setupViewpoint($v, $s);
+            $v->setOwner($this->getCharacter());
             $this->getCharacter()->setViewpoint($v);
+
+            $this->navigateToScene($s, []);
             $v->save($this->getEntityManager());
         }
 
         return $v;
+    }
+
+    /**
+     * Starting with the current viewpoint, navigate to the specified scene,
+     * calling the hook `h/lotgd/core/navigate-to/[scene template]` to
+     * set up the proper viewpoint values, and following any redirects specified
+     * by the hook.
+     * @param Scene $scene
+     * @param array $parameters
+     */
+    private function navigateToScene(Scene $scene, array $parameters)
+    {
+        $viewpoint = $this->getCharacter()->getViewpoint();
+        do {
+            $referrer = $viewpoint->getScene();
+
+            // Copy over the basic structure from the scene database.
+            $viewpoint->changeFromScene($scene);
+
+            // Generate the default set of actions: the default group with
+            // all children.
+            $ag = new ActionGroup(ActionGroup::DefaultGroup, '', 0);
+            $as = array_map(function ($c) {
+                return new Action($c->getId());
+            }, $scene->getChildren()->toArray());
+            $ag->setActions($as);
+
+            $viewpoint->setActions([$ag]);
+
+            // Let and installed listeners (ie modules) make modifications to the
+            // new viewpoint, including the ability to redirect the user to
+            // a different scene, by setting $context['redirect'] to a new scene.
+            $context = [
+                'referrer' => $referrer,
+                'viewpoint' => $viewpoint,
+                'scene' => $scene,
+                'parameters' => $parameters,
+                'redirect' => null
+            ];
+            $this->getEventManager()->publish('h/lotgd/core/navigate-to/' . $scene->getTemplate(), $context);
+
+            $scene = $context['redirect'];
+            if ($scene !== null) {
+                $id = $scene->getId();
+                $this->getLogger()->debug("Redirecting to sceneId={$id}");
+            }
+        } while($scene !== null);
     }
 
     /**
@@ -227,60 +277,14 @@ class Game
             throw new ActionNotFoundException("Invalid action id={$actionId} for current viewpoint.");
         }
 
-        while ($action != null) {
-            $nextSceneId = $action->getDestinationSceneId();
-            $nextScene = $this->getEntityManager()->getRepository(Scene::class)->find([
-                'id' => $nextSceneId
-            ]);
-            if ($nextScene == null) {
-                throw new SceneNotFoundException("Cannot find scene id={$nextSceneId} specified by action id={$actionId}.");
-            }
-
-            $this->setupViewpoint($v, $nextScene);
-
-            // Let and installed listeners (ie modules) make modifications to the
-            // $nextViewpoint, including the ability to redirect the user to
-            // a different scene, by setting $context['redirect'] to a new action.
-            $context = [
-                'viewpoint' => $v,
-                'scene' => $nextScene,
-                'parameters' => $parameters,
-                'redirect' => null
-            ];
-            $this->getEventManager()->publish('h/lotgd/core/navigate-to/' . $nextScene->getTemplate(), $context);
-            $action = $context['redirect'];
-
-            if ($action != null) {
-                $s = $action->getDestinationSceneId();
-                $this->getLogger()->debug("Redirecting to destinationSceneId={$s}");
-            }
+        $sceneId = $action->getDestinationSceneId();
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find([
+            'id' => $sceneId
+        ]);
+        if ($scene == null) {
+            throw new SceneNotFoundException("Cannot find scene id={$sceneId} specified by action id={$actionId}.");
         }
-
-        $this->getCharacter()->setViewpoint($v);
+        $this->navigateToScene($scene, $parameters);
         $v->save($this->getEntityManager());
-    }
-
-    /**
-     * Returns a viewpoint made from a Scene $s and the current user, complete
-     * with actions built from the scene's children. Further modifications to
-     * the viewpoint can be made by responding to the hook
-     * 'h/lotgd/core/viewpoint-for/[scene-template]'.
-     */
-    private function setupViewpoint(CharacterViewpoint $v, Scene $s)
-    {
-        $v->setOwner($this->getCharacter());
-        $v->changeFromScene($s);
-        $ag = new ActionGroup(ActionGroup::DefaultGroup, '', 0);
-        $as = array_map(function ($c) {
-            return new Action($c->getId());
-        }, $s->getChildren()->toArray());
-        $ag->setActions($as);
-
-        $v->setActions([$ag]);
-
-        $context = [
-            'viewpoint' => $v,
-        ];
-        $this->getEventManager()->publish('h/lotgd/core/viewpoint-for/' . $s->getTemplate(), $context);
     }
 }
