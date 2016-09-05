@@ -30,13 +30,13 @@ class Scene implements CreateableInterface
     private $id;
 
     /**
-     * @ManyToOne(targetEntity="Scene")
+     * @ManyToOne(targetEntity="Scene", cascade={"persist"})
      * @JoinColumn(name="parent", referencedColumnName="id", nullable=true)
      */
     private $parent = null;
 
     /**
-     * @OneToMany(targetEntity="Scene", mappedBy="parent")
+     * @OneToMany(targetEntity="Scene", mappedBy="parent", cascade={"persist", "remove"})
      */
     private $children = [];
 
