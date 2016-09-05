@@ -34,6 +34,23 @@ class LibraryConfigurationManager
     }
 
     /**
+     * Return a library configuration for the specified library, in 'vendor/library'
+     * format.
+     * @return LibraryConfiguration|null
+     */
+    public function getConfigurationForLibrary(string $library)
+    {
+        $configs = $this->getConfigurations();
+
+        foreach ($configs as $c) {
+            if ($c->getName() === $library) {
+                return $c;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Return an array of the library configurations.
      * @return array<LibraryConfiguration>
      */
