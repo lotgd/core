@@ -49,7 +49,6 @@ class ModuleManager
         } else {
             // TODO: handle error cases here.
             $m = new ModuleModel($name);
-            $m->save($this->g->getEntityManager());
 
             $class = $library->getRootNamespace() . 'Module';
             try {
@@ -74,6 +73,7 @@ class ModuleManager
 
             // Run the module's onRegister handler.
             $class::onRegister($this->g, $m);
+            $m->save($this->g->getEntityManager());
         }
     }
 
