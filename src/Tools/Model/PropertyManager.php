@@ -32,6 +32,17 @@ trait PropertyManager
         }
     }
 
+    public function unsetProperty(string $name)
+    {
+        $this->loadProperties();
+
+        if (isset($this->propertyStorage[$name])) {
+            $property = $this->propertyStorage[$name];
+            $this->properties->removeElement($property);
+            unset($this->propertyStorage[$name]);
+        }
+    }
+
     public function setProperty(string $name, $value)
     {
         $this->loadProperties();
