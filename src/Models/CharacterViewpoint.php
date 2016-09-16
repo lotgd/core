@@ -28,7 +28,7 @@ class CharacterViewpoint implements CreateableInterface
     private $attachments = [];
     /** @Column(type="array") */
     private $data = [];
-    /** @OneToOne(targetEntity="Scene") */
+    /** @ManyToOne(targetEntity="Scene") */
     private $scene;
 
     /** @var array */
