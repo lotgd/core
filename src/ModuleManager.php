@@ -43,12 +43,16 @@ class ModuleManager
         $name = $library->getName();
         $package = $library->getComposerPackage();
 
+        $this->g->getLogger()->debug("Registering module {$name}...");
+
         $m = $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($name);
         if ($m) {
             throw new ModuleAlreadyExistsException($name);
         } else {
             // TODO: handle error cases here.
+            $this->g->getLogger()->debug("Creating module model for {$name}");
             $m = new ModuleModel($name);
+            $m->save($this->g->getEntityManager());
 
             $class = $library->getRootNamespace() . 'Module';
             try {
@@ -72,6 +76,7 @@ class ModuleManager
             }
 
             // Run the module's onRegister handler.
+            $this->g->getLogger()->debug("Calling {$class}::onRegister");
             $class::onRegister($this->g, $m);
             $m->save($this->g->getEntityManager());
         }
@@ -89,6 +94,8 @@ class ModuleManager
         $name = $library->getName();
         $package = $library->getComposerPackage();
 
+        $this->g->getLogger()->debug("Unregistering module {$name}...");
+
         $m = $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($name);
         if (!$m) {
             throw new ModuleDoesNotExistException($name);
@@ -101,14 +108,17 @@ class ModuleManager
                 try {
                     $this->g->getEventManager()->unsubscribe($s, $class, $name);
                 } catch (SubscriptionNotFoundException $e) {
-                    $this->g->getLogger()->error("Could not find subscription {$s} in library {$name} to unsubscribe.");
+                    $this->g->getLogger()->error("Could not find subscription {$s} in library {$name} to unsubscribe");
                 }
             }
 
             // Run the module's onUnregister handler.
+            $this->g->getLogger()->debug("Calling {$class}::onUnregister");
             $class::onUnregister($this->g, $m);
 
             // TODO: handle error cases here.
+            $n = $m->getLibrary();
+            $this->g->getLogger()->debug("Deleting module model for {$n}");
             $m->delete($this->g->getEntityManager());
         }
     }
