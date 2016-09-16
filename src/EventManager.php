@@ -70,6 +70,8 @@ class EventManager
      */
     public function subscribe(string $pattern, string $class, string $library)
     {
+        $this->g->getLogger()->addDebug("Subscribing event pattern={$pattern} class={$class} library={$library}");
+
         try {
             // Can we resolve this class?
             $klass = new \ReflectionClass($class);
