@@ -226,16 +226,25 @@ class Game
         do {
             $referrer = $viewpoint->getScene();
 
+            $id = $scene->getId();
+            $referrerId = $referrer ? $referrer->getId() : 'null';
+            $this->getLogger()->addDebug("Navigating to sceneId={$id} from referrer sceneId={$referrerId}");
+
             // Copy over the basic structure from the scene database.
             $viewpoint->changeFromScene($scene);
 
             // Generate the default set of actions: the default group with
             // all children.
+            $this->getLogger()->addDebug("Building default action group...");
             $ag = new ActionGroup(ActionGroup::DefaultGroup, '', 0);
             $as = array_map(function ($c) {
+                $id = $c->getId();
+                $this->getLogger()->addDebug("  Adding navigation action for child sceneId={$id}");
                 return new Action($c->getId());
             }, $scene->getChildren()->toArray());
             $ag->setActions($as);
+            $count = count($as);
+            $this->getLogger()->addDebug("Total actions: {$count}");
 
             $viewpoint->setActionGroups([$ag]);
 
@@ -249,7 +258,8 @@ class Game
                 'parameters' => $parameters,
                 'redirect' => null
             ];
-            $this->getEventManager()->publish('h/lotgd/core/navigate-to/' . $scene->getTemplate(), $context);
+            $hook = 'h/lotgd/core/navigate-to/' . $scene->getTemplate();
+            $this->getEventManager()->publish($hook, $context);
 
             $scene = $context['redirect'];
             if ($scene !== null) {
@@ -267,14 +277,14 @@ class Game
      */
     public function takeAction(string $actionId, array $parameters = [])
     {
-        $this->getLogger()->debug("Taking action id={$actionId}");
+        $this->getLogger()->debug("Taking actionId={$actionId}");
 
         $v = $this->getViewpoint();
 
         // Verify $actionId is present in the current viewpoint.
         $action = $v->findActionById($actionId);
         if ($action === null) {
-            throw new ActionNotFoundException("Invalid action id={$actionId} for current viewpoint.");
+            throw new ActionNotFoundException("Invalid actionId={$actionId} for current viewpoint.");
         }
 
         $sceneId = $action->getDestinationSceneId();
@@ -282,7 +292,7 @@ class Game
             'id' => $sceneId
         ]);
         if ($scene == null) {
-            throw new SceneNotFoundException("Cannot find scene id={$sceneId} specified by action id={$actionId}.");
+            throw new SceneNotFoundException("Cannot find sceneId={$sceneId} specified by actionId={$actionId}.");
         }
         $this->navigateToScene($scene, $parameters);
         $v->save($this->getEntityManager());
