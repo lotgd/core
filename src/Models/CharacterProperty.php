@@ -16,10 +16,10 @@ use LotGD\Core\Tools\Model\Properties;
 class CharacterProperty
 {
     use Properties;
-    
-    /** @Id @ManyToOne(targetEntity="Character") */
+
+    /** @Id @ManyToOne(targetEntity="Character", inversedBy="properties") */
     private $owner;
-            
+
     /**
      * Returns the owner
      * @return \LotGD\Core\Models\Character
@@ -28,7 +28,7 @@ class CharacterProperty
     {
         return $this->owner;
     }
-    
+
     /**
      * Sets the owner
      * @param \LotGD\Core\Models\Character $owner

@@ -17,8 +17,8 @@ class ModuleProperty
 {
     use Properties;
 
-    /** @Id @ManyToOne(targetEntity="Module")
-     * @JoinColumn(referencedColumnName="library")
+    /** @Id @ManyToOne(targetEntity="Module", inversedBy="properties")
+     * @JoinColumn(name="owner", referencedColumnName="library")
      */
     private $owner;
 

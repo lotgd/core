@@ -67,5 +67,15 @@ class ModuleTest extends CoreModelTestCase
             ->getQuery()->getSingleScalarResult());
 
         $this->assertSame(6, $total);
+
+        // test cascading removes
+        $module->delete($em);
+
+        $total = intval($em->createQueryBuilder()
+            ->from(ModuleProperty::class, "u")
+            ->select("COUNT(u.propertyName)")
+            ->getQuery()->getSingleScalarResult());
+
+        $this->assertSame(0, $total);
     }
 }

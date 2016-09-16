@@ -45,9 +45,9 @@ class Character implements CharacterInterface, CreateableInterface
     private $health = 10;
     /** @Column(type="integer", options={"default":1})/ */
     private $level = 1;
-    /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist"}) */
+    /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist", "remove"}) */
     private $properties;
-    /** @OneToOne(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist"}) */
+    /** @OneToOne(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist", "remove"}) */
     private $viewpoint;
     /**
      * @ManyToMany(targetEntity="MessageThread", inversedBy="participants", cascade={"persist"})

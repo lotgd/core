@@ -30,7 +30,7 @@ class Module implements SaveableInterface
     /** @Column(type="datetime") */
     private $createdAt;
 
-    /** @OneToMany(targetEntity="ModuleProperty", mappedBy="owner", cascade={"persist"}) */
+    /** @OneToMany(targetEntity="ModuleProperty", mappedBy="owner", cascade={"persist", "remove"}) */
     private $properties;
 
     /**

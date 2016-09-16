@@ -4,6 +4,6 @@ modules:
         createdAt: "2016-05-01"
 module_properties:
     -
-        owner_id: 'lotgd/tests'
+        owner: 'lotgd/tests'
         propertyName: "test"
         propertyValue: 's:5:"hallo";'
