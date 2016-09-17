@@ -103,6 +103,9 @@ class CharacterViewpointTest extends CoreModelTestCase
 
         $output = $em->getRepository(CharacterViewpoint::class)->find(2);
         $this->assertEquals($actionGroups, $output->getActionGroups());
+
+        $this->assertEquals($ag2, $input->findActionGroupById('id2'));
+        $this->assertNull($input->findActionGroupById('not-there'));
     }
 
     public function testAttachments()

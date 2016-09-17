@@ -107,6 +107,22 @@ class CharacterViewpoint implements CreateableInterface
     }
 
     /**
+     * Finds an action group by id.
+     * @param $actionGroupId
+     * @return ActionGroup|null
+     */
+    public function findActionGroupById(string $actionGroupId)
+    {
+        $groups = $this->getActionGroups();
+        foreach ($groups as $g) {
+            if ($g->getId() == $actionGroupId) {
+                return $g;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns all attachments.
      * @return array
      */
