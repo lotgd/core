@@ -106,6 +106,13 @@ class CharacterViewpointTest extends CoreModelTestCase
 
         $this->assertEquals($ag2, $input->findActionGroupById('id2'));
         $this->assertNull($input->findActionGroupById('not-there'));
+
+        $testAction = new Action(4);
+        $input->addActionToGroupId($testAction, 'not-there');
+        $this->assertNull($input->findActionById($testAction->getId()));
+
+        $input->addActionToGroupId($testAction, 'id2');
+        $this->assertNotNull($input->findActionById($testAction->getId()));
     }
 
     public function testAttachments()

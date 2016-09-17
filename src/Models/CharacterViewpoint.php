@@ -6,6 +6,7 @@ namespace LotGD\Core\Models;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
+use LotGD\Core\Action;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\SceneBasics;
 
@@ -120,6 +121,26 @@ class CharacterViewpoint implements CreateableInterface
             }
         }
         return null;
+    }
+
+    /**
+     * Add the specified action to the group with the provided id. Does nothing
+     * if the id is not present.
+     * @param Action $action
+     * @param string $actionGroupId
+     */
+    public function addActionToGroupId(Action $action, string $actionGroupId)
+    {
+        $actionGroups = $this->getActionGroups();
+        foreach ($actionGroups as $group) {
+            if ($group->getId() == $actionGroupId) {
+                $actions = $group->getActions();
+                $actions[] = $action;
+                $group->setActions($actions);
+                break;
+            }
+        }
+        $this->setActionGroups($actionGroups);
     }
 
     /**
