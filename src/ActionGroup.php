@@ -9,7 +9,8 @@ namespace LotGD\Core;
 class ActionGroup
 {
     const DefaultGroup = 'lotgd/core/default';
-    
+    const HiddenGroup = 'lotgd/core/hidden';
+
     private $id;
     private $title;
     private $sortKey;

@@ -236,17 +236,19 @@ class Game
             // Generate the default set of actions: the default group with
             // all children.
             $this->getLogger()->addDebug("Building default action group...");
-            $ag = new ActionGroup(ActionGroup::DefaultGroup, '', 0);
+            $defaultGroup = new ActionGroup(ActionGroup::DefaultGroup, '', 0);
             $as = array_map(function ($c) {
                 $id = $c->getId();
                 $this->getLogger()->addDebug("  Adding navigation action for child sceneId={$id}");
                 return new Action($c->getId());
             }, $scene->getChildren()->toArray());
-            $ag->setActions($as);
+            $defaultGroup->setActions($as);
             $count = count($as);
             $this->getLogger()->addDebug("Total actions: {$count}");
 
-            $viewpoint->setActionGroups([$ag]);
+            $hiddenGroup = new ActionGroup(ActionGroup::HiddenGroup, '', 100);
+
+            $viewpoint->setActionGroups([$defaultGroup, $hiddenGroup]);
 
             // Let and installed listeners (ie modules) make modifications to the
             // new viewpoint, including the ability to redirect the user to
