@@ -17,7 +17,7 @@ class ConsoleCommand extends BaseCommand
     protected function configure()
     {
         $this->setName('console')
-             ->setDescription('Start a shell to interact with the game.');
+             ->setDescription('Start a shell to interact with the game');
     }
 
     /**
@@ -33,7 +33,7 @@ class ConsoleCommand extends BaseCommand
         print("Try things like `\$g::getVersion()`. To quit, ^D or `exit();`.\n");
         print("\n");
 
-        $boris = new \Boris\Boris('🐲  > '); // For some reason we need the extra spaces.
+        $boris = new \Boris\Boris('🐲 > ');
         $boris->setLocal(array(
             'g' => $this->game
         ));
