@@ -1,3 +1,3 @@
 #!/bin/bash -ex
-phpunit
+phpunit --stop-on-failure
 ./vendor/bin/phpdoccheck -d src --no-ansi

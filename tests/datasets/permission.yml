@@ -1,0 +1,6 @@
+## YAML Template.
+permissions:
+    -
+        id: "lotgd/core/superuser"
+        library: "lotgd/core"
+        name: "Superuser. Superseeds all flags."

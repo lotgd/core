@@ -1,0 +1,16 @@
+## YAML Template.
+testUsers:
+    -
+        id: 1
+        name: "Test User 1"
+testUserAssociations:
+    -
+        owner_id: 1
+        permission_id: "lotgd/core/superuser"
+        permissionState: 1
+
+permissions:
+    -
+        id: "lotgd/core/superuser"
+        library: "lotgd/core"
+        name: "Superuser. Superseeds all flags."
