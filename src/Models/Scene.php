@@ -14,7 +14,9 @@ use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\SceneBasics;
 
 /**
- * Description of Scene
+ * A scene is a location within the game, such as the Village or the Tavern. Designed
+ * to be a kind of "template" for generating the specific location information for
+ * a specific user, which then becomes a CharacterViewpoint.
  * @Entity
  * @Table(name="scenes")
  */
@@ -52,7 +54,7 @@ class Scene implements CreateableInterface
     ];
 
     /**
-     * Constructor
+     * Constructor for a scene.
      */
     public function __construct()
     {
@@ -61,7 +63,7 @@ class Scene implements CreateableInterface
     }
 
     /**
-     * Returns primary id
+     * Returns the primary ID for this scene.
      * @return int
      */
     public function getId(): int
@@ -127,7 +129,7 @@ class Scene implements CreateableInterface
     }
 
     /**
-     * Returns a list of all children registered for this entity
+     * Returns a list of all children registered for this scene.
      * @return Collection
      */
     public function getChildren(): Collection
@@ -136,7 +138,7 @@ class Scene implements CreateableInterface
     }
 
     /**
-     * Registers a child for this entity.
+     * Registers a child for this scene.
      * @param \LotGD\Core\Models\Scene $child
      */
     protected function addChild(Scene $child)
@@ -147,7 +149,7 @@ class Scene implements CreateableInterface
     }
 
     /**
-     * Removes a child from this entity.
+     * Removes a child from this scene.
      * @param \LotGD\Core\Models\Scene $child
      */
     protected function removeChild(Scene $child)
