@@ -6,11 +6,23 @@ testUsers:
 testUserAssociations:
     -
         owner_id: 1
-        permission_id: "lotgd/core/superuser"
+        permission_id: "test/permission_one"
         permissionState: 1
+    -
+        owner_id: 1
+        permission_id: "test/permission_two"
+        permissionState: -1
 
 permissions:
     -
-        id: "lotgd/core/superuser"
+        id: "test/permission_one"
         library: "lotgd/core"
-        name: "Superuser. Superseeds all flags."
+        name: "Test permission."
+    -
+        id: "test/permission_two"
+        library: "lotgd/core"
+        name: "Test permission."
+    -
+        id: "test/permission_tri"
+        library: "lotgd/core"
+        name: "Test permission."

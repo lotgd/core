@@ -6,18 +6,18 @@ namespace LotGD\Core\Tests\Ressources\TestModels;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
-use LotGD\Core\Models\PermissionAssociation;
+use LotGD\Core\Models\PermissionAssociationInterface;
 use LotGD\Core\Tools\Model\PermissionAssociationable;
 
 /**
  * @Entity
  * @Table("TestUserAssociations")
  */
-class UserPermissionAssociation {
+class UserPermissionAssociation implements PermissionAssociationInterface {
     use PermissionAssociationable;
 
     /**
-     * @Id @ManyToOne(targetEntity="User", inversedBy="permissions") 
+     * @Id @ManyToOne(targetEntity="User", inversedBy="permissions")
      */
     private $owner;
 }

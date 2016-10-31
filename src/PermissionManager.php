@@ -3,21 +3,23 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use LotGD\Core\Models\PermissionableInterface;
+
 /**
  * Permissions can be managed with the PermissionManager.
- * 
+ *
  * The PermissionManager class provides methods to work with permissions. It can
  * be used to create or delete permissions, to remove, allow or deny permissions
  * to actors and to check whether an actor has a certain permission or if it is
  * explicitely denied from him.
- * 
+ *
  * The wording used in this class is:
  *  - allowed, the actor has a certain permission in the allowed state.
  *  - denied, the actor has a certain permission in the denied state.
- * 
+ *
  * To make this more clear, the following table summarizes how different methods
  * react.
- * 
+ *
  * Method
  *             State: | Unset | Allowed | Denied
  * -------------------+-------+---------+---------
@@ -29,7 +31,7 @@ class PermissionManager
 {
     const Allowed = 1;
     const Denied = -1;
-    
+
     const Superuser = "lotgd/core/superuser";
     const AddScenes = "lotgd/core/scene/add";
     const EditScenes = "lotgd/core/scene/edit";
@@ -37,7 +39,18 @@ class PermissionManager
     const AddCharacters = "lotgd/core/characters/add";
     const EditCharacters = "lotgd/core/characters/edit";
     const DeleteCharacters = "lotgd/core/characters/delete";
-    
+
+    private $game;
+
+    /**
+     * Construct a permission manager.
+     * @param Game $g The game.
+     */
+    public function __construct(Game $game)
+    {
+        $this->game = $game;
+    }
+
     /**
      * Checks if an actor has a permission set. No assumption can be made if it's allowed or denied.
      * @param \LotGD\Core\PermissionableInterface $actor
@@ -45,12 +58,16 @@ class PermissionManager
      * @return bool True if the permission has been set, be it allowed or denied.
      */
     public function hasPermissionSet(
-        PermissionableInterface $actor, 
+        PermissionableInterface $actor,
         string $permissionId
     ): bool {
-        
+        if ($actor->hasPermission($permissionId)) {
+            return true;
+        } else {
+            return false;
+        }
     }
-    
+
     /**
      * Checks if an actor is allowed a given permission.
      * @param \LotGD\Core\PermissionableInterface $actor
@@ -58,12 +75,16 @@ class PermissionManager
      * @return bool True if the actor has the permission set and it's state is allowed.
      */
     public function isAllowed(
-        PermissionableInterface $actor, 
+        PermissionableInterface $actor,
         string $permissionId
     ): bool {
-        
+        if ($actor->hasPermission($permissionId)) {
+            return $actor->getPermission($permissionId)->checkState(static::Allowed);
+        } else {
+            return false;
+        }
     }
-    
+
     /**
      * Checks if an actor is denied a given permission.
      * @param \LotGD\Core\PermissionableInterface $actor
@@ -71,9 +92,13 @@ class PermissionManager
      * @return bool True if the actor has the permission set and it's state is denied.
      */
     public function isDenied(
-        PermissionableInterface $actor, 
+        PermissionableInterface $actor,
         string $permissionId
     ): bool {
-        
+        if ($actor->hasPermission($permissionId)) {
+            return $actor->getPermission($permissionId)->checkState(static::Denied);
+        } else {
+            return false;
+        }
     }
 }

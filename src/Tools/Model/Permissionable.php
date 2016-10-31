@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Tools\Model;
 
 use LotGD\Core\Models\Permission;
+use LotGD\Core\Models\PermissionAssociationInterface;
 
 /**
  * Tools to work with a permission type field.
@@ -29,11 +30,17 @@ trait Permissionable
         return isset($this->_permissions[$permissionId]);
     }
 
-    public function getPermission(string $permissionId): Permission
+    public function getPermission(string $permissionId): PermissionAssociationInterface
     {
         $this->loadPermissions();
 
         return $this->_permissions[$permissionId];
     }
 
+    public function getRawPermission(string $permissionId): Permission
+    {
+        $this->loadPermissions();
+
+        return $this->_permissions[$permissionId]->getPermission();
+    }
 }

@@ -16,9 +16,16 @@ interface PermissionableInterface
     public function hasPermission(string $permissionId): bool;
 
     /**
-     * Returns the permission
+     * Returns the permission association.
+     * @param string $permissionId
+     * @return PermissionAssociationInterface
+     */
+    public function getPermission(string $permissionId): PermissionAssociationInterface;
+
+    /**
+     * Returns the raw permission entity.
      * @param string $permissionId
      * @return Permission
      */
-    public function getPermission(string $permissionId): Permission;
+    public function getRawPermission(string $permissionId): Permission;
 }

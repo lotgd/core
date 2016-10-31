@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Ressources\TestModels;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Models\PermissionableInterface;
 use LotGD\Core\Tools\Model\Permissionable;
+
 
 /**
  * @Entity
@@ -22,6 +24,11 @@ class User implements PermissionableInterface {
     private $name;
     /** @OneToMany(targetEntity="UserPermissionAssociation", mappedBy="owner", cascade={"persist", "remove"}) */
     private $permissions;
+
+    public function __construct()
+    {
+        $this->permissions = new ArrayCollection();
+    }
 
     public function getId(): int
     {
