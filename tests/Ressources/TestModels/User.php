@@ -46,4 +46,9 @@ class User implements PermissionableInterface {
     {
         $this->name = $name;
     }
+
+    public function getActorName(): string
+    {
+        return "User #".$this->id." (".$this->name.")";
+    }
 }

@@ -135,10 +135,16 @@ class PermissionManager
             if ($this->isAllowed($actor, $permissionId) == false) {
                 $permission = $actor->getPermission($permissionId);
                 $permission->setState(static::Allowed);
+
+                $name = $actor->getActorName();
+                $this->game->getLogger()->debug("Granting permission {$permissionId} to {$name} (from denied).");
             }
         } else {
             $permission = $this->findPermission($permissionId);
             $actor->addPermission($permission, static::Allowed);
+
+            $name = $actor->getActorName();
+            $this->game->getLogger()->debug("Granting permission {$permissionId} to {$name} (from nothing).");
         }
     }
 
@@ -155,10 +161,16 @@ class PermissionManager
             if ($this->isDenied($actor, $permissionId) == false) {
                 $permission = $actor->getPermission($permissionId);
                 $permission->setState(static::Denied);
+
+                $name = $actor->getActorName();
+                $this->game->getLogger()->debug("Denying permission {$permissionId} from {$name} (from allowed).");
             }
         } else {
             $permission = $this->findPermission($permissionId);
             $actor->addPermission($permission, static::Denied);
+
+            $name = $actor->getActorName();
+            $this->game->getLogger()->debug("Denying permission {$permissionId} from {$name} (from nothing).");
         }
     }
 
@@ -174,6 +186,9 @@ class PermissionManager
         if ($actor->hasPermission($permissionId)) {
             $permissionAssoc = $actor->getPermission($permissionId);
             $actor->removePermission($permissionId);
+
+            $name = $actor->getActorName();
+            $this->game->getLogger()->debug("Removing permission {$permissionId} from {$name}).");
         }
     }
 }

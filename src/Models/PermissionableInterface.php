@@ -9,6 +9,12 @@ namespace LotGD\Core\Models;
 interface PermissionableInterface
 {
     /**
+     * Returns a name to identify the actor.
+     * @return string
+     */
+    public function getActorName(): string;
+
+    /**
      * Returns true if objects has a entry related to a given permission.
      * @param string $permissionId
      * @return bool
