@@ -28,4 +28,16 @@ interface PermissionableInterface
      * @return Permission
      */
     public function getRawPermission(string $permissionId): Permission;
+
+    /**
+     * Adds a permission with a set state.
+     * @param \LotGD\Core\Models\Permission $permission
+     */
+    public function addPermission(Permission $permission, int $state);
+
+    /**
+     * Removes a permission with a given id.
+     * @param string $permissionId
+     */
+    public function removePermission(string $permissionId);
 }

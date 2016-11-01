@@ -5,12 +5,12 @@ testUsers:
         name: "Test User 1"
 testUserAssociations:
     -
-        owner_id: 1
-        permission_id: "test/permission_one"
+        owner: 1
+        permission: "test/permission_one"
         permissionState: 1
     -
-        owner_id: 1
-        permission_id: "test/permission_two"
+        owner: 1
+        permission: "test/permission_two"
         permissionState: -1
 
 permissions:

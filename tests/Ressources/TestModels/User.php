@@ -22,8 +22,10 @@ class User implements PermissionableInterface {
     private $id;
     /** @Column(type="string", length=50); */
     private $name;
-    /** @OneToMany(targetEntity="UserPermissionAssociation", mappedBy="owner", cascade={"persist", "remove"}) */
+    /** @OneToMany(targetEntity="UserPermissionAssociation", mappedBy="owner", cascade={"persist", "remove"}, orphanRemoval=true) */
     private $permissions;
+
+    private $permissionAssociationEntity = UserPermissionAssociation::class;
 
     public function __construct()
     {

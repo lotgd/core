@@ -18,6 +18,7 @@ class UserPermissionAssociation implements PermissionAssociationInterface {
 
     /**
      * @Id @ManyToOne(targetEntity="User", inversedBy="permissions")
+     * @JoinColumn(name="owner", referencedColumnName="id")
      */
     private $owner;
 }

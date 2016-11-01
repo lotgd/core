@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use LotGD\Core\Exceptions\PermissionIdNotFoundException;
 use LotGD\Core\Models\PermissionableInterface;
+use LotGD\Core\Models\Permission;
 
 /**
  * Permissions can be managed with the PermissionManager.
@@ -99,6 +101,79 @@ class PermissionManager
             return $actor->getPermission($permissionId)->checkState(static::Denied);
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Retrieves a permission entity from the database by a permission id.
+     * @param string $permissionId
+     * @return Permission
+     * @throws PermissionIdNotFoundException
+     */
+    private function findPermission(string $permissionId): Permission
+    {
+        $em = $this->game->getEntityManager();
+        $result = $em->getRepository(Permission::class)->find($permissionId);
+
+        if ($result) {
+            return $result;
+        } else {
+            throw new PermissionIdNotFoundException("Permission {$permissionId} was not found.");
+        }
+    }
+
+    /**
+     * Allows an actor a permission given by the permission id.
+     * @param PermissionableInterface $actor
+     * @param string $permissionId
+     */
+    public function allow(
+        PermissionableInterface $actor,
+        string $permissionId
+    ) {
+        if ($actor->hasPermission($permissionId)) {
+            if ($this->isAllowed($actor, $permissionId) == false) {
+                $permission = $actor->getPermission($permissionId);
+                $permission->setState(static::Allowed);
+            }
+        } else {
+            $permission = $this->findPermission($permissionId);
+            $actor->addPermission($permission, static::Allowed);
+        }
+    }
+
+    /**
+     * Denies an actor a permission given by the permission id.
+     * @param PermissionableInterface $actor
+     * @param string $permissionId
+     */
+    public function deny(
+        PermissionableInterface $actor,
+        string $permissionId
+    ) {
+        if ($actor->hasPermission($permissionId)) {
+            if ($this->isDenied($actor, $permissionId) == false) {
+                $permission = $actor->getPermission($permissionId);
+                $permission->setState(static::Denied);
+            }
+        } else {
+            $permission = $this->findPermission($permissionId);
+            $actor->addPermission($permission, static::Denied);
+        }
+    }
+
+    /**
+     * Removes a permission from an actor.
+     * @param PermissionableInterface $actor
+     * @param string $permissionId
+     */
+    public function remove(
+        PermissionableInterface $actor,
+        string $permissionId
+    ) {
+        if ($actor->hasPermission($permissionId)) {
+            $permissionAssoc = $actor->getPermission($permissionId);
+            $actor->removePermission($permissionId);
         }
     }
 }
