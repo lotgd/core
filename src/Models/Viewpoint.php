@@ -11,12 +11,12 @@ use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\SceneBasics;
 
 /**
- * A CharacterViewpoint is the current Scene a character is experiencing with
+ * A Viewpoint is the current Scene a character is experiencing with
  * all changes from modules included.
  * @Entity
- * @Table(name="character_viewpoints")
+ * @Table(name="viewpoints")
  */
-class CharacterViewpoint implements CreateableInterface
+class Viewpoint implements CreateableInterface
 {
     use Creator;
     use SceneBasics;
@@ -56,7 +56,7 @@ class CharacterViewpoint implements CreateableInterface
     }
 
     /**
-     * Copies the static data from a scene to this CharacterViewpoint entity
+     * Copies the static data from a scene to this Viewpoint entity
      * @param \LotGD\Core\Models\Scene $scene
      */
     public function changeFromScene(Scene $scene)

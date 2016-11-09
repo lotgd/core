@@ -8,7 +8,7 @@ use Monolog\Logger;
 
 use LotGD\Core\Models\ {
     Character,
-    CharacterViewpoint,
+    Viewpoint,
     Scene
 };
 use LotGD\Core\Exceptions\ {
@@ -181,9 +181,9 @@ class Game
 
     /**
      * Return the viewpoint for the current user.
-     * @return CharacterViewpoint
+     * @return Viewpoint
      */
-    public function getViewpoint(): CharacterViewpoint
+    public function getViewpoint(): Viewpoint
     {
         $v = $this->getCharacter()->getViewpoint();
 
@@ -201,7 +201,7 @@ class Game
                 throw new InvalidConfigurationException("No subscriber to h/lotgd/core/default-scene returned a scene.");
             }
 
-            $v = new CharacterViewpoint();
+            $v = new Viewpoint();
             $v->setOwner($this->getCharacter());
             $this->getCharacter()->setViewpoint($v);
 

@@ -20,7 +20,7 @@ use LotGD\Core\Game;
 use LotGD\Core\TimeKeeper;
 use LotGD\Core\ModuleManager;
 use LotGD\Core\Models\Character;
-use LotGD\Core\Models\CharacterViewpoint;
+use LotGD\Core\Models\Viewpoint;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Exceptions\ {
     ActionNotFoundException,

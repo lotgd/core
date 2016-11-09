@@ -7,7 +7,7 @@ use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
 use LotGD\Core\Attachment;
 use LotGD\Core\Models\Character;
-use LotGD\Core\Models\CharacterViewpoint;
+use LotGD\Core\Models\Viewpoint;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Tests\CoreModelTestCase;
 
@@ -28,12 +28,12 @@ class SampleAttachment extends Attachment
 }
 
 /**
- * Tests the management of CharacterViewpoints
+ * Tests the management of Viewpoints
  */
-class CharacterViewpointTest extends CoreModelTestCase
+class ViewpointTest extends CoreModelTestCase
 {
     /** @var string default data set */
-    protected $dataset = "characterViewpoints";
+    protected $dataset = "viewpoints";
 
     public function testGetters()
     {
@@ -44,7 +44,7 @@ class CharacterViewpointTest extends CoreModelTestCase
         $this->assertSame(2, $testCharacter->getId());
         $characterScene = $testCharacter->getViewpoint();
 
-        $this->assertInstanceOf(CharacterViewpoint::class, $characterScene);
+        $this->assertInstanceOf(Viewpoint::class, $characterScene);
         $this->assertSame("The Village", $characterScene->getTitle());
         $this->assertSame("This is the village.", $characterScene->getDescription());
 
@@ -95,13 +95,13 @@ class CharacterViewpointTest extends CoreModelTestCase
             $ag2
         ];
 
-        $input = $em->getRepository(CharacterViewpoint::class)->find(2);
+        $input = $em->getRepository(Viewpoint::class)->find(2);
         $input->setActionGroups($actionGroups);
         $input->save($em);
 
         $em->clear();
 
-        $output = $em->getRepository(CharacterViewpoint::class)->find(2);
+        $output = $em->getRepository(Viewpoint::class)->find(2);
         $this->assertEquals($actionGroups, $output->getActionGroups());
 
         $this->assertEquals($ag2, $input->findActionGroupById('id2'));
@@ -124,13 +124,13 @@ class CharacterViewpointTest extends CoreModelTestCase
 
         $attachments = [$a1, $a2];
 
-        $input = $em->getRepository(CharacterViewpoint::class)->find(2);
+        $input = $em->getRepository(Viewpoint::class)->find(2);
         $input->setAttachments($attachments);
         $input->save($em);
 
         $em->clear();
 
-        $output = $em->getRepository(CharacterViewpoint::class)->find(2);
+        $output = $em->getRepository(Viewpoint::class)->find(2);
         $this->assertEquals($attachments, $output->getAttachments());
         $this->assertEquals('baz', $output->getAttachments()[0]->getFoo());
         $this->assertEquals('fiz', $output->getAttachments()[1]->getFoo());

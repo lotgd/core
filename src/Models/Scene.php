@@ -16,7 +16,7 @@ use LotGD\Core\Tools\Model\SceneBasics;
 /**
  * A scene is a location within the game, such as the Village or the Tavern. Designed
  * to be a kind of "template" for generating the specific location information for
- * a specific user, which then becomes a CharacterViewpoint.
+ * a specific user, which then becomes a Viewpoint.
  * @Entity
  * @Table(name="scenes")
  */
