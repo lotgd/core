@@ -47,7 +47,7 @@ class Character implements CharacterInterface, CreateableInterface
     private $level = 1;
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist", "remove"}) */
     private $properties;
-    /** @OneToOne(targetEntity="CharacterViewpoint", mappedBy="owner", cascade={"persist", "remove"}) */
+    /** @OneToOne(targetEntity="Viewpoint", mappedBy="owner", cascade={"persist", "remove"}) */
     private $viewpoint;
     /**
      * @ManyToMany(targetEntity="MessageThread", inversedBy="participants", cascade={"persist"})
@@ -248,7 +248,7 @@ class Character implements CharacterInterface, CreateableInterface
 
     /**
      * Returns the current character viewpoint or null if one is not set.
-     * @return \LotGD\Core\Models\CharacterViewpoint|null
+     * @return \LotGD\Core\Models\Viewpoint|null
      */
     public function getViewpoint()
     {
@@ -258,7 +258,7 @@ class Character implements CharacterInterface, CreateableInterface
     /**
      * Sets the current character viewpoint.
      */
-    public function setViewpoint(CharacterViewpoint $v)
+    public function setViewpoint(Viewpoint $v)
     {
         $this->viewpoint = $v;
     }

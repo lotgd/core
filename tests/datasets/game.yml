@@ -11,7 +11,7 @@ characters:
         id: 3
         name: "Char without a Scene"
         displayName: "C"
-character_viewpoints:
+viewpoints:
     -
         owner_id: 2
         title: "The Village"

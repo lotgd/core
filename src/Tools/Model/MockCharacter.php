@@ -9,7 +9,7 @@ use LotGD\Core\{
     Game
 };
 use LotGD\Core\Exceptions\IsNullException;
-use LotGD\Core\Models\CharacterViewpoint;
+use LotGD\Core\Models\Viewpoint;
 
 /**
  * Provides basic implementation to mock CharacterInterface.
@@ -81,7 +81,7 @@ trait MockCharacter
         throw new IsNullException();
     }
 
-    public function getViewpoint(): CharacterViewpoint
+    public function getViewpoint(): Viewpoint
     {
         throw new IsNullException();
     }
