@@ -135,4 +135,54 @@ class ViewpointTest extends CoreModelTestCase
         $this->assertEquals('baz', $output->getAttachments()[0]->getFoo());
         $this->assertEquals('fiz', $output->getAttachments()[1]->getFoo());
     }
+
+    public function testRemoveActionsWithSceneId()
+    {
+        $em = $this->getEntityManager();
+
+        $a1 = new Action(1);
+        $a2 = new Action(2);
+        $a3 = new Action(3);
+
+        $ag1 = new ActionGroup('id1', 'title1', 42);
+        $ag1->setActions([
+            $a1,
+            $a2,
+            $a3
+        ]);
+        $ag2 = new ActionGroup('id2', 'title2', 101);
+        $ag2->setActions([
+            new Action(4)
+        ]);
+
+        $actionGroups = [
+            $ag1,
+            $ag2
+        ];
+
+        $input = $em->getRepository(Viewpoint::class)->find(2);
+        $input->setActionGroups($actionGroups);
+        $input->save($em);
+
+        $em->clear();
+
+        $output = $em->getRepository(Viewpoint::class)->find(2);
+
+        // Not finding the scene ID should change nothing.
+        $output->removeActionsWithSceneId(1000);
+        $this->assertEquals($actionGroups, $output->getActionGroups());
+
+        $ag1_output = new ActionGroup('id1', 'title1', 42);
+        $ag1_output->setActions([
+            $a1,
+            $a3
+        ]);
+
+        $actionGroupsWithout2 = [
+            $ag1_output,
+            $ag2
+        ];
+        $output->removeActionsWithSceneId(2);
+        $this->assertEquals($actionGroupsWithout2, $output->getActionGroups());
+    }
 }

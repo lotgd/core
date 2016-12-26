@@ -214,4 +214,22 @@ class Viewpoint implements CreateableInterface
         }
         return null;
     }
+
+    /**
+     * Removes any actions that correspond to a given scene ID, if present.
+     * @param int $id
+     */
+    public function removeActionsWithSceneId(int $id)
+    {
+        foreach ($this->getActionGroups() as $group) {
+            $actions = $group->getActions();
+            foreach ($actions as $key => $a) {
+                if ($a->getDestinationSceneId() == $id) {
+                    unset($actions[$key]);
+                }
+            }
+            $actions = array_values($actions);
+            $group->setActions($actions);
+        }
+    }
 }
