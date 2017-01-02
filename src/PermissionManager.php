@@ -4,16 +4,18 @@ declare(strict_types=1);
 namespace LotGD\Core;
 
 use LotGD\Core\Exceptions\PermissionIdNotFoundException;
+use LotGD\Core\Models\Actor;
 use LotGD\Core\Models\PermissionableInterface;
 use LotGD\Core\Models\Permission;
 
 /**
- * Permissions can be managed with the PermissionManager.
+ * The PermissionManager manages (checks and manipulates) of actors.
  *
- * The PermissionManager class provides methods to work with permissions. It can
- * be used to create or delete permissions, to remove, allow or deny permissions
- * to actors and to check whether an actor has a certain permission or if it is
- * explicitely denied from him.
+ * The PermissionManager class provides methods to work with permissions and is
+ * the only way to check and manipulate permissions. It can be used to create or
+ * delete permissions, to remove, allow or deny permissions to actors and to
+ * check whether an actor has a certain permission or if it is explicitely
+ * denied from him.
  *
  * The wording used in this class is:
  *  - allowed, the actor has a certain permission in the allowed state.
@@ -60,7 +62,7 @@ class PermissionManager
      * @return bool True if the permission has been set, be it allowed or denied.
      */
     public function hasPermissionSet(
-        PermissionableInterface $actor,
+        Actor $actor,
         string $permissionId
     ): bool {
         if ($actor->hasPermission($permissionId)) {
@@ -77,7 +79,7 @@ class PermissionManager
      * @return bool True if the actor has the permission set and it's state is allowed.
      */
     public function isAllowed(
-        PermissionableInterface $actor,
+        Actor $actor,
         string $permissionId
     ): bool {
         if ($actor->hasPermission($permissionId)) {
@@ -94,7 +96,7 @@ class PermissionManager
      * @return bool True if the actor has the permission set and it's state is denied.
      */
     public function isDenied(
-        PermissionableInterface $actor,
+        Actor $actor,
         string $permissionId
     ): bool {
         if ($actor->hasPermission($permissionId)) {
@@ -128,7 +130,7 @@ class PermissionManager
      * @param string $permissionId
      */
     public function allow(
-        PermissionableInterface $actor,
+        Actor $actor,
         string $permissionId
     ) {
         if ($actor->hasPermission($permissionId)) {
@@ -154,7 +156,7 @@ class PermissionManager
      * @param string $permissionId
      */
     public function deny(
-        PermissionableInterface $actor,
+        Actor $actor,
         string $permissionId
     ) {
         if ($actor->hasPermission($permissionId)) {
@@ -180,7 +182,7 @@ class PermissionManager
      * @param string $permissionId
      */
     public function remove(
-        PermissionableInterface $actor,
+        Actor $actor,
         string $permissionId
     ) {
         if ($actor->hasPermission($permissionId)) {

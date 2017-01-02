@@ -1,22 +1,26 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core\Tools\Model;
+namespace LotGD\Core\Models;
 
 use LotGD\Core\Exceptions\PermissionAlreadyExistsException;
 use LotGD\Core\Exceptions\PermissionDoesNotExistException;
 use LotGD\Core\Models\Permission;
 use LotGD\Core\Models\PermissionAssociationInterface;
 
-
 /**
- * Tools to work with a permission type field.
+ * This abtract class provides functionality for user entities that crates might
+ * want to implement, such as permissions.
  */
-trait Permissionable
+abstract class Actor
 {
     /** @var array Associations between permission-id and PermissionAssociation entity. */
     private $_permissions = [];
 
+    /**
+     * Loads all associated permissions for this actor.
+     * @throws PermissionAssociationEntityMissingException
+     */
     protected function loadPermissions()
     {
         if (empty($this->permissionAssociationEntity)) {
@@ -32,6 +36,12 @@ trait Permissionable
         }
     }
 
+    /**
+     * Checks if the actor is associated with a given permission. For permission
+     * checking, use only the PermissionManager class.
+     * @param string $permissionId
+     * @return bool
+     */
     public function hasPermission(string $permissionId): bool
     {
         $this->loadPermissions();
@@ -39,6 +49,12 @@ trait Permissionable
         return isset($this->_permissions[$permissionId]);
     }
 
+    /**
+     * Returns the associated permission given by an id. For permission
+     * checking, use only the PermissionManager class.
+     * @param string $permissionId
+     * @return PermissionAssociationInterface
+     */
     public function getPermission(string $permissionId): PermissionAssociationInterface
     {
         $this->loadPermissions();
@@ -46,6 +62,12 @@ trait Permissionable
         return $this->_permissions[$permissionId];
     }
 
+    /**
+     * Returns the raw permission given by the id. For permission
+     * checking, use only the PermissionManager class.
+     * @param string $permissionId
+     * @return Permission
+     */
     public function getRawPermission(string $permissionId): Permission
     {
         $this->loadPermissions();
@@ -53,6 +75,13 @@ trait Permissionable
         return $this->_permissions[$permissionId]->getPermission();
     }
 
+    /**
+     * Associates a permission with this actor in a given state.  For permission
+     * manipulation, use only the PermissionManager class.
+     * @param Permission $permission
+     * @param int $state
+     * @throws PermissionAlreadyExistsException
+     */
     public function addPermission(Permission $permission, int $state)
     {
         $this->loadPermissions();
@@ -67,6 +96,12 @@ trait Permissionable
         }
     }
 
+    /**
+     * Removes an associated permission from this actor by a given id. For permission
+     * manipulation, use only the PermissionManager class.
+     * @param string $permissionId
+     * @throws PermissionDoesNotExistException
+     */
     public function removePermission(string $permissionId)
     {
         $this->loadPermissions();

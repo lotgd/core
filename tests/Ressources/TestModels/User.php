@@ -7,25 +7,27 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
-use LotGD\Core\Models\PermissionableInterface;
-use LotGD\Core\Tools\Model\Permissionable;
+use Lotgd\Core\Models\Actor;
+#use LotGD\Core\Models\PermissionableInterface;
+#use LotGD\Core\Tools\Model\Permissionable;
 
 
 /**
  * @Entity
  * @Table("TestUsers")
  */
-class User implements PermissionableInterface {
-    use Permissionable;
+class User extends Actor #implements PermissionableInterface {
+{
+    #use Permissionable;
 
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
     /** @Column(type="string", length=50); */
     private $name;
     /** @OneToMany(targetEntity="UserPermissionAssociation", mappedBy="owner", cascade={"persist", "remove"}, orphanRemoval=true) */
-    private $permissions;
+    protected $permissions;
 
-    private $permissionAssociationEntity = UserPermissionAssociation::class;
+    protected $permissionAssociationEntity = UserPermissionAssociation::class;
 
     public function __construct()
     {

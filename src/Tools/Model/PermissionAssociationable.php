@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tools\Model;
 
+use LotGD\Core\Models\Actor;
 use LotGD\Core\Models\Permission;
 use LotGD\Core\Models\PermissionableInterface;
 
@@ -19,7 +20,7 @@ trait PermissionAssociationable
     /** @Column(type="integer") */
     protected $permissionState;
 
-    public function __construct(PermissionableInterface $owner, Permission $permission, int $state) {
+    public function __construct(Actor $owner, Permission $permission, int $state) {
         $this->owner = $owner;
         $this->permission = $permission;
         $this->permissionState = $state;
