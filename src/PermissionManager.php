@@ -65,7 +65,7 @@ class PermissionManager
         Actor $actor,
         string $permissionId
     ): bool {
-        if ($actor->hasPermission($permissionId)) {
+        if ($actor->hasPermissionSet($permissionId)) {
             return true;
         } else {
             return false;
@@ -82,7 +82,7 @@ class PermissionManager
         Actor $actor,
         string $permissionId
     ): bool {
-        if ($actor->hasPermission($permissionId)) {
+        if ($actor->hasPermissionSet($permissionId)) {
             return $actor->getPermission($permissionId)->checkState(static::Allowed);
         } else {
             return false;
@@ -99,7 +99,7 @@ class PermissionManager
         Actor $actor,
         string $permissionId
     ): bool {
-        if ($actor->hasPermission($permissionId)) {
+        if ($actor->hasPermissionSet($permissionId)) {
             return $actor->getPermission($permissionId)->checkState(static::Denied);
         } else {
             return false;
@@ -133,7 +133,7 @@ class PermissionManager
         Actor $actor,
         string $permissionId
     ) {
-        if ($actor->hasPermission($permissionId)) {
+        if ($actor->hasPermissionSet($permissionId)) {
             if ($this->isAllowed($actor, $permissionId) == false) {
                 $permission = $actor->getPermission($permissionId);
                 $permission->setState(static::Allowed);
@@ -159,7 +159,7 @@ class PermissionManager
         Actor $actor,
         string $permissionId
     ) {
-        if ($actor->hasPermission($permissionId)) {
+        if ($actor->hasPermissionSet($permissionId)) {
             if ($this->isDenied($actor, $permissionId) == false) {
                 $permission = $actor->getPermission($permissionId);
                 $permission->setState(static::Denied);
@@ -185,7 +185,7 @@ class PermissionManager
         Actor $actor,
         string $permissionId
     ) {
-        if ($actor->hasPermission($permissionId)) {
+        if ($actor->hasPermissionSet($permissionId)) {
             $permissionAssoc = $actor->getPermission($permissionId);
             $actor->removePermission($permissionId);
 

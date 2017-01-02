@@ -42,7 +42,7 @@ abstract class Actor
      * @param string $permissionId
      * @return bool
      */
-    public function hasPermission(string $permissionId): bool
+    public function hasPermissionSet(string $permissionId): bool
     {
         $this->loadPermissions();
 
@@ -86,7 +86,7 @@ abstract class Actor
     {
         $this->loadPermissions();
 
-        if ($this->hasPermission($permission->getId())) {
+        if ($this->hasPermissionSet($permission->getId())) {
             $permissionId = $permission->getId();
             throw new PermissionAlreadyExistsException("The permission with the id {$permissionId} has already been set on this actor.");
         } else {
@@ -106,7 +106,7 @@ abstract class Actor
     {
         $this->loadPermissions();
 
-        if ($this->hasPermission($permissionId)) {
+        if ($this->hasPermissionSet($permissionId)) {
             $permissionAssoc = $this->getPermission($permissionId);
             $this->permissions->removeElement($permissionAssoc);
             unset($this->_permissions[$permissionId]);

@@ -41,8 +41,8 @@ class PermissionManagerTest extends CoreModelTestCase
         $em = $this->getEntityManager();
         $user = $em->getRepository(User::class)->find(1);
 
-        $this->assertTrue($user->hasPermission("test/permission_one"));
-        $this->assertTrue($user->hasPermission("test/permission_two"));
+        $this->assertTrue($user->hasPermissionSet("test/permission_one"));
+        $this->assertTrue($user->hasPermissionSet("test/permission_two"));
     }
 
     public function testUserReturnsPermission()

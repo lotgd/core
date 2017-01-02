@@ -47,7 +47,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
                 $libraryConfigurationManager = new LibraryConfigurationManager($composerManager, getcwd());
                 $directories = $libraryConfigurationManager->getEntityDirectories();
                 $directories[] = implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'src', 'Models']);
-                $directories[] = implode(DIRECTORY_SEPARATOR, [__DIR__, 'Ressources', 'TestModels']);
+                $directories[] = implode(DIRECTORY_SEPARATOR, [__DIR__, 'Resources', 'TestModels']);
 
                 // Read db annotations from model files
                 $configuration = Setup::createAnnotationMetadataConfiguration($directories, true);
