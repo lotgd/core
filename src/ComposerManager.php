@@ -6,7 +6,8 @@ namespace LotGD\Core;
 use Composer\{
     Composer,
     Factory,
-    IO\NullIO
+    IO\NullIO,
+    Package\CompletePackageInterface
 };
 use Monolog\Logger;
 
@@ -41,13 +42,13 @@ class ComposerManager
     {
         if ($this->composer === null) {
             // Verify location of composer.json.
-            $path = $this->cwd . DIRECTORY_SEPARATOR . "composer.json";
-            if (!file_exists($path)) {
-                throw new InvalidConfigurationException("composer.json cannot be found at {$path}.");
+            $composerConfigPath = $this->cwd . DIRECTORY_SEPARATOR . "composer.json";
+            if (!file_exists($composerConfigPath)) {
+                throw new InvalidConfigurationException("composer.json cannot be found at {$composerConfigPath}.");
             }
 
-            $io = new NullIO();
-            $this->composer = Factory::create($io, $path);
+            $factory = new Factory();
+            $this->composer = $factory->createComposer(new NullIO(), $composerConfigPath, false, $this->cwd);
         }
 
         return $this->composer;
@@ -58,7 +59,7 @@ class ComposerManager
      * @return PackageInterface Package corresponding to this library.
      * @throws LibraryDoesNotExistException
      */
-    public function getPackageForLibrary(string $library): PackageInterface
+    public function getPackageForLibrary(string $library): CompletePackageInterface
     {
         // TODO: should probably do something better than O(n) here.
         $packages = $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages();

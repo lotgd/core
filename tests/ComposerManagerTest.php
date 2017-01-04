@@ -40,4 +40,50 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
         $namespace = 'LotGD\\NotFound';
         $this->assertNull($manager->translateNamespaceToPath($namespace));
     }
+    
+    public function testListPackageWithRootCwd()
+    {
+        $manager = new ComposerManager(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
+        
+        $packageCount = count($manager->getPackages());
+        
+        $this->assertGreaterThan(1, $packageCount);
+    }
+    
+    public function testListPackageWithDifferentThanRootCwd()
+    {
+        $oldcwd = getcwd();
+        chdir($oldcwd . DIRECTORY_SEPARATOR . "tests");
+        
+        $manager = new ComposerManager(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
+        
+        $packageCount = count($manager->getPackages());
+        
+        $this->assertGreaterThan(1, $packageCount);
+        
+        chdir($oldcwd);
+    }
+    
+    public function testGetPackageByLibraryNameWithRootCwd()
+    {
+        $manager = new ComposerManager(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
+        
+        $package = $manager->getPackageForLibrary("composer/composer");
+        
+        $this->assertSame("composer/composer", $package->getName());
+    }
+    
+    public function testGetPackageByLibraryNameWithDifferentThanRootCwd()
+    {
+        $oldcwd = getcwd();
+        chdir($oldcwd . DIRECTORY_SEPARATOR . "tests");
+        
+        $manager = new ComposerManager(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
+        
+        $package = $manager->getPackageForLibrary("composer/composer");
+        
+        $this->assertSame("composer/composer", $package->getName());
+        
+        chdir($oldcwd);
+    }
 }

@@ -100,7 +100,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         list($dsn, $user, $password) = $configuration->getDatabaseConnectionDetails("/home/web/sqlite");
         
         $this->assertNotSame($rawDSN, $dsn);
-        $this->assertSame("sqlite:/home/web/sqlite/db.db3", $dsn);
+        $this->assertSame("sqlite:/home/web/sqlite" . DIRECTORY_SEPARATOR . "db.db3", $dsn);
     }
     
     public function testIfInvalidConfigurationExceptionIsThrownIfDatabaseDSNIsMissing()
