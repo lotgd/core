@@ -1,0 +1,1 @@
+CMD /C  phpunit --stop-on-failure

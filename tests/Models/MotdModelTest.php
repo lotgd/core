@@ -52,7 +52,6 @@ class MotDModelTest extends CoreModelTestCase
         $time4->setTimezone(new \DateTimeZone("America/Los_Angeles"));
         
         $this->assertSame($time1->getTimestamp(), $time2->getTimestamp());
-        $this->assertEquals($time1, $time2);
         $this->assertSame($time2, $time3);
         $this->assertEquals($time2->getTimezone(), $time3->getTimezone());
         $this->assertNotEquals($time1->getTimezone(), $time2->getTimezone());
@@ -100,7 +99,7 @@ class MotDModelTest extends CoreModelTestCase
         $this->assertSame($motdCreationArguments["author"]->getName(), $checkMotd->getAuthor()->getName());
         $this->assertSame($motdCreationArguments["title"], $checkMotd->getTitle());
         $this->assertSame($motdCreationArguments["body"], $checkMotd->getBody());
-        $this->assertEquals($motd->getCreationTime(), $checkMotd->getCreationTime());
+        $this->assertEquals($motd->getCreationTime()->format("Ymd-His"), $checkMotd->getCreationTime()->format("Ymd-His"));
         
         if ($motdCreationArguments["systemMessage"] === true) {
             $this->assertNotSame($motdCreationArguments["author"]->getName(), $checkMotd->getApparantAuthor()->getName());
