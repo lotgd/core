@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Ressources\TestModels;
 
+use Generator;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use Lotgd\Core\Models\Actor;
-#use LotGD\Core\Models\PermissionableInterface;
-#use LotGD\Core\Tools\Model\Permissionable;
 
 
 /**
@@ -18,16 +18,12 @@ use Lotgd\Core\Models\Actor;
  */
 class User extends Actor #implements PermissionableInterface {
 {
-    #use Permissionable;
-
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
     /** @Column(type="string", length=50); */
     private $name;
     /** @OneToMany(targetEntity="UserPermissionAssociation", mappedBy="owner", cascade={"persist", "remove"}, orphanRemoval=true) */
     protected $permissions;
-
-    protected $permissionAssociationEntity = UserPermissionAssociation::class;
 
     public function __construct()
     {
@@ -52,5 +48,17 @@ class User extends Actor #implements PermissionableInterface {
     public function getActorName(): string
     {
         return "User #".$this->id." (".$this->name.")";
+    }
+
+    protected function getPermissionAssociationClass(): string
+    {
+        return UserPermissionAssociation::class;
+    }
+
+    protected function getPermissionAssociations(): Generator
+    {
+        foreach ($this->permissions as $permission) {
+            yield $permission;
+        }
     }
 }

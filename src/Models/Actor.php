@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Generator;
+
 use LotGD\Core\Exceptions\PermissionAlreadyExistsException;
 use LotGD\Core\Exceptions\PermissionDoesNotExistException;
 use LotGD\Core\Models\Permission;
@@ -15,7 +17,20 @@ use LotGD\Core\Models\PermissionAssociationInterface;
 abstract class Actor
 {
     /** @var array Associations between permission-id and PermissionAssociation entity. */
-    private $_permissions = [];
+    private $permissionIdToAssociation = [];
+
+    /**
+     * Needs to return a generator which iterates through all permission associations.
+     * @return Generator List of PermissionAssociations.
+     */
+    abstract protected function getPermissionAssociations(): Generator;
+
+    /**
+     * Returns the class of the permission associations used for the entity
+     * implementing this class.
+     * @return string fully qualified class name of the permission association entity.
+     */
+    abstract protected function getPermissionAssociationClass(): string;
 
     /**
      * Loads all associated permissions for this actor.
@@ -23,15 +38,15 @@ abstract class Actor
      */
     protected function loadPermissions()
     {
-        if (empty($this->permissionAssociationEntity)) {
+        if (class_exists($this->getPermissionAssociationClass()) === false) {
             throw new PermissionAssociationEntityMissingException(
-                "The permissionable entity does not have the property permissionAssociationEntity set."
+                "The method getPermissionAssociationClass does not return a valid class name."
             );
         }
 
-        if (empty($this->_permissions)) {
-            foreach ($this->permissions as $permission) {
-                $this->_permissions[$permission->getId()] = $permission;
+        if (empty($this->permissionIdToAssociation)) {
+            foreach ($this->getPermissionAssociations() as $permission) {
+                $this->permissionIdToAssociation[$permission->getId()] = $permission;
             }
         }
     }
@@ -46,7 +61,7 @@ abstract class Actor
     {
         $this->loadPermissions();
 
-        return isset($this->_permissions[$permissionId]);
+        return isset($this->permissionIdToAssociation[$permissionId]);
     }
 
     /**
@@ -59,7 +74,7 @@ abstract class Actor
     {
         $this->loadPermissions();
 
-        return $this->_permissions[$permissionId];
+        return $this->permissionIdToAssociation[$permissionId];
     }
 
     /**
@@ -72,7 +87,7 @@ abstract class Actor
     {
         $this->loadPermissions();
 
-        return $this->_permissions[$permissionId]->getPermission();
+        return $this->permissionIdToAssociation[$permissionId]->getPermission();
     }
 
     /**
@@ -90,9 +105,11 @@ abstract class Actor
             $permissionId = $permission->getId();
             throw new PermissionAlreadyExistsException("The permission with the id {$permissionId} has already been set on this actor.");
         } else {
-            $permissionAssoc = new $this->permissionAssociationEntity($this, $permission, $state);
+            $associationEntity = $this->getPermissionAssociationClass();
+
+            $permissionAssoc = new $associationEntity($this, $permission, $state);
             $this->permissions->add($permissionAssoc);
-            $this->_permissions[$permissionAssoc->getId()] = $permissionAssoc;
+            $this->permissionIdToAssociation[$permissionAssoc->getId()] = $permissionAssoc;
         }
     }
 
@@ -109,7 +126,7 @@ abstract class Actor
         if ($this->hasPermissionSet($permissionId)) {
             $permissionAssoc = $this->getPermission($permissionId);
             $this->permissions->removeElement($permissionAssoc);
-            unset($this->_permissions[$permissionId]);
+            unset($this->permissionIdToAssociation[$permissionId]);
         } else {
             throw new PermissionDoesNotExistException("The permission with the id {$permissionId} has not been set on this actor.");
         }

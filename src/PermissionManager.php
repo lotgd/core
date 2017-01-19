@@ -9,13 +9,13 @@ use LotGD\Core\Models\PermissionableInterface;
 use LotGD\Core\Models\Permission;
 
 /**
- * The PermissionManager manages (checks and manipulates) of actors.
+ * The PermissionManager manages (checks and manipulates) permissions of actors.
  *
  * The PermissionManager class provides methods to work with permissions and is
  * the only way to check and manipulate permissions. It can be used to create or
  * delete permissions, to remove, allow or deny permissions to actors and to
- * check whether an actor has a certain permission or if it is explicitely
- * denied from him.
+ * check whether an actor has a certain permission or if it is explicitly
+ * denied to him.
  *
  * The wording used in this class is:
  *  - allowed, the actor has a certain permission in the allowed state.
