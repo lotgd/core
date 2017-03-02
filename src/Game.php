@@ -9,7 +9,8 @@ use Monolog\Logger;
 use LotGD\Core\Models\ {
     Character,
     Viewpoint,
-    Scene
+    Scene,
+    SceneConnection
 };
 use LotGD\Core\Exceptions\ {
     ActionNotFoundException,
@@ -36,6 +37,10 @@ class Game
 
     /**
      * Construct a game. You probably want to use Bootstrap to do this.
+     * @param Configuration $configuration
+     * @param Logger $logger
+     * @param EntityManagerInterface $entityManager
+     * @param string $cwd
      */
     public function __construct(
         Configuration $configuration,
@@ -136,9 +141,9 @@ class Game
 
     /**
      * Returns the logger instance to write logs.
-     * @return \Monolog\Logger
+     * @return Logger
      */
-    public function getLogger(): \Monolog\Logger
+    public function getLogger(): Logger
     {
         return $this->logger;
     }
@@ -161,6 +166,7 @@ class Game
     /**
      * Returns the currently configured user character.
      * @return Character
+     * @throws CharacterNotFoundException
      */
     public function getCharacter(): Character
     {
@@ -182,6 +188,7 @@ class Game
     /**
      * Return the viewpoint for the current user.
      * @return Viewpoint
+     * @throws InvalidConfigurationException
      */
     public function getViewpoint(): Viewpoint
     {
@@ -236,19 +243,53 @@ class Game
             // Generate the default set of actions: the default group with
             // all children.
             $this->getLogger()->addDebug("Building default action group...");
-            $defaultGroup = new ActionGroup(ActionGroup::DefaultGroup, '', 0);
-            $as = array_map(function ($c) {
+            $actionGroups = [
+                ActionGroup::DefaultGroup => new ActionGroup(ActionGroup::DefaultGroup, '', 0),
+            ];
+
+            $scene->getConnections()->map(function(SceneConnection $connection) use ($scene, $actionGroups) {
+                if ($connection->getOutgoingScene() === $scene) {
+                    // current scene is outgoing, use incoming.
+                    $connectedScene = $connection->getIncomingScene();
+                    $connectionGroupName = $connection->getOutgoingConnectionGroupName();
+                } else {
+                    // current scene is not outgoing, thus incoming, use outgoing.
+                    $connectedScene = $connection->getOutgoingScene();
+                    $connectionGroupName = $connection->getIncomingConnectionGroupName();
+                }
+
+                $this->getLogger()->addDebug("  Adding navigation action for child sceneId={$connectedScene->getId()}");
+                $action = new Action($connectedScene->getId());
+
+                if ($connectionGroupName === null) {
+                    $actionGroups[ActionGroup::DefaultGroup]->addAction($action);
+                } else {
+                    if (isset($actionGroups[$connectionGroupName])) {
+                        $actionGroups[$connectionGroupName]->addAction($action);
+                    } else {
+                        $connectionGroup = $scene->getConnectionGroup($connectionGroupName);
+                        $actionGroup = new ActionGroup($connectionGroupName->getName(), $connectionGroupName->getTitle(), 0);
+                        $actionGroup->addAction($action);
+
+                        $actionGroups[$connectionGroupName] = $actionGroup;
+                    }
+                }
+            });
+            /*$as = array_map(function ($c) {
                 $id = $c->getId();
                 $this->getLogger()->addDebug("  Adding navigation action for child sceneId={$id}");
                 return new Action($c->getId());
-            }, $scene->getChildren()->toArray());
-            $defaultGroup->setActions($as);
-            $count = count($as);
-            $this->getLogger()->addDebug("Total actions: {$count}");
+            }, $scene->getChildren()->toArray());*/
+            //$defaultGroup->setActions($as);
+            //$count = count($as);
+            $counts = implode(", ", array_map(function($k, $v) {
+                return $k .count($v);
+            }, array_keys($actionGroups), array_values($actionGroups)));
+            $this->getLogger()->addDebug("Total actions: {$counts}");
 
-            $hiddenGroup = new ActionGroup(ActionGroup::HiddenGroup, '', 100);
+            $actionGroups[ActionGroup::HiddenGroup] = new ActionGroup(ActionGroup::HiddenGroup, '', 100);
 
-            $viewpoint->setActionGroups([$defaultGroup, $hiddenGroup]);
+            $viewpoint->setActionGroups(array_values($actionGroups));
 
             // Let and installed listeners (ie modules) make modifications to the
             // new viewpoint, including the ability to redirect the user to
@@ -275,7 +316,9 @@ class Game
      * Take the specified navigation action for the currently configured
      * user. This action must be present in the current user's viewpoint.
      * @param string $actionId The identifier of the action to take.
-     * @param array $paramters
+     * @param array $parameters
+     * @throws ActionNotFoundException
+     * @throws SceneNotFoundException
      */
     public function takeAction(string $actionId, array $parameters = [])
     {

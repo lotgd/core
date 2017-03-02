@@ -7,8 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
-use Doctrine\ORM\Mapping\Column;
 
+use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\SceneBasics;
@@ -20,7 +20,7 @@ use LotGD\Core\Tools\Model\SceneBasics;
  * @Entity
  * @Table(name="scenes")
  */
-class Scene implements CreateableInterface
+class Scene implements CreateableInterface, SceneConnectable
 {
     use Creator;
     use Deletor;
@@ -30,18 +30,19 @@ class Scene implements CreateableInterface
     private $id;
 
     /**
-     * @ManyToMany(targetEntity="Scene", mappedBy="children", cascade={"persist"})
+     * @OneToMany(targetEntity="SceneConnectionGroup", mappedBy="scene", cascade={"persist", "remove"})
      */
-    private $parents = null;
+    private $connectionGroups = null;
 
     /**
-     * @ManyToMany(targetEntity="Scene", inversedBy="parents", cascade={"persist", "remove"})
-     * @JoinTable(name="paths",
-     *      joinColumns={@JoinColumn(name="scene_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@JoinColumn(name="child_scene_id", referencedColumnName="id")}
-     *      )
+     * @OneToMany(targetEntity="SceneConnection", mappedBy="outgoingScene", cascade={"persist"})
      */
-    private $children = [];
+    private $outgoingConnections = null;
+
+    /**
+     * @OneToMany(targetEntity="SceneConnection", mappedBy="incomingScene", cascade={"persist"})
+     */
+    private $incomingConnections = null;
 
     /**
      * @var array
@@ -53,13 +54,17 @@ class Scene implements CreateableInterface
         "template"
     ];
 
+    /* @var ?ArrayCollection */
+    private $connectedScenes = null;
+
     /**
      * Constructor for a scene.
      */
     public function __construct()
     {
-        $this->children = new ArrayCollection();
-        $this->parents = new ArrayCollection();
+        $this->connectionGroups = new ArrayCollection();
+        $this->outgoingConnections = new ArrayCollection();
+        $this->incomingConnections = new ArrayCollection();
     }
 
     /**
@@ -72,88 +77,215 @@ class Scene implements CreateableInterface
     }
 
     /**
-     * Set the parents to the given Collection.
-     * @param Collection $parents
-     */
-    public function setParents(Collection $parents)
-    {
-        // Super slow, but presumably these are short collections :)
-        // We should probably move to a set collection at some point.
-        $oldParents = $this->parents;
-        $additions = $parents->filter(function($element) use ($oldParents) {
-            return !$oldParents->contains($element);
-        });
-        $removals = $this->parents->filter(function($element) use ($parents) {
-            return !$parents->contains($element);
-        });
-
-        foreach ($additions as $a) {
-            $this->addParent($a);
-        }
-        foreach ($removals as $r) {
-            $this->removeParent($r);
-        }
-
-        $this->parents = $parents;
-    }
-
-    /**
-     * Adds a parent to this scene.
-     * @param \LotGD\Core\Models\Scene $parent
-     */
-    public function addParent(Scene $parent)
-    {
-        if (!$this->parents->contains($parent)) {
-            $this->parents->add($parent);
-            $parent->addChild($this);
-        }
-    }
-
-    /**
-     * Removes a parent from this scene.
-     * @param Scene $parent
-     */
-    public function removeParent(Scene $parent)
-    {
-        $this->parents->removeElement($parent);
-        $parent->removeChild($this);
-    }
-
-    /**
-     * Returns all the possible parents of this scene.
+     * Filters all connection groups for a specific name.
+     * @param string $name
      * @return Collection
      */
-    public function getParents(): Collection
+    private function filterConnectionGroupCollectionByName(string $name): Collection
     {
-        return $this->parents;
+        return $this->connectionGroups->filter(function(SceneConnectionGroup $group) use ($name) {
+            if ($group->getName() === $name) {
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 
     /**
-     * Returns a list of all children registered for this scene.
-     * @return Collection
+     * Returns true if this scene has a connection group with a given name associated.
+     * @param string $name
+     * @return bool
      */
-    public function getChildren(): Collection
+    public function hasConnectionGroup(string $name): bool
     {
-        return $this->children;
+        return count($this->filterConnectionGroupCollectionByName($name)) === 1 ? true : false;
     }
 
     /**
-     * Registers a child for this scene.
-     * @param \LotGD\Core\Models\Scene $child
+     * Returns a connection group entity associated with this scene by a given name.
+     * @param string $name
+     * @return \LotGD\Core\Models\SceneConnectionGroup
      */
-    protected function addChild(Scene $child)
+    public function getConnectionGroup(string $name): SceneConnectionGroup
     {
-        if (!$this->children->contains($child)) {
-            $this->children->add($child);
+        return $this->filterConnectionGroupCollectionByName($name)->first();
+    }
+
+    /**
+     * Adds a connection group to this scene.
+     * @param SceneConnectionGroup $group
+     * @throws ArgumentException
+     */
+    public function addConnectionGroup(SceneConnectionGroup $group): void
+    {
+        if ($this->connectionGroups->contains($group) === true) {
+            throw new ArgumentException("This entity already owns the given connection group.");
+        }
+
+        if ($group->getScene()) {
+            throw new ArgumentException("The given connection group is already owned by another scene entity.");
+        }
+
+        $group->setScene($this);
+        $this->connectionGroups->add($group);
+    }
+
+    /**
+     * Removes a connection group from this scene.
+     * @param \LotGD\Core\Models\SceneConnectionGroup $group
+     * @throws ArgumentException
+     */
+    public function dropConnectionGroup(SceneConnectionGroup $group): void
+    {
+        if ($this->connectionGroups->contains($group) === false) {
+            throw new ArgumentException("This entity does not own the given connection group.");
+        }
+
+        $this->connectionGroups->removeElement($group);
+    }
+
+    /**
+     * Lazy loading helper function - loads all scenes that are connected to this scene.
+     */
+    private function loadConnectedScenes(): void
+    {
+        if ($this->connectedScenes === null) {
+            $connectedScenes = new ArrayCollection();
+
+            foreach ($this->outgoingConnections as $connection) {
+                $incomingScene = $connection->getIncomingScene();
+
+                if ($connectedScenes->contains($incomingScene) === false) {
+                    $connectedScenes->add($incomingScene);
+                }
+            }
+
+            foreach ($this->incomingConnections as $connection) {
+                $outgoingScenes = $connection->getOutgoingScene();
+
+                if ($connectedScenes->contains($outgoingScenes) === false) {
+                    $connectedScenes->add($outgoingScenes);
+                }
+            }
+
+            $this->connectedScenes = $connectedScenes;
         }
     }
 
     /**
-     * Removes a child from this scene.
-     * @param \LotGD\Core\Models\Scene $child
+     * Returns a list of scenes that are connected to this scene.
+     *
+     * This procedure can get slow, especially if there are a lot of scenes connected
+     * to one. Use this method only for the installation and removal of modules,
+     * or for administrative purposes (like a scene graph).
+     * @return ArrayCollection
      */
-    protected function removeChild(Scene $child)
+    public function getConnectedScenes(): ArrayCollection
     {
-        $this->children->removeElement($child);
+        $this->loadConnectedScenes();
+        return $this->connectedScenes;
+    }
+
+    /**
+     * Checks if the given scene is connected to this entity.
+     * @param \LotGD\Core\Models\Scene $scene
+     * @return bool True if yes.
+     */
+    public function isConnectedTo(Scene $scene): bool
+    {
+        $this->loadConnectedScenes();
+
+        if ($this->connectedScenes->contains($scene)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns all collections of this entity.
+     * @return Collection
+     */
+    public function getConnections(): Collection
+    {
+        return new ArrayCollection(
+            $this->outgoingConnections->toArray(),
+            $this->incomingConnections->toArray()
+        );
+    }
+
+    /**
+     * Adds a connection to the outgoing connections.
+     * @param \LotGD\Core\Models\SceneConnection $connection
+     */
+    public function addOutgoingConnection(SceneConnection $connection): void
+    {
+        $this->outgoingConnections->add($connection);
+
+        // If we already have loaded all connected scenes, we need to add the entry manually.
+        if ($this->connectedScenes !== null) {
+            $this->connectedScenes->add($connection->getIncomingScene());
+        }
+    }
+
+    /**
+     * Adds a connection to the incoming connections.
+     * @param \LotGD\Core\Models\SceneConnection $connection
+     */
+    public function addIncomingConnection(SceneConnection $connection): void
+    {
+        $this->incomingConnections->add($connection);
+
+        // If we already have loaded all connected scenes, we need to add the entry manually.
+        if ($this->connectedScenes !== null) {
+            $this->connectedScenes->add($connection->getOutgoingScene());
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function connect(
+        SceneConnectable $connectable,
+        int $directionality = self::Bidirectional
+    ): SceneConnection {
+        if ($connectable instanceof self) {
+            if ($this === $connectable) {
+                throw new ArgumentException("Cannot connect a scene to itself.");
+            }
+
+            if ($this->isConnectedTo($connectable)) {
+                throw new ArgumentException(
+                    "The given scene (ID {$connectable->getId()}) is already connected to this (ID {$this->getId()}) one."
+                );
+            }
+
+            $connection = new SceneConnection($this, $connectable, $directionality);
+
+            $outgoingScene = $this;
+            $incomingScene = $connectable;
+        } else {
+            if ($this === $connectable->getScene()) {
+                throw new ArgumentException("Cannot connect a scene to itself.");
+            }
+
+            if ($this->isConnectedTo($connectable->getScene())) {
+                throw new ArgumentException(
+                    "The given scene (ID {$connectable->getId()}) is already connected to this (ID {$this->getId()}) one."
+                );
+            }
+
+            $connection = new SceneConnection($this, $connectable->getScene(), $directionality);
+            $connection->setIncomingConnectionGroupName($connectable->getName());
+
+            $outgoingScene = $this;
+            $incomingScene = $connectable->getScene();
+        }
+
+        $outgoingScene->addOutgoingConnection($connection);
+        $incomingScene->addIncomingConnection($connection);
+
+        return $connection;
     }
 }

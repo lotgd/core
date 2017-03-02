@@ -5,7 +5,10 @@ namespace LotGD\Core\Tests\Models;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Models\Scene;
+use LotGD\Core\Models\SceneConnectionGroup;
+use LotGD\Core\Models\SceneConnection;
 use LotGD\Core\Tests\CoreModelTestCase;
 
 /**
@@ -31,68 +34,215 @@ class SceneModelTest extends CoreModelTestCase
 
         $this->assertEquals("The Forest", $scene->getTitle());
         $this->assertEquals("This is a very dangerous and dark forest", $scene->getDescription());
-        $this->assertInstanceOf(Scene::class, $scene->getParents()[0]);
-        $this->assertCount(1, $scene->getParents());
-        $this->assertCount(0, $scene->getChildren());
 
         $em->flush();
     }
 
-    /**
-     * Test if parent<=>child relationship is working.
-     */
-    public function testChildParentRelationships()
+    public function testIfHasConnectionGroupReturnsTrueIfConnectionGroupExists()
     {
-        $em = $this->getEntityManager();
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(1);
 
-        $parentScene = $em->getRepository(Scene::class)->find(1);
-        $childScene = $em->getRepository(Scene::class)->find(2);
-
-        $this->assertContains($parentScene, $childScene->getParents());
-        $this->assertContains($childScene, $parentScene->getChildren());
-
-        $em->flush();
+        $this->assertTrue($scene->hasConnectionGroup("lotgd/tests/village/outside"));
+        $this->assertTrue($scene->hasConnectionGroup("lotgd/tests/village/market"));
+        $this->assertTrue($scene->hasConnectionGroup("lotgd/tests/village/empty"));
     }
 
-    /**
-     * Test if the scene can be removed.
-     */
-    public function testMoveScene()
+    public function testIfHasConnectionGroupReturnsFalseIfConnectionGroupDoesNotExist()
     {
-        $em = $this->getEntityManager();
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
 
-        $parentScene1 = $em->getRepository(Scene::class)->find(1);
-        $parentScene2 = $em->getRepository(Scene::class)->find(4);
+        $this->assertFalse($scene2->hasConnectionGroup("lotgd/tests/village/outside"));
+        $this->assertFalse($scene2->hasConnectionGroup("lotgd/tests/village/market"));
+        $this->assertFalse($scene2->hasConnectionGroup("lotgd/tests/village/empty"));
 
-        $orphanScene = $em->getRepository(scene::class)->find(5);
-        $this->assertCount(0, $orphanScene->getParents());
-        $this->assertCount(0, $orphanScene->getChildren());
 
-        // Assign orphanScene to parentScene1 and check relationships
-        $orphanScene->addParent($parentScene1);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
 
-        $this->assertCount(1, $orphanScene->getParents());
-        $this->assertCount(3, $parentScene1->getChildren());
-        $this->assertContains($parentScene1, $orphanScene->getParents());
-        $this->assertContains($orphanScene, $parentScene1->getChildren());
+        $this->assertFalse($scene1->hasConnectionGroup("lotgd/tests/village/23426"));
+    }
 
-        // Add the scene now to parentScene2 and check relationships
-        $orphanScene->addParent($parentScene2);
+    public function testIfAddConnectionGroupWorks()
+    {
+        $connectionGroup = new SceneConnectionGroup("lotgd/tests/village/new", "New Street");
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(1);
 
-        $this->assertCount(3, $parentScene1->getChildren());
-        $this->assertCount(1, $parentScene2->getChildren());
-        $this->assertContains($parentScene2, $orphanScene->getParents());
-        $this->assertContains($orphanScene, $parentScene2->getChildren());
+        $this->assertFalse($scene->hasConnectionGroup("lotgd/tests/village/new"));
 
-        // Make an orphan out of it again
-        $orphanScene->setParents(new ArrayCollection());
+        $scene->addConnectionGroup($connectionGroup);
 
-        $this->assertCount(2, $parentScene1->getChildren());
-        $this->assertCount(0, $parentScene2->getChildren());
-        $this->assertCount(0, $orphanScene->getParents());
-        $this->assertNotContains($orphanScene, $parentScene1->getChildren());
-        $this->assertNotContains($orphanScene, $parentScene2->getChildren());
+        $this->getEntityManager()->flush();
 
-        $em->flush();
+        $this->assertTrue($scene->hasConnectionGroup("lotgd/tests/village/new"));
+    }
+
+    public function testIfAddConnectionGroupThrowsArgumentExceptionIfGroupIsAlreadyAssignedToItself()
+    {
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findOneBy(["scene" => 1, "name" => "lotgd/tests/village/outside"]);
+
+        $this->expectException(ArgumentException::class);
+        $scene->addConnectionGroup($connectionGroup);
+    }
+
+    public function testIfAddConnectionGroupThrowsArgumentExceptionIfGroupIsAlreadyAssignedToSomwhereElse()
+    {
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findOneBy(["scene" => 1, "name" => "lotgd/tests/village/outside"]);
+
+        $this->expectException(ArgumentException::class);
+        $scene->addConnectionGroup($connectionGroup);
+    }
+
+    public function testifDropConnectionGroupWorks()
+    {
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findOneBy(["scene" => 1, "name" => "lotgd/tests/village/outside"]);
+
+        $this->assertTrue($scene->hasConnectionGroup("lotgd/tests/village/outside"));
+
+        $scene->dropConnectionGroup($connectionGroup);
+
+        $this->getEntityManager()->flush();
+
+        $this->assertFalse($scene->hasConnectionGroup("lotgd/tests/village/outside"));
+    }
+
+    public function testIfDropConnectionGroupThrowsArgumentExceptionIfEntityIsRemovedFromNonOwningScene()
+    {
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findOneBy(["scene" => 1, "name" => "lotgd/tests/village/outside"]);
+
+        $this->expectException(ArgumentException::class);
+        $scene->dropConnectionGroup($connectionGroup);
+    }
+
+    public function testIfGetConnectedScenesReturnsConnectedScenes()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+
+        $this->assertCount(3, $scene1->getConnectedScenes());
+        $this->assertCount(1, $scene2->getConnectedScenes());
+
+        $this->assertTrue($scene1->getConnectedScenes()->contains($scene2));
+        $this->assertTrue($scene2->getConnectedScenes()->contains($scene1));
+        $this->assertFalse($scene1->getConnectedScenes()->contains($scene1));
+        $this->assertFalse($scene2->getConnectedScenes()->contains($scene2));
+    }
+
+    public function testIfIsConnectedToReturnsExpectedReturnValue()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+        $scene5 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+
+        $this->assertTrue($scene1->isConnectedTo($scene2));
+        $this->assertTrue($scene2->isConnectedTo($scene1));
+        $this->assertFalse($scene1->isConnectedTo($scene5));
+        $this->assertFalse($scene2->isConnectedTo($scene5));
+        $this->assertFalse($scene5->isConnectedTo($scene1));
+        $this->assertFalse($scene5->isConnectedTo($scene2));
+    }
+
+    public function testIfTwoScenesCanGetConnected()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+
+        $scene1->connect($scene2);
+
+        $this->assertTrue($scene1->getConnectedScenes()->contains($scene2));
+        $this->assertTrue($scene2->getConnectedScenes()->contains($scene1));
+        $this->assertFalse($scene1->getConnectedScenes()->contains($scene1));
+        $this->assertFalse($scene2->getConnectedScenes()->contains($scene2));
+
+        $this->getEntityManager()->flush();
+    }
+
+    public function testIfASceneConnectionGroupCanGetConnectedToAScene()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+
+        $scene1->getConnectionGroup("lotgd/tests/village/outside")->connect($scene2);
+
+        $this->assertTrue($scene1->isConnectedTo($scene2));
+        $this->assertTrue($scene2->isConnectedTo($scene1));
+        $this->assertFalse($scene1->isConnectedTo($scene1));
+        $this->assertFalse($scene2->isConnectedTo($scene2));
+
+        $this->getEntityManager()->flush();
+    }
+
+    public function testIfASceneCanGetConnectedToASceneConnectionGroup()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+
+        $scene2->connect($scene1->getConnectionGroup("lotgd/tests/village/outside"));
+
+        $this->assertTrue($scene1->isConnectedTo($scene2));
+        $this->assertTrue($scene2->isConnectedTo($scene1));
+        $this->assertFalse($scene1->isConnectedTo($scene1));
+        $this->assertFalse($scene2->isConnectedTo($scene2));
+
+        $this->getEntityManager()->flush();
+    }
+
+    public function testIfASceneConnectionGroupCanGetConnectedToAnotherSceneConnectionGroup()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+        $scene2->addConnectionGroup(new SceneConnectionGroup("test/orphaned", "Orphan group"));
+
+        $scene1
+            ->getConnectionGroup("lotgd/tests/village/outside")
+            ->connect(
+                $scene2->getConnectionGroup("test/orphaned")
+            );
+
+        $this->assertTrue($scene1->isConnectedTo($scene2));
+        $this->assertTrue($scene2->isConnectedTo($scene1));
+        $this->assertFalse($scene1->isConnectedTo($scene1));
+        $this->assertFalse($scene2->isConnectedTo($scene2));
+
+        $this->getEntityManager()->flush();
+    }
+
+    public function testIfConnectingASceneToItselfThrowsAnException()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+
+        $this->expectException(ArgumentException::class);
+        $scene1->connect($scene1);
+
+        $this->expectException(ArgumentException::class);
+        $scene1->connect($scene1->getConnectionGroup("lotgd/tests/village/outside"));
+
+        $this->expectException(ArgumentException::class);
+        $scene1->getConnectionGroup("lotgd/tests/village/outside")->connect($scene1);
+
+        $this->expectException(ArgumentException::class);
+        $scene1->getConnectionGroup("lotgd/tests/village/outside")->connect($scene1->getConnectionGroup("lotgd/tests/village/outside"));
+
+        $this->assertFalse($scene1->isConnectedTo($scene1));
+    }
+
+    public function testIfConnectingASceneToAnotherAlreadyConnectedSceneThrowsAnException()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+
+        $this->expectException(ArgumentException::class);
+        $scene1->connect($scene2);
+
+        $this->expectException(ArgumentException::class);
+        $scene1->getConnectionGroup("lotgd/tests/village/hidden")->connect($scene2);
+
+        $this->expectException(ArgumentException::class);
+        $scene1->connect($scene2->getConnectionGroup("lotgd/tests/forest/category"));
+
+        $this->expectException(ArgumentException::class);
+        $scene1->getConnectionGroup("lotgd/tests/village/hidden")->connect($scene2->getConnectionGroup("lotgd/tests/forest/category"));
     }
 }

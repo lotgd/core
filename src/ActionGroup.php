@@ -76,4 +76,9 @@ class ActionGroup
     {
         $this->actions = $actions;
     }
+
+    public function addAction(Action $action)
+    {
+        $this->actions[] = $action;
+    }
 }

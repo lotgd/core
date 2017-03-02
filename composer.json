@@ -12,7 +12,7 @@
         "bin/daenerys"
     ],
     "require": {
-        "php": "^7.0.0",
+        "php": "^7.1.0",
         "composer/composer": "*",
         "gedmo/doctrine-extensions": "*",
         "doctrine/orm": "^2.5",

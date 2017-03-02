@@ -32,10 +32,10 @@ scenes:
         title: "The Weaponry"
         description: "This is the place where you can buy awesome weapons"
         template: "lotgd/tests/weaponry"
-paths:
+scene_connections:
     -
-        scene_id: 1
-        child_scene_id: 2
+        outgoing_scene_id: 1
+        incoming_scene_id: 2
     -
-        scene_id: 1
-        child_scene_id: 3
+        outgoing_scene_id: 1
+        incoming_scene_id: 3
