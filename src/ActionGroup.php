@@ -77,6 +77,10 @@ class ActionGroup
         $this->actions = $actions;
     }
 
+    /**
+     * Adds a single action to the list of actions.
+     * @param Action $action
+     */
     public function addAction(Action $action)
     {
         $this->actions[] = $action;

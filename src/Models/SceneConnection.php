@@ -111,4 +111,18 @@ class SceneConnection
     {
         return $this->incomingScene;
     }
+
+    /**
+     * Returns if the directionality of this entity is as given as the first parameter.
+     * @param int $directionality
+     * @return bool
+     */
+    public function isDirectionality(int $directionality): bool
+    {
+        if ($this->directionality === $directionality) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

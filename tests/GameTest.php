@@ -190,4 +190,63 @@ class GameTest extends CoreModelTestCase
         $v = $this->g->getViewpoint();
         $this->assertSame($s->getTemplate(), $v->getTemplate());
     }
+
+    public function testIfActionsAreAddedAsExpected()
+    {
+        $viewpointToArray = function(Viewpoint $v) {
+            $returnTree = [];
+            foreach ($v->getActionGroups() as $actionGroup) {
+                $returnTree[$actionGroup->getId()] = [];
+
+                foreach ($actionGroup->getActions() as $action) {
+                    $returnTree[$actionGroup->getId()][] = $action->getDestinationSceneId();
+                }
+            }
+
+            return [$v->getTitle(), $returnTree];
+        };
+
+        $sortedValues = function(array $array) {
+            $values = array_values($array);
+            sort($values);
+            return $values;
+        };
+
+        $c = $this->getEntityManager()->getRepository(Character::class)->find(3);
+        $this->g->setCharacter($c);
+
+        $v0 = $this->g->getViewpoint();
+        $this->g->takeAction($v0->getActionGroups()[0]->getActions()[2]->getId());
+
+        $v1 = $this->g->getViewpoint();
+        $this->assertSame([
+            "Parent Scene",
+            [
+                ActionGroup::DefaultGroup => [1],
+                "lotgd/tests/none/child1" => [5],
+                "lotgd/tests/none/child2" => [6],
+                ActionGroup::HiddenGroup => [],
+            ]
+        ], $viewpointToArray($v1));
+
+        $this->g->takeAction($v1->getActionGroups()[1]->getActions()[0]->getId());
+        $v2 = $this->g->getviewpoint();
+        $this->assertSame([
+            "Child Scene 1",
+            [
+                ActionGroup::DefaultGroup => [6, 4],
+                ActionGroup::HiddenGroup => [],
+            ]
+        ], $viewpointToArray($v2));
+
+        $this->g->takeAction($v1->getActionGroups()[0]->getActions()[0]->getId());
+        $v3 = $this->g->getviewpoint();
+        $this->assertSame([
+            "Child Scene 2",
+            [
+                ActionGroup::DefaultGroup => [4],
+                ActionGroup::HiddenGroup => [],
+            ]
+        ], $viewpointToArray($v3));
+    }
 }

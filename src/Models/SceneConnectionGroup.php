@@ -73,6 +73,15 @@ class SceneConnectionGroup implements SceneConnectable
     }
 
     /**
+     * Returns the title of this connection group.
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
      * @inheritDoc
      */
     public function connect(SceneConnectable $connectable, int $directionality = null): SceneConnection

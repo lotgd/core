@@ -210,8 +210,10 @@ class Scene implements CreateableInterface, SceneConnectable
     public function getConnections(): Collection
     {
         return new ArrayCollection(
-            $this->outgoingConnections->toArray(),
-            $this->incomingConnections->toArray()
+            array_merge(
+                $this->outgoingConnections->toArray(),
+                $this->incomingConnections->toArray()
+            )
         );
     }
 

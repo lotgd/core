@@ -6,17 +6,11 @@ namespace LotGD\Core;
 use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
 
-use LotGD\Core\Models\ {
-    Character,
-    Viewpoint,
-    Scene,
-    SceneConnection
+use LotGD\Core\Models\{
+    Character, SceneConnectable, Viewpoint, Scene, SceneConnection
 };
 use LotGD\Core\Exceptions\ {
-    ActionNotFoundException,
-    CharacterNotFoundException,
-    InvalidConfigurationException,
-    SceneNotFoundException
+    ActionNotFoundException, CharacterNotFoundException, InvalidConfigurationException, SceneNotFoundException
 };
 
 /**
@@ -247,7 +241,9 @@ class Game
                 ActionGroup::DefaultGroup => new ActionGroup(ActionGroup::DefaultGroup, '', 0),
             ];
 
-            $scene->getConnections()->map(function(SceneConnection $connection) use ($scene, $actionGroups) {
+            // Iterates through all connections and adds an action to the connected scene to the action group. If the connection
+            // belongs to a new connection Group, it creates a new ActionGroup.
+            $scene->getConnections()->map(function(SceneConnection $connection) use ($scene, &$actionGroups) {
                 if ($connection->getOutgoingScene() === $scene) {
                     // current scene is outgoing, use incoming.
                     $connectedScene = $connection->getIncomingScene();
@@ -256,6 +252,12 @@ class Game
                     // current scene is not outgoing, thus incoming, use outgoing.
                     $connectedScene = $connection->getOutgoingScene();
                     $connectionGroupName = $connection->getIncomingConnectionGroupName();
+
+                    // Check if the connection is unidirectional - if yes, the current scene (incoming in this branch) cannot
+                    // connect to the outgoing scene.
+                    if ($connection->isDirectionality(SceneConnectable::Unidirectional)) {
+                        return;
+                    }
                 }
 
                 $this->getLogger()->addDebug("  Adding navigation action for child sceneId={$connectedScene->getId()}");
@@ -268,20 +270,15 @@ class Game
                         $actionGroups[$connectionGroupName]->addAction($action);
                     } else {
                         $connectionGroup = $scene->getConnectionGroup($connectionGroupName);
-                        $actionGroup = new ActionGroup($connectionGroupName->getName(), $connectionGroupName->getTitle(), 0);
+                        $actionGroup = new ActionGroup($connectionGroupName, $connectionGroup->getTitle(), 0);
                         $actionGroup->addAction($action);
 
                         $actionGroups[$connectionGroupName] = $actionGroup;
                     }
                 }
             });
-            /*$as = array_map(function ($c) {
-                $id = $c->getId();
-                $this->getLogger()->addDebug("  Adding navigation action for child sceneId={$id}");
-                return new Action($c->getId());
-            }, $scene->getChildren()->toArray());*/
-            //$defaultGroup->setActions($as);
-            //$count = count($as);
+
+            // Logging
             $counts = implode(", ", array_map(function($k, $v) {
                 return $k .count($v);
             }, array_keys($actionGroups), array_values($actionGroups)));
