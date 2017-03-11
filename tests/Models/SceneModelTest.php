@@ -6,9 +6,7 @@ namespace LotGD\Core\Tests\Models;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use LotGD\Core\Exceptions\ArgumentException;
-use LotGD\Core\Models\Scene;
-use LotGD\Core\Models\SceneConnectionGroup;
-use LotGD\Core\Models\SceneConnection;
+use LotGD\Core\Models\{Scene, SceneConnection, SceneConnectionGroup};
 use LotGD\Core\Tests\CoreModelTestCase;
 
 /**
@@ -19,9 +17,125 @@ class SceneModelTest extends CoreModelTestCase
     /** @var string default data set */
     protected $dataset = "scene";
 
-    public function testCreate()
+    protected function getNumberOfScenes(): int
     {
-        $scene = new Scene();
+        $results = $this->getEntityManager()->getRepository(Scene::class)->findAll();
+        return count($results);
+    }
+
+    protected function getNumberOfSceneConnections(): int
+    {
+        $results = $this->getEntityManager()->getRepository(SceneConnection::class)->findAll();
+        return count($results);
+    }
+
+    protected function getNumberOfSceneGroups(): int
+    {
+        $results = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findAll();
+        return count($results);
+    }
+
+    protected function getTestSceneData(): array
+    {
+        return [
+            "title" => "A new scene",
+            "description" => "This is a new scene",
+            "template" => "lotgd/test/new-scene"
+        ];
+    }
+
+    public function testIfSceneCanGetCreatedAndDeleted()
+    {
+        $em = $this->getEntityManager();
+
+        // Count number of scenes
+        $n1 = $this->getNumberOfScenes();
+        $this->assertGreaterThan(0, $n1);
+
+        // create new scene, flush and clear. Number of scenes in db should be +1
+        $newScene = Scene::create($this->getTestSceneData());
+        $newScene->save($em);
+        $this->flushAndClear();
+        unset($newScene);
+
+        // recount and assert that n1 + 1 === n2
+        $n2 = $this->getNumberOfScenes();
+        $this->assertSame($n1 + 1, $n2);
+
+        // fetch new scene, delete, flush and clear.
+        $newScene = $em->getRepository(Scene::class)->findOneBy($this->getTestSceneData());
+        $newScene->delete($em);
+        $this->flushAndClear();
+
+        // recount and assert that n3 == n1
+        $n3 = $this->getNumberOfScenes();
+        $this->assertSame($n1, $n3);
+    }
+
+    public function testIfSceneWithConnectionsCanGetCreatedAndDeleted()
+    {
+        $em = $this->getEntityManager();
+
+        // Count number of scenes
+        $n1 = $this->getNumberOfScenes();
+        $this->assertGreaterThan(0, $n1);
+
+        // Count number of connections
+        $c1 = $this->getNumberOfSceneConnections();
+        $this->assertGreaterTHan(0, $c1);
+
+        // create new scene, connect to another one. Number of scenes must be +1, number of connections must be +1
+        // this tests for cascade=persist
+        $scene = Scene::create($this->getTestSceneData());
+        $scene->connect($em->getRepository(Scene::class)->find(1));
+        $scene->save($em);
+        $this->flushAndClear();
+        unset($scene);
+
+        // recount and assert that this is the case
+        $this->assertSame($n1 + 1, $this->getNumberOfScenes());
+        $this->assertSame($c1 + 1, $this->getNumberOfSceneConnections());
+
+        // delete scene again. Number of scenes and number of connections must be what it was at the beginning
+        // this tests for cascade=remove
+        $scene = $em->getRepository(Scene::class)->findOneBy($this->getTestSceneData());
+        $scene->delete($em);
+        $this->flushAndClear();
+        unset($scene);
+
+        // recount and assert that this is the case
+        $this->assertSame($n1, $this->getNumberOfScenes());
+        $this->assertSame($c1, $this->getNumberOfSceneConnections());
+    }
+
+    public function testIfSceneWithConnectionGroupsCanGetCreatedAndDeleted()
+    {
+        $em = $this->getEntityManager();
+
+        // count number of scenes
+        $n1 = $this->getNumberOfScenes();
+        $g1 = $this->getNumberOfSceneGroups();
+
+        // create new scene, add scene group. Number of scenes must be +1, number of scene connection groups must be +1
+        // this tests for cascade=persist
+        $scene = Scene::create($this->getTestSceneData());
+        $scene->addConnectionGroup(new SceneConnectionGroup("test", "test"));
+        $scene->save($em);
+        $this->flushAndClear();
+
+        // recount and assert that this is the case
+        $this->assertSame($n1 + 1, $this->getNumberOfScenes());
+        $this->assertSame($g1 + 1, $this->getNumberOfSceneGroups());
+
+        // delete scene again. Number of scenes and number of connection groups must be what it was at the beginning
+        $scene = $em->getRepository(Scene::class)->findOneBy($this->getTestSceneData());
+        $scene->delete($em);
+        $this->flushAndClear();
+        unset($scene);
+
+        // recount and assert that this is the case
+        $this->assertSame($n1, $this->getNumberOfScenes());
+        $this->assertSame($g1, $this->getNumberOfSceneGroups());
     }
 
     /**

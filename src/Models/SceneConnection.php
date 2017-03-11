@@ -15,15 +15,15 @@ class SceneConnection
 {
     /**
      * @Id
-     * @ManyToOne(targetEntity="Scene", inversedBy="outgoingConnections", cascade={"persist"})
-     * @JoinColumn(name="outgoing_scene_id", referencedColumnName="id")
+     * @ManyToOne(targetEntity="Scene")
+     * @JoinColumn(name="outgoingScene", referencedColumnName="id")
      */
     private $outgoingScene;
 
     /**
      * @Id
-     * @ManyToOne(targetEntity="Scene", inversedBy="incomingConnections", cascade={"persist"})
-     * @JoinColumn(name="incoming_scene_id", referencedColumnName="id")
+     * @ManyToOne(targetEntity="Scene")
+     * @JoinColumn(name="incomingScene", referencedColumnName="id")
      */
     private $incomingScene;
 

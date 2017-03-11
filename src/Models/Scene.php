@@ -35,12 +35,12 @@ class Scene implements CreateableInterface, SceneConnectable
     private $connectionGroups = null;
 
     /**
-     * @OneToMany(targetEntity="SceneConnection", mappedBy="outgoingScene", cascade={"persist"})
+     * @OneToMany(targetEntity="SceneConnection", mappedBy="outgoingScene", cascade={"persist", "remove"})
      */
     private $outgoingConnections = null;
 
     /**
-     * @OneToMany(targetEntity="SceneConnection", mappedBy="incomingScene", cascade={"persist"})
+     * @OneToMany(targetEntity="SceneConnection", mappedBy="incomingScene", cascade={"persist", "remove"})
      */
     private $incomingConnections = null;
 
@@ -50,7 +50,6 @@ class Scene implements CreateableInterface, SceneConnectable
     private static $fillable = [
         "title",
         "description",
-        "parents",
         "template"
     ];
 

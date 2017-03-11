@@ -34,8 +34,8 @@ scenes:
         template: "lotgd/tests/weaponry"
 scene_connections:
     -
-        outgoing_scene_id: 1
-        incoming_scene_id: 2
+        outgoingScene: 1
+        incomingScene: 2
     -
-        outgoing_scene_id: 1
-        incoming_scene_id: 3
+        outgoingScene: 1
+        incomingScene: 3

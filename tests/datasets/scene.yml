@@ -26,28 +26,28 @@ scenes:
         template: "lotgd/tests/orphan"
 scene_connection_groups:
     -
-        scene_id: 1
+        scene: 1
         name: "lotgd/tests/village/outside"
         title: "Outside"
     -
-        scene_id: 1
+        scene: 1
         name: "lotgd/tests/village/market"
         title: "Market"
     -
-        scene_id: 1
+        scene: 1
         name: "lotgd/tests/village/empty"
         title: "Empty"
     -
-        scene_id: 2
+        scene: 2
         name: "lotgd/tests/forest/category"
         title: "Empty"
 scene_connections:
     -
-        outgoing_scene_id: 1
-        incoming_scene_id: 2
+        outgoingScene: 1
+        incomingScene: 2
     -
-        outgoing_scene_id: 1
-        incoming_scene_id: 3
+        outgoingScene: 1
+        incomingScene: 3
     -
-        outgoing_scene_id: 1
-        incoming_scene_id: 4
+        outgoingScene: 1
+        incomingScene: 4

@@ -53,38 +53,38 @@ scenes:
         template: "lotgd/tests/none"
 scene_connection_groups:
     -
-        scene_id: 4
+        scene: 4
         name: "lotgd/tests/none/child1"
         title: "Child 1"
     -
-        scene_id: 4
+        scene: 4
         name: "lotgd/tests/none/child2"
         title: "Child 2"
 scene_connections:
     -
-        outgoing_scene_id: 1
-        incoming_scene_id: 2
+        outgoingScene: 1
+        incomingScene: 2
         directionality: 0
     -
-        outgoing_scene_id: 1
-        incoming_scene_id: 3
+        outgoingScene: 1
+        incomingScene: 3
         directionality: 0
     -
-        outgoing_scene_id: 1
-        incoming_scene_id: 4
+        outgoingScene: 1
+        incomingScene: 4
         directionality: 0
     -
-        outgoing_scene_id: 4
-        incoming_scene_id: 5
+        outgoingScene: 4
+        incomingScene: 5
         outgoingConnectionGroupName: "lotgd/tests/none/child1"
         directionality: 0
     -
-        outgoing_scene_id: 4
-        incoming_scene_id: 6
+        outgoingScene: 4
+        incomingScene: 6
         outgoingConnectionGroupName: "lotgd/tests/none/child2"
         directionality: 0
     -
-        outgoing_scene_id: 5
-        incoming_scene_id: 6
+        outgoingScene: 5
+        incomingScene: 6
         directionality: 1
 

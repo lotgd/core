@@ -82,4 +82,10 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
         // Clear out the cache so tests don't get confused.
         $this->getEntityManager()->clear();
     }
+
+    protected function flushAndClear()
+    {
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+    }
 }

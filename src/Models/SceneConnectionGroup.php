@@ -19,7 +19,7 @@ class SceneConnectionGroup implements SceneConnectable
     /**
      * @Id
      * @ManyToOne(targetEntity="Scene", inversedBy="outgoingConnections", cascade={"persist"})
-     * @JoinColumn(name="scene_id", referencedColumnName="id")
+     * @JoinColumn(name="scene", referencedColumnName="id")
      */
     private $scene;
 
