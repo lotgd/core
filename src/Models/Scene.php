@@ -5,12 +5,12 @@ namespace LotGD\Core\Models;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Tools\Model\Creator;
-use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\SceneBasics;
 
 /**
@@ -23,7 +23,6 @@ use LotGD\Core\Tools\Model\SceneBasics;
 class Scene implements CreateableInterface, SceneConnectable
 {
     use Creator;
-    use Deletor;
     use SceneBasics;
 
     /** @Id @Column(type="integer") @GeneratedValue */
@@ -288,5 +287,28 @@ class Scene implements CreateableInterface, SceneConnectable
         $incomingScene->addIncomingConnection($connection);
 
         return $connection;
+    }
+
+    /**
+     * Deletes this entity and all connected children.
+     *
+     * This is a fix to a weird bug causing the deletion to NOT cascade, despite the tests passing.
+     * @param EntityManager $em
+     */
+    public function delete(EntityManager $em)
+    {
+        // Delete connections
+        $connections = $this->getConnections();
+        foreach ($connections as $connection) {
+            $em->remove($connection);
+        }
+
+        // Delete connection groups
+        foreach ($this->connectionGroups as $group) {
+            $em->remove($group);
+        }
+
+        $em->remove($this);
+        $em->flush();
     }
 }
