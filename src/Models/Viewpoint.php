@@ -56,7 +56,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Copies the static data from a scene to this Viewpoint entity
+     * Copies the static data from a scene to this Viewpoint entity.
      * @param \LotGD\Core\Models\Scene $scene
      */
     public function changeFromScene(Scene $scene)
@@ -69,6 +69,38 @@ class Viewpoint implements CreateableInterface
         $this->setActionGroups([]);
         $this->setAttachments([]);
         $this->setData([]);
+    }
+
+    /**
+     * Returns a restoration point that can be used to reconstruct the current viewpoint.
+     * @return ViewpointRestorationPoint
+     */
+    public function getRestorationPoint(): ViewpointRestorationPoint
+    {
+        $restoration = new ViewpointRestorationPoint(
+            $this->getTitle(),
+            $this->getDescription(),
+            $this->getTemplate(),
+            $this->getActionGroups(),
+            $this->getAttachments(),
+            $this->getData()
+        );
+
+        return $restoration;
+    }
+
+    /**
+     * Changes the current viewpoint to the state saved in the given restoration point.
+     * @param ViewpointRestorationPoint $restoration
+     */
+    public function changeFromRestorationPoint(ViewpointRestorationPoint $restoration)
+    {
+        $this->setTitle($restoration->getTitle());
+        $this->setDescription($restoration->getDescription());
+        $this->setTemplate($restoration->getTemplate());
+        $this->getActionGroups($restoration->getActionGroups());
+        $this->setAttachments($restoration->getAttachments());
+        $this->setData($restoration->getData());
     }
 
     /**
