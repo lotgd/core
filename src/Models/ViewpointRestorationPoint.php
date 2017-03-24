@@ -82,7 +82,7 @@ class ViewpointRestorationPoint
      * Attachements of the viewpoint.
      * @return array
      */
-    public function getAttachements(): array
+    public function getAttachments(): array
     {
         return $this->attachements;
     }
