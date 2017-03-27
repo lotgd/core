@@ -98,7 +98,7 @@ class Viewpoint implements CreateableInterface
         $this->setTitle($restoration->getTitle());
         $this->setDescription($restoration->getDescription());
         $this->setTemplate($restoration->getTemplate());
-        $this->getActionGroups($restoration->getActionGroups());
+        $this->setActionGroups($restoration->getActionGroups());
         $this->setAttachments($restoration->getAttachments());
         $this->setData($restoration->getData());
     }
