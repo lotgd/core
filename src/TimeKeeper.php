@@ -46,13 +46,15 @@ class TimeKeeper
     /**
      * Returns whether a user who is interating with the game now and last
      * interacted at $lastInteractionTime should experience a New Day event.
-     * @param DateTime $lastInteractionTime
+     * @param DateTime|null $lastInteractionTime
+     * @return bool
      */
-    public function isNewDay(DateTime $lastInteractionTime): bool
+    public function isNewDay(?DateTime $lastInteractionTime): bool
     {
         if ($lastInteractionTime == null) {
             return true;
         }
+
         $t1 = $this->gameTime();
         $t2 = $this->convertToGameTime($lastInteractionTime);
         $d1 = $t1->format("Y-m-d");
@@ -75,9 +77,7 @@ class TimeKeeper
      * @param DateTime $time Game time to convert.
      * @return DateTime Real time corresponding to game time $time.
      */
-    public function convertFromGameTime(
-        DateTime $time
-    ): DateTime {
+    public function convertFromGameTime(DateTime $time): DateTime {
         // Game dates are in the distant past, better not use getTimestamp().
         $i = $this->theBeginning->diff($time);
 
@@ -96,9 +96,7 @@ class TimeKeeper
      * @param DateTime $time Real time to convert.
      * @return DateTime Game time corresponding to real time $time.
      */
-    public function convertToGameTime(
-        DateTime $time
-    ): DateTime {
+    public function convertToGameTime(DateTime $time): DateTime {
         $timeUnix = $time->getTimestamp();
         $epochUnix = $this->adjustedEpoch->getTimestamp();
 

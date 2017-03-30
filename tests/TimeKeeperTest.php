@@ -63,7 +63,25 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
     $this->assertEquals('0000-01-02', $converted->format('Y-m-d'));
   }
 
-  public function testDetectsNewDay() {
+  public function testIfIsNewDayReturnsTrueWithNullAsLastInteractionTime() {
+      $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, 4);
+
+      $this->assertTrue($keeper->isNewDay(null));
+  }
+
+  public function testIfIsNewDayReturnsFalseIfLastInteractionTimeWasJustRecently()
+  {
+      // game days per day: 4, each day 6h.
+      $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, 4);
+
+      $now = new \DateTime();
+      $nowMinus1Second = $now->sub(new \DateInterval("PT1S"));
+      $newMinus1Minute = $now->sub(new \DateInterval("PT1M"));
+      $newMinus1Hour = $now->sub(new \DateInterval("PT1H"));
+      $oldPLus1H = $now->sub(new \DateInterval("PT5H59M59S"));
+
+      $this->assertFalse($keeper->isNewDay($now));
+      $this->assertFalse($keeper->isNewDay($nowMinus1Second));
   }
 
   public function testConvertToRespectsGameOffset() {
