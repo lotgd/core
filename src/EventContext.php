@@ -20,12 +20,12 @@ class EventContext
      * EventContext constructor.
      * @param string $event The published event
      * @param string $matchingPattern The matching pattern
-     * @param array $data
+     * @param EventContextDataContainer $data
      */
     public function __construct(
         string $event,
         string $matchingPattern,
-        array $data
+        EventContextDataContainer $data
     ) {
         $this->event = $event;
         $this->matchingPattern = $matchingPattern;
@@ -51,102 +51,40 @@ class EventContext
     }
 
     /**
-     * Returns a list of fields in this context
-     * @return array
+     * Returns the immutable data container.
+     * @return EventContextDataContainer
      */
-    public function getListOfFields(): array
+    public function getData(): EventContextDataContainer
     {
-        return array_keys($this->data);
+        return $this->data;
     }
 
     /**
-     * Returns a comma separated string with all allowed fields, for debugging reasons.
-     * @return string
-     */
-    private function getFormattedListOfFields(): string
-    {
-        return substr(
-            implode(", ", $this->getListOfFields()),
-            0,
-            -2
-        );
-    }
-
-    /**
-     * Sets a field and returns the changed object.
-     * @param $field
-     * @param $value
-     * @return EventContext
-     */
-    public function setField($field, $value): self
-    {
-        if ($this->hasField($field)) {
-            $data = $this->data;
-            $data[$field] = $value;
-        } else {
-            $this->throwException($field);
-        }
-
-        return new static($this->event, $this->matchingPattern, $data);
-    }
-
-    /**
-     * Sets multiple fields at once and returns the changed object.
-     * @param $data array of field => value
-     * @return EventContext
-     */
-    public function setFields($data): self
-    {
-        $oldData = $this->data;
-
-        foreach ($data as $key => $value) {
-            if ($this->hasField($field)) {
-                $oldData[$key] = $value;
-            } else {
-                $this->throwException($field);
-            }
-        }
-
-        return new static($this->event, $this->matchingPattern, $oldData);
-    }
-
-    /**
-     * Returns the data to a field.
+     * Returns a data field
      * @param $field
      * @return mixed
      */
-    public function getField($field)
+    public function getDataField($field)
     {
-        if ($this->hasField($field)) {
-            return $this->data[$field];
-        } else {
-            $this->throwException($field);
-        }
+        return $this->data->get($field);
     }
 
     /**
-     * Returns true if the context has a specific field.
+     * Sets a data field
      * @param $field
-     * @return bool
+     * @param $value
      */
-    public function hasField($field)
+    public function setDataField($field, $value)
     {
-        if (isset($this->data[$field])) {
-            return true;
-        } else {
-            return false;
-        }
+        $this->data = $this->data->set($field, $value);
     }
 
     /**
-     * internal use only - throws an ArgumentException a field is given that's not valid.
-     * @param $field
-     * @throws ArgumentException
+     * Sets multiple data fields at once.
+     * @param $data
      */
-    private function throwException($field)
+    public function setDataFields($data)
     {
-        throw new ArgumentException(
-            "{$field} is not valid in this context, only {$this->getFormattedListOfFields()} are allowed."
-        );
+        $this->data = $this->data->setFields($data);
     }
 }
