@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core;
 
 use DateTime;
+use LotGD\Core\Exceptions\ArgumentException;
 
 /**
  * Configurable way to convert back and forth between real time and game time.
@@ -33,9 +34,17 @@ class TimeKeeper
     public function __construct(DateTime $gameEpoch, int $gameOffsetSeconds, int $gameDaysPerDay)
     {
         $gameEpochCopy = clone($gameEpoch);
-        $this->adjustedEpoch = $gameEpochCopy->add(
-            $this->interval(0, 0, 0, 0, $gameOffsetSeconds)
-        );
+
+        if ($gameOffsetSeconds < 0) {
+            $this->adjustedEpoch = $gameEpochCopy->sub(
+                $this->interval(0, 0, 0, 0, $gameOffsetSeconds*-1)
+            );
+        } else {
+            $this->adjustedEpoch = $gameEpochCopy->add(
+                $this->interval(0, 0, 0, 0, $gameOffsetSeconds)
+            );
+        }
+        
         $this->theBeginning = new DateTime("0000-01-01 UTC");
 
         $this->secondsPerGameDay = (float) $this->secondsPerDay / $gameDaysPerDay;
