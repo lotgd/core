@@ -72,17 +72,37 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
   public function testIfIsNewDayReturnsFalseIfLastInteractionTimeWasJustRecently()
   {
       // game days per day: 4, each day 6h.
-      $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, 4);
+      $keeper = new TimeKeeper($this->gameEpoch, 3600*5, 4);
+      $keeper->changeNow(new \DateTime("2017-01-02 11:59:59"));
 
-      $now = new \DateTime();
-      $nowMinus1Second = $now->sub(new \DateInterval("PT1S"));
-      $newMinus1Minute = $now->sub(new \DateInterval("PT1M"));
-      $newMinus1Hour = $now->sub(new \DateInterval("PT1H"));
-      $oldPLus1H = $now->sub(new \DateInterval("PT5H59M59S"));
+      $time1 = new \DateTime("2017-01-02 06:00:00");
+      $time2 = new \DateTime("2017-01-02 11:59:59");
+      $time3 = new \DateTime("2017-01-02 09:00:00");
+      $time4 = new \DateTime("2017-01-02 09:59:30");
 
-      $this->assertFalse($keeper->isNewDay($now));
-      $this->assertFalse($keeper->isNewDay($nowMinus1Second));
+      $this->assertFalse($keeper->isNewDay($time1));
+      $this->assertFalse($keeper->isNewDay($time2));
+      $this->assertFalse($keeper->isNewDay($time3));
+      $this->assertFalse($keeper->isNewDay($time4));
   }
+
+    public function testIfIsNewDayReturnsFalseIfLastInteractionTimeWasOnLastGameDay()
+    {
+        // game days per day: 4, each day 6h.
+        // interestingly, it looks like new game day starts 01:00:00?
+        $keeper = new TimeKeeper($this->gameEpoch, 3600*5, 4);
+        $keeper->changeNow(new \DateTime("2017-01-02 12:00:00")); // it is a new day
+
+        $time1 = new \DateTime("2017-01-02 06:00:00");
+        $time2 = new \DateTime("2017-01-02 11:59:59");
+        $time3 = new \DateTime("2017-01-02 09:00:00");
+        $time4 = new \DateTime("2017-01-02 09:59:30");
+
+        $this->assertTrue($keeper->isNewDay($time1));
+        $this->assertTrue($keeper->isNewDay($time2));
+        $this->assertTrue($keeper->isNewDay($time3));
+        $this->assertTrue($keeper->isNewDay($time4));
+    }
 
   public function testConvertToRespectsGameOffset() {
     $date = new \DateTime('2015-07-27 01:01:15 PDT');
