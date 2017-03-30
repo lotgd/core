@@ -22,6 +22,8 @@ class TimeKeeper
     private $secondsPerGameMinute;
     private $secondsPerGameSecond;
 
+    private $now;
+
     /**
      * Construct a TimeKeeper with required configuration.
      * @param DateTime $gameEpoch When in real time is game day 0.
@@ -41,6 +43,17 @@ class TimeKeeper
         $this->secondsPerGameHour = $this->secondsPerGameDay / 24;
         $this->secondsPerGameMinute = $this->secondsPerGameHour / 60;
         $this->secondsPerGameSecond = $this->secondsPerGameMinute / 60;
+
+        $this->now = new DateTime();
+    }
+
+    /**
+     * Changes the "now" state of the TimeKeeper.
+     * @param DateTime $dateTime
+     */
+    public function changeNow(DateTime $dateTime)
+    {
+        $this->now = $dateTime;
     }
 
     /**
@@ -55,7 +68,7 @@ class TimeKeeper
             return true;
         }
 
-        $t1 = $this->gameTime();
+        $t1 = $this->getGameTime();
         $t2 = $this->convertToGameTime($lastInteractionTime);
         $d1 = $t1->format("Y-m-d");
         $d2 = $t2->format("Y-m-d");
@@ -67,9 +80,9 @@ class TimeKeeper
      * Return the current game time.
      * @return DateTime
      */
-    public function gameTime(): DateTime
+    public function getGameTime(): DateTime
     {
-        return $this->convertToGameTime(new DateTime());
+        return $this->convertToGameTime($this->now);
     }
 
     /**

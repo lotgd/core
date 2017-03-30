@@ -165,6 +165,6 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
 
   public function testGameTimeSanity() {
     $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
-    $this->assertNotNull($keeper->gameTime());
+    $this->assertNotNull($keeper->getGameTime());
   }
 }
