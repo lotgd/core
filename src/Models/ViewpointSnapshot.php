@@ -7,13 +7,13 @@ namespace LotGD\Core\Models;
  * Represents a complete set of viewpoint data used to restore a saved viewpoint.
  * @package LotGD\Core\Models
  */
-class ViewpointRestorationPoint
+class ViewpointSnapshot
 {
     private $title;
     private $description;
     private $template;
     private $actionGroups;
-    private $attachements;
+    private $attachments;
     private $data;
 
     /**
@@ -22,7 +22,7 @@ class ViewpointRestorationPoint
      * @param string $description
      * @param string $template
      * @param array $actionGroups
-     * @param array $attachements
+     * @param array $attachments
      * @param array $data
      */
     public function __construct(
@@ -30,7 +30,7 @@ class ViewpointRestorationPoint
         string $description,
         string $template,
         array $actionGroups,
-        array $attachements,
+        array $attachments,
         array $data
     )
     {
@@ -38,7 +38,7 @@ class ViewpointRestorationPoint
         $this->description = $description;
         $this->template = $template;
         $this->actionGroups = $actionGroups;
-        $this->attachements = $attachements;
+        $this->attachments = $attachments;
         $this->data = $data;
     }
 
@@ -84,7 +84,7 @@ class ViewpointRestorationPoint
      */
     public function getAttachments(): array
     {
-        return $this->attachements;
+        return $this->attachments;
     }
 
     /**

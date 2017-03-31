@@ -73,11 +73,11 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Returns a restoration point that can be used to reconstruct the current viewpoint.
-     * @return ViewpointRestorationPoint
+     * @return ViewpointSnapshot
      */
-    public function getRestorationPoint(): ViewpointRestorationPoint
+    public function getSnapshot(): ViewpointSnapshot
     {
-        $restoration = new ViewpointRestorationPoint(
+        $snapshot = new ViewpointSnapshot(
             $this->getTitle(),
             $this->getDescription(),
             $this->getTemplate(),
@@ -86,21 +86,21 @@ class Viewpoint implements CreateableInterface
             $this->getData()
         );
 
-        return $restoration;
+        return $snapshot;
     }
 
     /**
      * Changes the current viewpoint to the state saved in the given restoration point.
-     * @param ViewpointRestorationPoint $restoration
+     * @param ViewpointSnapshot $snapshot
      */
-    public function changeFromRestorationPoint(ViewpointRestorationPoint $restoration)
+    public function changeFromSnapshot(ViewpointSnapshot $snapshot)
     {
-        $this->setTitle($restoration->getTitle());
-        $this->setDescription($restoration->getDescription());
-        $this->setTemplate($restoration->getTemplate());
-        $this->setActionGroups($restoration->getActionGroups());
-        $this->setAttachments($restoration->getAttachments());
-        $this->setData($restoration->getData());
+        $this->setTitle($snapshot->getTitle());
+        $this->setDescription($snapshot->getDescription());
+        $this->setTemplate($snapshot->getTemplate());
+        $this->setActionGroups($snapshot->getActionGroups());
+        $this->setAttachments($snapshot->getAttachments());
+        $this->setData($snapshot->getData());
     }
 
     /**

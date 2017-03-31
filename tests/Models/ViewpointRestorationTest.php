@@ -59,12 +59,12 @@ class ViewpointRestorationTest extends CoreModelTestCase
     public function testIfViewpointAfterUnserializationIsEqualToBeforeItsSerialization()
     {
         $viewpoint = $this->getViewpoint();
-        $viewpointRestoration = $this->getViewpoint()->getRestorationPoint();
+        $viewpointRestoration = $this->getViewpoint()->getSnapshot();
         $serialized = serialize($viewpointRestoration);
         $viewpointRestored = unserialize($serialized);
 
         $newViewpoint = $this->getAlternativeViewpoint();
-        $newViewpoint->changeFromRestorationPoint($viewpointRestored);
+        $newViewpoint->changeFromSnapshot($viewpointRestored);
 
         $this->assertSame($viewpoint->getTitle(), $newViewpoint->getTitle());
         $this->assertSame($viewpoint->getDescription(), $newViewpoint->getDescription());
