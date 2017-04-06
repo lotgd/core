@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace LotGD\Core;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
 
@@ -152,7 +153,7 @@ class Game
             $gameEpoch = $this->getConfiguration()->getGameEpoch();
             $gameOffsetSeconds = $this->getConfiguration()->getGameOffsetSeconds();
             $gameDaysPerDay = $this->getConfiguration()->getGameDaysPerDay();
-            $this->timeKeeper = new TimeKeeper($gameEpoch, $gameOffsetSeconds, $gameDaysPerDay);
+            $this->timeKeeper = new TimeKeeper($gameEpoch, new DateTime(), $gameOffsetSeconds, $gameDaysPerDay);
         }
         return $this->timeKeeper;
     }

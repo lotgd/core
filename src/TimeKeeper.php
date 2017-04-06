@@ -28,11 +28,16 @@ class TimeKeeper
     /**
      * Construct a TimeKeeper with required configuration.
      * @param DateTime $gameEpoch When in real time is game day 0.
+     * @param DateTime $now The current time.
      * @param int $gameOffsetSeconds How many seconds from midnight on the epoch should the first game day start.
      * @param int $gameDaysPerDay How many game days are in one real day.
      */
-    public function __construct(DateTime $gameEpoch, int $gameOffsetSeconds, int $gameDaysPerDay)
-    {
+    public function __construct(
+        DateTime $gameEpoch,
+        DateTime $now,
+        int $gameOffsetSeconds,
+        int $gameDaysPerDay
+    ) {
         $gameEpochCopy = clone($gameEpoch);
 
         if ($gameOffsetSeconds < 0) {
@@ -53,16 +58,7 @@ class TimeKeeper
         $this->secondsPerGameMinute = $this->secondsPerGameHour / 60;
         $this->secondsPerGameSecond = $this->secondsPerGameMinute / 60;
 
-        $this->now = new DateTime();
-    }
-
-    /**
-     * Changes the "now" state of the TimeKeeper.
-     * @param DateTime $dateTime
-     */
-    public function changeNow(DateTime $dateTime)
-    {
-        $this->now = $dateTime;
+        $this->now = $now;
     }
 
     /**

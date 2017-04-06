@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
+use DateTime;
 use LotGD\Core\TimeKeeper;
 
 /**
@@ -22,7 +23,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
 
   public function testConvertToBasicConversion() {
     $this->gameDaysPerDay = 1;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $date = new \DateTime('2015-07-27 23:59:59 PDT');
     $converted = $keeper->convertToGameTime($date);
@@ -37,7 +38,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
     $date = new \DateTime('2015-07-27 05:59:59 PDT');
 
     $this->gameDaysPerDay = 4;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertToGameTime($date);
     $this->assertEquals('0000-01-01', $converted->format('Y-m-d'));
@@ -47,7 +48,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
     $date = new \DateTime('2015-07-27 06:00:00 PDT');
 
     $this->gameDaysPerDay = 4;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertToGameTime($date);
     $this->assertEquals('0000-01-02', $converted->format('Y-m-d'));
@@ -57,14 +58,14 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
     $date = new \DateTime('2015-07-27 11:59:59 PDT');
 
     $this->gameDaysPerDay = 4;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertToGameTime($date);
     $this->assertEquals('0000-01-02', $converted->format('Y-m-d'));
   }
 
   public function testIfIsNewDayReturnsTrueWithNullAsLastInteractionTime() {
-      $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, 4);
+      $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, 4);
 
       $this->assertTrue($keeper->isNewDay(null));
   }
@@ -72,8 +73,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
   public function testIfIsNewDayReturnsFalseIfLastInteractionTimeWasJustRecently()
   {
       // game days per day: 4, each day 6h.
-      $keeper = new TimeKeeper($this->gameEpoch, 3600*5, 4);
-      $keeper->changeNow(new \DateTime("2017-01-02 11:59:59"));
+      $keeper = new TimeKeeper($this->gameEpoch, new DateTime("2017-01-02 11:59:59"), 3600*5, 4);
 
       $time1 = new \DateTime("2017-01-02 06:00:00");
       $time2 = new \DateTime("2017-01-02 11:59:59");
@@ -90,8 +90,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
     {
         // game days per day: 4, each day 6h.
         // interestingly, it looks like new game day starts 01:00:00?
-        $keeper = new TimeKeeper($this->gameEpoch, 3600*5, 4);
-        $keeper->changeNow(new \DateTime("2017-01-02 12:00:00")); // it is a new day
+        $keeper = new TimeKeeper($this->gameEpoch, new DateTime("2017-01-02 12:00:00"), 3600*5, 4);
 
         $time1 = new \DateTime("2017-01-02 06:00:00");
         $time2 = new \DateTime("2017-01-02 11:59:59");
@@ -109,7 +108,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
 
     $this->gameOffsetSeconds = 60*60;
     $this->gameDaysPerDay = 1;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertToGameTime($date);
     $this->assertEquals('0000-01-01 00:01:15', $converted->format('Y-m-d H:i:s'));
@@ -120,7 +119,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
 
     $this->gameOffsetSeconds = 60*60;
     $this->gameDaysPerDay = 1;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertToGameTime($date);
     $this->assertEquals('0000-01-01 23:59:59', $converted->format('Y-m-d H:i:s'));
@@ -131,7 +130,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
 
     $this->gameOffsetSeconds = 60*60;
     $this->gameDaysPerDay = 1;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertToGameTime($date);
     $this->assertEquals('0000-01-02', $converted->format('Y-m-d'));
@@ -142,7 +141,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
 
     $this->gameOffsetSeconds = 60*60;
     $this->gameDaysPerDay = 1;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertToGameTime($date);
     $this->assertEquals('0000-01-02', $converted->format('Y-m-d'));
@@ -152,7 +151,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
     $date = new \DateTime('0000-01-02 00:00:00 UTC');
 
     $this->gameDaysPerDay = 1;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertFromGameTime($date);
     $this->assertEquals("2015-07-28", $converted->format('Y-m-d'));
@@ -165,7 +164,7 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
     $this->gameEpoch = $epoch;
     $this->gameOffsetSeconds = 60*60;
     $this->gameDaysPerDay = 1;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertFromGameTime($date);
     $this->assertEquals("2015-07-29 00:59:59", $converted->format('Y-m-d H:i:s'));
@@ -177,14 +176,14 @@ class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
 
     $this->gameEpoch = $epoch;
     $this->gameDaysPerDay = 4;
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
 
     $converted = $keeper->convertFromGameTime($date);
     $this->assertEquals("2015-07-27 11:59:59", $converted->format('Y-m-d H:i:s'));
   }
 
   public function testGameTimeSanity() {
-    $keeper = new TimeKeeper($this->gameEpoch, $this->gameOffsetSeconds, $this->gameDaysPerDay);
+    $keeper = new TimeKeeper($this->gameEpoch, new DateTime(), $this->gameOffsetSeconds, $this->gameDaysPerDay);
     $this->assertNotNull($keeper->getGameTime());
   }
 }
