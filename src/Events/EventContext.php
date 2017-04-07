@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core;
+namespace LotGD\Core\Events;
 use LotGD\Core\Exceptions\ArgumentException;
 
 
@@ -50,6 +50,11 @@ class EventContext
         return $this->matchingPattern;
     }
 
+    public function hasDataType($type): bool
+    {
+        return $this->data instanceof $type ? true : false;
+    }
+
     /**
      * Returns the immutable data container.
      * @return EventContextDataContainer
@@ -86,5 +91,15 @@ class EventContext
     public function setDataFields($data)
     {
         $this->data = $this->data->setFields($data);
+    }
+
+    /**
+     * Checks if given original data is the same as currently held within this context.
+     * @param EventContextDataContainer $originalData
+     * @return bool
+     */
+    public function hasDataChanged(EventContextDataContainer $originalData): bool
+    {
+        return $this->data === $originalData ? false : true;
     }
 }

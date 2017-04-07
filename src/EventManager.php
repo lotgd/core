@@ -5,11 +5,13 @@ namespace LotGD\Core;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+use LotGD\Core\Events\EventContext;
 use LotGD\Core\Models\EventSubscription;
 use LotGD\Core\EventHandler;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\SubscriptionNotFoundException;
 use LotGD\Core\Exceptions\WrongTypeException;
+use LotGD\Core\Events\EventContextDataContainer;
 
 /**
  * Manages a simple publish/subscribe system based on regular expressions
@@ -33,8 +35,9 @@ class EventManager
      * are run.
      *
      * @param string $event The name of the event to publish.
+     * @param EventContextDataContainer $contextData The Data context
      */
-    public function publish(string $event, array &$context)
+    public function publish(string $event, EventContextDataContainer $contextData): EventContextDataContainer
     {
         // For right now, implement the naive approach of iterating every entry
         // in the subscription database, checking the regular expression. We
@@ -49,9 +52,17 @@ class EventManager
             if (preg_match($s->getPattern(), $event)) {
                 $class = $s->getClass();
                 $this->g->getLogger()->addDebug("  Handling with {$class}.");
-                $c = $class::handleEvent($this->g, $event, $context);
+
+                $eventContext = new EventContext($event, $s->getPattern(), $contextData);
+
+                $returnedEventContext = $class::handleEvent($this->g, $eventContext);
+                if ($returnedEventContext->hasDataChanged($contextData)) {
+                    $contextData = $returnedEventContext->getData();
+                }
             }
         }
+
+        return $contextData;
     }
 
     /**

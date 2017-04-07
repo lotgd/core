@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core;
-
+namespace LotGD\Core\Events;
 
 use LotGD\Core\Exceptions\ArgumentException;
 
-class EventContextDataContainer
+abstract class EventContextDataContainer
 {
     private $data;
 
@@ -39,7 +38,7 @@ class EventContextDataContainer
      */
     public function has(string $field): bool
     {
-        return isset($this->data[$field]);
+        return array_key_exists($field, $this->data);
     }
 
     /**

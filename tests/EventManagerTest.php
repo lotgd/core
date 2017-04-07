@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
+use LotGD\Core\Events\EventContext;
+use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Game;
 use LotGD\Core\EventManager;
 use LotGD\Core\EventHandler;
@@ -20,7 +22,9 @@ class EventManagerTestInvalidSubscriber
 
 class EventManagerTestSubscriber implements EventHandler
 {
-    public static function handleEvent(Game $g, string $event, array &$context) {}
+    public static function handleEvent(Game $g, EventContext $context): EventContext {
+        return $context;
+    }
 }
 
 class EventManagerTest extends CoreModelTestCase
@@ -129,9 +133,11 @@ class EventManagerTest extends CoreModelTestCase
         $em = new EventManager($this->g);
 
         $event = 'test.foo.something_here';
-        $context = array('foo' => 'bar');
+        $contextData = EventContextData::create(["foo" => "bar"]);
 
-        $em->publish($event, $context);
-        $this->assertEquals($context['foo'], 'baz');
+        // The event is expected to change foo from bar to baz.
+        $contextDataModified = $em->publish($event, $contextData);
+        $this->assertNotSame($contextData, $contextDataModified);
+        $this->assertEquals("baz", $contextDataModified->get("foo"));
     }
 }

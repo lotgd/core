@@ -8,26 +8,16 @@ use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 use Monolog\Handler\NullHandler;
 
-use LotGD\Core\Action;
-use LotGD\Core\ActionGroup;
-use LotGD\Core\Bootstrap;
-use LotGD\Core\Configuration;
-use LotGD\Core\ComposerManager;
-use LotGD\Core\DiceBag;
-use LotGD\Core\EventHandler;
-use LotGD\Core\EventManager;
-use LotGD\Core\Game;
-use LotGD\Core\TimeKeeper;
-use LotGD\Core\ModuleManager;
-use LotGD\Core\Models\Character;
-use LotGD\Core\Models\Viewpoint;
-use LotGD\Core\Models\Scene;
-use LotGD\Core\Exceptions\ {
-    ActionNotFoundException,
-    CharacterNotFoundException,
-    InvalidConfigurationException
+use LotGD\Core\{
+    Action, ActionGroup, Bootstrap, Configuration, ComposerManager, DiceBag, EventHandler, EventManager, Events\NewViewpoint, Game, TimeKeeper, ModuleManager
 };
-use LotGD\Core\Tests\CoreModelTestCase;
+use LotGD\Core\Models\{
+    Character, Viewpoint, Scene
+};
+use LotGD\Core\Exceptions\ {
+    ActionNotFoundException, CharacterNotFoundException, InvalidConfigurationException
+};
+use LotGD\Core\Events\EventContext;
 
 class DefaultSceneProvider implements EventHandler
 {
@@ -35,17 +25,22 @@ class DefaultSceneProvider implements EventHandler
     public static $attachments = ['actions'];
     public static $data = ['data'];
 
-    public static function handleEvent(Game $g, string $event, array &$context)
+    public static function handleEvent(Game $g, EventContext $context): EventContext
     {
-        switch ($event) {
+        switch ($context->getEvent()) {
             case 'h/lotgd/core/default-scene':
-                if (!isset($context['character'])) {
-                    throw new \Exception("Key 'character' was expected on event h/lotgd/core/default-scene.");
+                if (!$context->hasDataType(NewViewpoint::class)) {
+                    throw new \Exception(sprintf(
+                        "Context was expected to be %s, %s instead.",
+                        NewViewpoint::class,
+                        get_class($context->getData())
+                    ));
                 }
-                $context['scene'] = $g->getEntityManager()->getRepository(Scene::class)->find(1);
+
+                $context->setDataField("scene", $g->getEntityManager()->getRepository(Scene::class)->find(1));
                 break;
             case 'h/lotgd/core/navigate-to/lotgd/tests/village':
-                $v = $context['viewpoint'];
+                $v = $context->getDataField('viewpoint');
 
                 self::$actionGroups = [new ActionGroup('default', 'Title', 0)];
                 self::$actionGroups[0]->setActions([
@@ -58,6 +53,8 @@ class DefaultSceneProvider implements EventHandler
                 $v->setData(self::$data);
                 break;
         }
+
+        return $context;
     }
 }
 
@@ -124,7 +121,7 @@ class GameTest extends CoreModelTestCase
         $c = $this->getEntityManager()->getRepository(Character::class)->find(1);
         $this->g->setCharacter($c);
 
-        // There shouldnt be any listeners to provide a default scene.
+        // There should'nt be any listeners to provide a default scene.
         $this->expectException(InvalidConfigurationException::class);
         $this->g->getViewpoint();
     }

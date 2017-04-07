@@ -5,6 +5,8 @@ namespace LotGD\Core;
 
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use LotGD\Core\Events\NavigateToScene;
+use LotGD\Core\Events\NewViewpoint;
 use Monolog\Logger;
 
 use LotGD\Core\Models\{
@@ -192,13 +194,14 @@ class Game
         if ($v === null) {
             // No viewpoint set up for this user. Run the hook to find the default
             // scene.
-            $context = [
+            $contextData = NewViewpoint::create([
                 'character' => $this->getCharacter(),
                 'scene' => null
-            ];
-            $this->getEventManager()->publish('h/lotgd/core/default-scene', $context);
+            ]);
 
-            $s = $context['scene'];
+            $contextData = $this->getEventManager()->publish('h/lotgd/core/default-scene', $contextData);
+
+            $s = $contextData->get("scene");
             if ($s === null) {
                 throw new InvalidConfigurationException("No subscriber to h/lotgd/core/default-scene returned a scene.");
             }
@@ -292,17 +295,18 @@ class Game
             // Let and installed listeners (ie modules) make modifications to the
             // new viewpoint, including the ability to redirect the user to
             // a different scene, by setting $context['redirect'] to a new scene.
-            $context = [
+            $contextData = NavigateToScene::create([
                 'referrer' => $referrer,
                 'viewpoint' => $viewpoint,
                 'scene' => $scene,
                 'parameters' => $parameters,
                 'redirect' => null
-            ];
-            $hook = 'h/lotgd/core/navigate-to/' . $scene->getTemplate();
-            $this->getEventManager()->publish($hook, $context);
+            ]);
 
-            $scene = $context['redirect'];
+            $hook = 'h/lotgd/core/navigate-to/' . $scene->getTemplate();
+            $contextData = $this->getEventManager()->publish($hook, $contextData);
+
+            $scene = $contextData->get('redirect');
             if ($scene !== null) {
                 $id = $scene->getId();
                 $this->getLogger()->debug("Redirecting to sceneId={$id}");

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace LotGD\Core;
+use LotGD\Core\Events\EventContext;
 
 interface EventHandler
 {
