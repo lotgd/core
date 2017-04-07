@@ -8,8 +8,21 @@ use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Scene;
 
+/**
+ * NewViewpoint data container which is used if no scene has ever been visited.
+ *
+ * Fields are:
+ *  character   Character
+ *  scene       Scene|null
+ * @package LotGD\Core\Events
+ */
 class NewViewpoint extends EventContextDataContainer
 {
+    /**
+     * NewViewpoint constructor.
+     * @param array $data
+     * @throws ArgumentException In case $data contains invalid data.
+     */
     protected function __construct(array $data)
     {
         if (array_keys($data) !== ["character", "scene"]) {

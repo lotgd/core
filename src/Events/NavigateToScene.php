@@ -12,8 +12,24 @@ use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\Viewpoint;
 
 
+/**
+ * NavigateToScene data container which can be used for navigational events.
+ *
+ * Fields are:
+ *  referrer    Scene|null
+ *  viewpoint   Viewpoint
+ *  scene       Scene
+ *  parameters  array
+ *  redirect    Scene|null
+ * @package LotGD\Core\Events
+ */
 class NavigateToScene extends EventContextDataContainer
 {
+    /**
+     * NavigateToScene constructor.
+     * @param array $data Must contain fields referrer, viewpoint, scene, parameters and redirect; none more.
+     * @throws ArgumentException
+     */
     protected function __construct(array $data)
     {
         $mustHaveForm = ["referrer", "viewpoint", "scene", "parameters", "redirect"];

@@ -50,7 +50,12 @@ class EventContext
         return $this->matchingPattern;
     }
 
-    public function hasDataType($type): bool
+    /**
+     * Checks if the data in this event context has a certain subtype.
+     * @param string $type FQCN to be checked.
+     * @return bool
+     */
+    public function hasDataType(string $type): bool
     {
         return $this->data instanceof $type ? true : false;
     }
