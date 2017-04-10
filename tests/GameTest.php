@@ -9,7 +9,7 @@ use Monolog\Logger;
 use Monolog\Handler\NullHandler;
 
 use LotGD\Core\{
-    Action, ActionGroup, Bootstrap, Configuration, ComposerManager, DiceBag, EventHandler, EventManager, Events\NewViewpoint, Game, TimeKeeper, ModuleManager
+    Action, ActionGroup, Bootstrap, Configuration, ComposerManager, DiceBag, EventHandler, EventManager, Events\NewViewpointData, Game, TimeKeeper, ModuleManager
 };
 use LotGD\Core\Models\{
     Character, Viewpoint, Scene
@@ -29,10 +29,10 @@ class DefaultSceneProvider implements EventHandler
     {
         switch ($context->getEvent()) {
             case 'h/lotgd/core/default-scene':
-                if (!$context->hasDataType(NewViewpoint::class)) {
+                if (!$context->hasDataType(NewViewpointData::class)) {
                     throw new \Exception(sprintf(
                         "Context was expected to be %s, %s instead.",
-                        NewViewpoint::class,
+                        NewViewpointData::class,
                         get_class($context->getData())
                     ));
                 }

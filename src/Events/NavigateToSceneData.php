@@ -23,7 +23,7 @@ use LotGD\Core\Models\Viewpoint;
  *  redirect    Scene|null
  * @package LotGD\Core\Events
  */
-class NavigateToScene extends EventContextDataContainer
+class NavigateToSceneData extends EventContextData
 {
     /**
      * NavigateToScene constructor.

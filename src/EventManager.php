@@ -11,7 +11,7 @@ use LotGD\Core\EventHandler;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\SubscriptionNotFoundException;
 use LotGD\Core\Exceptions\WrongTypeException;
-use LotGD\Core\Events\EventContextDataContainer;
+use LotGD\Core\Events\EventContextData;
 
 /**
  * Manages a simple publish/subscribe system based on regular expressions
@@ -35,9 +35,10 @@ class EventManager
      * are run.
      *
      * @param string $event The name of the event to publish.
-     * @param EventContextDataContainer $contextData The Data context
+     * @param EventContextData $contextData The Data context
+     * @return EventContextData The changed data.
      */
-    public function publish(string $event, EventContextDataContainer $contextData): EventContextDataContainer
+    public function publish(string $event, EventContextData $contextData): EventContextData
     {
         // For right now, implement the naive approach of iterating every entry
         // in the subscription database, checking the regular expression. We
@@ -56,9 +57,9 @@ class EventManager
                 $eventContext = new EventContext($event, $s->getPattern(), $contextData);
 
                 $returnedEventContext = $class::handleEvent($this->g, $eventContext);
-                if ($returnedEventContext->hasDataChanged($contextData)) {
-                    $contextData = $returnedEventContext->getData();
-                }
+                // Overwrite contextData - contextData might be the same if nothing has changed,
+                // or might reference a completely new object the event handler changed a value.
+                $contextData = $returnedEventContext->getData();
             }
         }
 

@@ -5,8 +5,8 @@ namespace LotGD\Core;
 
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use LotGD\Core\Events\NavigateToScene;
-use LotGD\Core\Events\NewViewpoint;
+use LotGD\Core\Events\NavigateToSceneData;
+use LotGD\Core\Events\NewViewpointData;
 use Monolog\Logger;
 
 use LotGD\Core\Models\{
@@ -194,7 +194,7 @@ class Game
         if ($v === null) {
             // No viewpoint set up for this user. Run the hook to find the default
             // scene.
-            $contextData = NewViewpoint::create([
+            $contextData = NewViewpointData::create([
                 'character' => $this->getCharacter(),
                 'scene' => null
             ]);
@@ -295,7 +295,7 @@ class Game
             // Let and installed listeners (ie modules) make modifications to the
             // new viewpoint, including the ability to redirect the user to
             // a different scene, by setting $context['redirect'] to a new scene.
-            $contextData = NavigateToScene::create([
+            $contextData = NavigateToSceneData::create([
                 'referrer' => $referrer,
                 'viewpoint' => $viewpoint,
                 'scene' => $scene,

@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 namespace LotGD\Core\Events;
-use LotGD\Core\Exceptions\ArgumentException;
 
 
 /**
@@ -20,12 +19,12 @@ class EventContext
      * EventContext constructor.
      * @param string $event The published event
      * @param string $matchingPattern The matching pattern
-     * @param EventContextDataContainer $data
+     * @param EventContextData $data
      */
     public function __construct(
         string $event,
         string $matchingPattern,
-        EventContextDataContainer $data
+        EventContextData $data
     ) {
         $this->event = $event;
         $this->matchingPattern = $matchingPattern;
@@ -62,9 +61,9 @@ class EventContext
 
     /**
      * Returns the immutable data container.
-     * @return EventContextDataContainer
+     * @return EventContextData
      */
-    public function getData(): EventContextDataContainer
+    public function getData(): EventContextData
     {
         return $this->data;
     }
@@ -100,10 +99,10 @@ class EventContext
 
     /**
      * Checks if given original data is the same as currently held within this context.
-     * @param EventContextDataContainer $originalData
+     * @param EventContextData $originalData
      * @return bool
      */
-    public function hasDataChanged(EventContextDataContainer $originalData): bool
+    public function hasDataChanged(EventContextData $originalData): bool
     {
         return $this->data === $originalData ? false : true;
     }

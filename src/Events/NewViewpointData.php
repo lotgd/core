@@ -16,7 +16,7 @@ use LotGD\Core\Models\Scene;
  *  scene       Scene|null
  * @package LotGD\Core\Events
  */
-class NewViewpoint extends EventContextDataContainer
+class NewViewpointData extends EventContextData
 {
     /**
      * NewViewpoint constructor.
