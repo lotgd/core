@@ -6,6 +6,7 @@ namespace LotGD\Core\Tests;
 use Composer\Package\PackageInterface;
 use Composer\Composer;
 
+use Doctrine\Common\Util\Debug;
 use LotGD\Core\Game;
 use LotGD\Core\ComposerManager;
 use LotGD\Core\EventHandler;
@@ -18,6 +19,7 @@ use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
 use LotGD\Core\Tests\CoreModelTestCase;
 use LotGD\Core\Tests\FakeModule\Module as FakeModule;
+use LotGD\Core\Tests\DefectiveModule\Module as DefectiveModule;
 
 class ModuleManagerTest extends CoreModelTestCase
 {
@@ -135,8 +137,7 @@ class ModuleManagerTest extends CoreModelTestCase
     {
         $class = FakeModule::class;
         $name = 'lotgd/tests2';
-        $subscriptions = array(
-        );
+        $subscriptions = [];
         $library = $this->getMockBuilder(LibraryConfiguration::class)
                         ->disableOriginalConstructor()
                         ->getMock();
@@ -198,5 +199,37 @@ class ModuleManagerTest extends CoreModelTestCase
         $this->assertLessThanOrEqual(5, $timeDiff);
         $this->assertGreaterThanOrEqual(-5, $timeDiff);
         $this->assertEquals($name, $modules[1]->getLibrary());
+    }
+
+    public function testRegisteringDefectiveModule()
+    {
+        $class = DefectiveModule::class;
+        $name = "lotgd/tests3";
+        $subscriptions = [];
+        $library = $this->getMockBuilder(LibraryConfiguration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $library->method('getName')->willReturn($name);
+        $library->method('getRootNamespace')->willReturn('LotGD\\Core\\Tests\\DefectiveModule\\');
+        $library->method('getSubscriptionPatterns')->willReturn($subscriptions);
+
+        $eventManager = $this->getMockBuilder(EventManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->game->method('getEventManager')->willReturn($eventManager);
+        $modulesBefore = $this->mm->getModules();
+        try {
+            // onRegister throws an exception. This exception needs to be captured and handled by mm->register without actually
+            // registering a real module...
+            $this->mm->register($library);
+            $exceptionCaptured = false;
+        } catch(\Exception $e) {
+            $exceptionCaptured = true;
+        }
+        $modulesAfter = $this->mm->getModules();
+
+        $this->assertFalse($exceptionCaptured);
+        $this->assertCount(count($modulesBefore), $modulesAfter);
     }
 }
