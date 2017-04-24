@@ -224,7 +224,7 @@ class ModuleManagerTest extends CoreModelTestCase
             // registering a real module...
             $this->mm->register($library);
             $exceptionCaptured = false;
-        } catch(\Exception $e) {
+        } catch(\Throwable $e) {
             $exceptionCaptured = true;
         }
         $modulesAfter = $this->mm->getModules();

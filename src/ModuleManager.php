@@ -3,11 +3,9 @@ declare (strict_types=1);
 
 namespace LotGD\Core;
 
-use Composer\Package\PackageInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use Throwable;
 
 use LotGD\Core\PackageConfiguration;
-use LotGD\Core\Exceptions\KeyNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
 use LotGD\Core\Models\Module as ModuleModel;
@@ -52,7 +50,6 @@ class ModuleManager
             // TODO: handle error cases here.
             $this->g->getLogger()->debug("Creating module model for {$name}");
             $m = new ModuleModel($name);
-            $m->save($this->g->getEntityManager());
 
             $class = $library->getRootNamespace() . 'Module';
             try {
@@ -77,8 +74,14 @@ class ModuleManager
 
             // Run the module's onRegister handler.
             $this->g->getLogger()->debug("Calling {$class}::onRegister");
-            $class::onRegister($this->g, $m);
-            $m->save($this->g->getEntityManager());
+
+            try {
+                $class::onRegister($this->g, $m);
+                $m->save($this->g->getEntityManager());
+            } catch (Throwable $e) {
+                $this->g->getLogger()->debug("Calling {$class}::onRegister failed with exception: {$e->getMessage()}");
+                unset($m);
+            }
         }
     }
 
