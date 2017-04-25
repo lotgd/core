@@ -5,9 +5,11 @@ namespace LotGD\Core;
 
 use Throwable;
 
-use LotGD\Core\PackageConfiguration;
+use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\Exceptions\ModuleDoesNotExistException;
+use LotGD\Core\Exceptions\SubscriptionNotFoundException;
+use LotGD\Core\Exceptions\WrongTypeException;
 use LotGD\Core\Models\Module as ModuleModel;
 
 /**
@@ -79,7 +81,7 @@ class ModuleManager
                 $class::onRegister($this->g, $m);
                 $m->save($this->g->getEntityManager());
             } catch (Throwable $e) {
-                $this->g->getLogger()->debug("Calling {$class}::onRegister failed with exception: {$e->getMessage()}");
+                $this->g->getLogger()->error("Calling {$class}::onRegister failed with exception: {$e->getMessage()}");
                 unset($m);
             }
         }
