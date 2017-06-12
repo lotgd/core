@@ -11,17 +11,20 @@ class Action
 {
     protected $id;
     protected $destinationSceneId;
+    protected $title = null;
     protected $parameters = [];
 
     /**
      * Construct a new action with the specified Scene as its destination.
      * @param int $destinationSceneId
+     * @param string|null $title
      * @param array $parameters
      */
-    public function __construct(int $destinationSceneId, array $parameters = [])
+    public function __construct(int $destinationSceneId, ?string $title = null, array $parameters = [])
     {
         $this->id = bin2hex(random_bytes(8));
         $this->destinationSceneId = $destinationSceneId;
+        $this->title = $title;
         $this->parameters = $parameters;
     }
 
@@ -43,6 +46,22 @@ class Action
     public function getDestinationSceneId(): int
     {
         return $this->destinationSceneId;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function setTitle(?string $title)
+    {
+        $this->title = $title;
     }
 
     /**
