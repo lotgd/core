@@ -210,7 +210,7 @@ class GameTest extends CoreModelTestCase
         // subscribe event
         $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
 
-        $action = new Action(7, ["foo" => "baz"]);
+        $action = new Action(7, null, ["foo" => "baz"]);
         $actionId = $action->getId();
 
         $ag = new ActionGroup("group1", "Group 1", 5);
@@ -239,7 +239,7 @@ class GameTest extends CoreModelTestCase
         // subscribe event
         $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
 
-        $action = new Action(7, ["foo" => "baz"]);
+        $action = new Action(7, null, ["foo" => "baz"]);
         $actionId = $action->getId();
 
         $ag = new ActionGroup("group1", "Group 1", 5);
