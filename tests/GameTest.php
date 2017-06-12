@@ -52,6 +52,19 @@ class DefaultSceneProvider implements EventHandler
                 $v->setAttachments(self::$attachments);
                 $v->setData(self::$data);
                 break;
+
+            case 'h/lotgd/core/navigate-to/lotgd/tests/paramaters':
+                /* @var Viewpoint $v //*/
+                $v = $context->getDataField('viewpoint');
+                /* @var array //*/
+                $p = $context->getDataField('parameters');
+
+                if ($p["foo"] === "baz") {
+                    $v->setDescription("Parameter is baz.");
+                } else {
+                    $v->setDescription("Parameter is NOT baz.");
+                }
+                break;
         }
 
         return $context;
@@ -186,6 +199,64 @@ class GameTest extends CoreModelTestCase
 
         $v = $this->g->getViewpoint();
         $this->assertSame($s->getTemplate(), $v->getTemplate());
+    }
+
+    public function testIfActionParametersAreRelayedToEvent()
+    {
+        /* @var $c Character */
+        $c = $this->getEntityManager()->getRepository(Character::class)->find(2);
+        $this->g->setCharacter($c);
+
+        // subscribe event
+        $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+
+        $action = new Action(7, ["foo" => "baz"]);
+        $actionId = $action->getId();
+
+        $ag = new ActionGroup("group1", "Group 1", 5);
+        $ag->addAction($action);
+
+        $v = $c->getViewpoint();
+        $v->setDescription("Test");
+        $v->setActionGroups([$ag]);
+        $c->setViewpoint($v);
+
+        $this->g->takeAction($actionId);
+
+        $v = $c->getViewpoint();
+        $this->assertSame("Parameter is baz.", $v->getDescription());
+
+        // unsubscribe event
+        $this->g->getEventManager()->unsubscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+    }
+
+    public function testIfActionParametersTakePriorityToOtherParameters()
+    {
+        /* @var $c Character */
+        $c = $this->getEntityManager()->getRepository(Character::class)->find(2);
+        $this->g->setCharacter($c);
+
+        // subscribe event
+        $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+
+        $action = new Action(7, ["foo" => "baz"]);
+        $actionId = $action->getId();
+
+        $ag = new ActionGroup("group1", "Group 1", 5);
+        $ag->addAction($action);
+
+        $v = $c->getViewpoint();
+        $v->setDescription("Test");
+        $v->setActionGroups([$ag]);
+        $c->setViewpoint($v);
+
+        $this->g->takeAction($actionId, ["foo" => "nobaz"]);
+
+        $v = $c->getViewpoint();
+        $this->assertSame("Parameter is baz.", $v->getDescription());
+
+        // unsubscribe event
+        $this->g->getEventManager()->unsubscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
     }
 
     public function testIfActionsAreAddedAsExpected()

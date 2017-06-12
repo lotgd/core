@@ -333,6 +333,7 @@ class Game
         if ($action === null) {
             throw new ActionNotFoundException("Invalid actionId={$actionId} for current viewpoint.");
         }
+        $actionParameters = $action->getParameters();
 
         $sceneId = $action->getDestinationSceneId();
         $scene = $this->getEntityManager()->getRepository(Scene::class)->find([
@@ -341,7 +342,12 @@ class Game
         if ($scene == null) {
             throw new SceneNotFoundException("Cannot find sceneId={$sceneId} specified by actionId={$actionId}.");
         }
+
+        // action parameters overwrite other parameters since the former cannot be changed by the user
+        $parameters = array_merge($parameters, $actionParameters);
+
         $this->navigateToScene($scene, $parameters);
+
         $v->save($this->getEntityManager());
     }
 }

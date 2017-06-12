@@ -51,6 +51,11 @@ scenes:
         title: "Child Scene 2"
         description: "This is a parent scene that connects to two children."
         template: "lotgd/tests/none"
+    -
+        id: 7
+        title: "Parameter test"
+        description: "This is a parameter test"
+        template: "lotgd/tests/paramaters"
 scene_connection_groups:
     -
         scene: 4
