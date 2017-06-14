@@ -9,7 +9,7 @@ use Monolog\Logger;
 use Monolog\Handler\NullHandler;
 
 use LotGD\Core\{
-    Action, ActionGroup, Bootstrap, Configuration, ComposerManager, DiceBag, EventHandler, EventManager, Events\NewViewpointData, Game, TimeKeeper, ModuleManager
+    Action, ActionGroup, Bootstrap, Configuration, ComposerManager, DiceBag, EventHandler, EventManager, Events\NewViewpointData, Game, GameBuilder, TimeKeeper, ModuleManager
 };
 use LotGD\Core\Models\{
     Character, Viewpoint, Scene
@@ -85,7 +85,12 @@ class GameTest extends CoreModelTestCase
         $logger  = new Logger('test');
         $logger->pushHandler(new NullHandler());
 
-        $this->g = new Game(new Configuration(getenv('LOTGD_TESTS_CONFIG_PATH')), $logger, $this->getEntityManager(), implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
+        $this->g = (new GameBuilder())
+            ->withConfiguration(new Configuration(getenv('LOTGD_TESTS_CONFIG_PATH')))
+            ->withLogger($logger)
+            ->withEntityManager($this->getEntityManager())
+            ->withCwd(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']))
+            ->create();
     }
 
     public function testBasicInjection()

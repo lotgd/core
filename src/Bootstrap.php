@@ -64,7 +64,12 @@ class Bootstrap
         $pdo = $this->connectToDatabase($dsn, $user, $password);
         $entityManager = $this->createEntityManager($pdo);
 
-        $this->game = new Game($config, $this->logger, $entityManager, $cwd);
+        $this->game = (new GameBuilder())
+            ->withConfiguration($config)
+            ->withLogger($this->logger)
+            ->withEntityManager($entityManager)
+            ->withCwd($cwd)
+            ->create();
 
         return $this->game;
     }

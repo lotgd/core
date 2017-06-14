@@ -85,10 +85,16 @@ class Game
      */
     public function getModuleManager(): ModuleManager
     {
-        if ($this->moduleManager === null) {
-            $this->moduleManager = new ModuleManager($this);
-        }
         return $this->moduleManager;
+    }
+
+    /**
+     * Sets the game's module manager.
+     * @param ModuleManager $moduleManager
+     */
+    public function setModuleManager(ModuleManager $moduleManager): void
+    {
+        $this->moduleManager = $moduleManager;
     }
 
     /**
@@ -97,10 +103,16 @@ class Game
      */
     public function getComposerManager(): ComposerManager
     {
-        if ($this->composerManager === null) {
-            $this->composerManager = new ComposerManager($this->cwd);
-        }
         return $this->composerManager;
+    }
+
+    /**
+     * Sets the game's composer manager.
+     * @param ComposerManager $composerManager
+     */
+    public function setComposerManager(ComposerManager $composerManager): void
+    {
+        $this->composerManager = $composerManager;
     }
 
     /**
@@ -118,10 +130,16 @@ class Game
      */
     public function getEventManager(): EventManager
     {
-        if ($this->eventManager === null) {
-            $this->eventManager = new EventManager($this);
-        }
         return $this->eventManager;
+    }
+
+    /**
+     * Sets the game's event manager.
+     * @param EventManager $eventManager
+     */
+    public function setEventManager(EventManager $eventManager): void
+    {
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -130,10 +148,16 @@ class Game
      */
     public function getDiceBag(): DiceBag
     {
-        if ($this->diceBag === null) {
-            $this->diceBag = new DiceBag();
-        }
         return $this->diceBag;
+    }
+
+    /**
+     * Sets the game's dice bag.
+     * @param DiceBag $diceBag
+     */
+    public function setDiceBag(DiceBag $diceBag): void
+    {
+        $this->diceBag = $diceBag;
     }
 
     /**
