@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Action;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\SceneBasics;
+use LotGD\Core\Tools\SceneDescription;
 
 /**
  * A Viewpoint is the current Scene a character is experiencing with
@@ -32,6 +33,9 @@ class Viewpoint implements CreateableInterface
     /** @ManyToOne(targetEntity="Scene") */
     private $scene;
 
+    /** @var SceneDescription */
+    private $_description;
+
     /** @var array */
     private static $fillable = [
         "owner"
@@ -53,6 +57,39 @@ class Viewpoint implements CreateableInterface
     public function setOwner(Character $owner)
     {
         $this->owner = $owner;
+    }
+
+    /**
+     * Sets the description of this viewpoint.
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+        $this->_description = new SceneDescription($description);
+    }
+
+    /**
+     * Returns the current description as a string
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Adds a paragraph to the existing description
+     * @param string $paragraph
+     */
+    public function addDescriptionParagraph(string $paragraph)
+    {
+        if ($this->_description === null) {
+            $this->_description = new SceneDescription($this->description);
+        }
+
+        $this->_description->addParagraph($paragraph);
+        $this->description = (string)$this->_description;
     }
 
     /**
