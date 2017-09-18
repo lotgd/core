@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Action;
+use LotGD\Core\ActionGroup;
+use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\SceneBasics;
 use LotGD\Core\Tools\SceneDescription;
@@ -177,11 +179,38 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
+     * Adds a new action group to a viewpoint
+     * @param ActionGroup $group The new group to add.
+     * @param null|string $after, optional group id that comes before.
+     * @throws ArgumentException
+     */
+    public function addActionGroup(ActionGroup $group, ?string $after = null): void
+    {
+        $groupid = $group->getId();
+        if ($this->findActionGroupById($groupid) == true) {
+            throw new ArgumentException("Group {$group} is already contained in this viewpoint.");
+        }
+
+        if ($after === null) {
+            $this->actionGroups[] = $group;
+        } else {
+            $groups = [];
+            foreach ($this->actionGroups as $g) {
+                if ($g->getId() == $after) {
+                    $groups[] = $group;
+                }
+                $groups[] = $g;
+            }
+            $this->actionGroups = $groups;
+        }
+    }
+
+    /**
      * Finds an action group by id.
      * @param $actionGroupId
      * @return ActionGroup|null
      */
-    public function findActionGroupById(string $actionGroupId)
+    public function findActionGroupById(string $actionGroupId): ?ActionGroup
     {
         $groups = $this->getActionGroups();
         foreach ($groups as $g) {
@@ -190,6 +219,23 @@ class Viewpoint implements CreateableInterface
             }
         }
         return null;
+    }
+
+    /**
+     * Checks if the viewpoint has a certain action group.
+     * @param string $actionGroupId
+     * @return bool
+     */
+    public function hasActionGroup(string $actionGroupId): bool
+    {
+        $groups = $this->getActionGroups();
+        foreach ($groups as $g) {
+            if ($g->getId() == $actionGroupId) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
