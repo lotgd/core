@@ -185,4 +185,16 @@ class ViewpointTest extends CoreModelTestCase
         $output->removeActionsWithSceneId(2);
         $this->assertEquals($actionGroupsWithout2, $output->getActionGroups());
     }
+
+    public function testChangingSceneDescription()
+    {
+        $em = $this->getEntityManager();
+        $testCharacter = $em->getRepository(Character::class)->find(2);
+        $characterScene = $testCharacter->getViewpoint();
+
+        $this->assertSame("This is the village.", $characterScene->getDescription());
+
+        $characterScene->addDescriptionParagraph("You enjoy being here.");
+        $this->assertSame("This is the village.\n\nYou enjoy being here.", $characterScene->getDescription());
+    }
 }
