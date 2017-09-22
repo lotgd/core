@@ -92,6 +92,35 @@ class BattleTest extends CoreModelTestCase
     }
 
     /**
+     * Tests if a fight can happen if it is serialized between each round.
+     */
+    public function testFairBattleWithSerializationBetweenRounds()
+    {
+        $em = $this->getEntityManager();
+
+        $character = $em->getRepository(Character::class)->find(1);
+        $monster = $em->getRepository(Monster::class)->find(1);
+
+        $battle = new Battle($this->getMockGame($character), $character, $monster);
+        $battle = $battle->serialize();
+
+        for ($n = 0; $n < 99; $n++) {
+            $battle = Battle::unserialize($this->getMockGame($character), $character, $battle);
+
+            $battle->fightNRounds(1);
+
+            if ($battle->isOver()) {
+                break;
+            }
+
+            $battle = $battle->serialize();
+        }
+
+        $this->assertTrue($battle->isOver());
+        $this->assertTrue($battle->getPlayer()->isAlive() xor $battle->getMonster()->isAlive());
+    }
+
+    /**
      * Tests a fight which the player has to win (lvl 100 vs lvl 1)
      */
     public function testPlayerWinBattle()

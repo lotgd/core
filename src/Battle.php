@@ -61,12 +61,45 @@ class Battle
      * @param FighterInterface $player
      * @param FighterInterface $monster
      */
-    public function __construct(Game $game, FighterInterface $player, FighterInterface $monster)
+    public function __construct(Game $game, FighterInterface $player, ?FighterInterface $monster)
     {
         $this->game = $game;
         $this->player = $player;
         $this->monster = $monster;
         $this->events = new ArrayCollection();
+    }
+
+    /**
+     * Returns a string which contains the important fields that must be serialized.
+     * @return string
+     */
+    public function serialize(): string
+    {
+        return serialize([
+            "monster" => $this->monster,
+            "result" => $this->result,
+            "round" => $this->round,
+            "configuration" => $this->configuration,
+        ]);
+    }
+
+    /**
+     * @param Game $game
+     * @param FighterInterface $player
+     * @param string $serialized
+     * @return Battle
+     */
+    public static function unserialize(Game $game, FighterInterface $player, string $serialized): self
+    {
+        $battle = new self($game, $player, null);
+        $unserialized = unserialize($serialized);
+
+        $battle->monster  = $unserialized["monster"];
+        $battle->result = $unserialized["result"];
+        $battle->round = $unserialized["round"];
+        $battle->configuration = $unserialized["configuration"];
+
+        return $battle;
     }
     
     /**
