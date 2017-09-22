@@ -51,4 +51,23 @@ class DiceBagTests extends \PHPUnit_Framework_TestCase
         $this->assertGreaterThanOrEqual(1, $value);
         $this->assertLessThanOrEqual(3, $value);
     }
+
+    public function testDice()
+    {
+        $db = new DiceBag();
+        $value = $db->dice(1, 6);
+        $this->assertGreaterThanOrEqual(1, $value);
+        $this->assertLessThanOrEqual(6, $value);
+        
+        $value = $db->dice(5, 5);
+        $this->assertSame(5, $value);
+
+        $value = $db->dice(1, 3);
+        $this->assertGreaterThanOrEqual(1, $value);
+        $this->assertLessThanOrEqual(3, $value);
+
+        $value = $db->dice(3, 1);
+        $this->assertGreaterThanOrEqual(1, $value);
+        $this->assertLessThanOrEqual(3, $value);
+    }
 }
