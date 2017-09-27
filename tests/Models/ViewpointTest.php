@@ -197,4 +197,17 @@ class ViewpointTest extends CoreModelTestCase
         $characterScene->addDescriptionParagraph("You enjoy being here.");
         $this->assertSame("This is the village.\n\nYou enjoy being here.", $characterScene->getDescription());
     }
+
+    public function testClearingSceneDescription()
+    {
+        $em = $this->getEntityManager();
+        $testCharacter = $em->getRepository(Character::class)->find(2);
+        $characterScene = $testCharacter->getViewpoint();
+
+        $characterScene->clearDescription();
+        $this->assertSame("", $characterScene->getDescription());
+
+        $characterScene->addDescriptionParagraph("You enjoy being here.");
+        $this->assertSame("You enjoy being here.", $characterScene->getDescription());
+    }
 }

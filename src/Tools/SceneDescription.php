@@ -61,6 +61,13 @@ class SceneDescription
         $input = str_replace("\r\n", "\n", $input);
         $input = str_replace("\r", "\n", $input);
 
-        return explode("\n\n", $input);
+        $parts = explode("\n\n", $input);
+        foreach ($parts as $key => $part) {
+            if (strlen($part) === 0) {
+                unset($parts[$key]);
+            }
+        }
+
+        return $parts;
     }
 }
