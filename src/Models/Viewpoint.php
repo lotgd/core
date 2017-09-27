@@ -77,6 +77,7 @@ class Viewpoint implements CreateableInterface
     public function clearDescription(): void
     {
         $this->description = "";
+        $this->_description = new SceneDescription("");
     }
 
     /**
