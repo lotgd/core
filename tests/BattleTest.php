@@ -85,6 +85,10 @@ class BattleTest extends CoreModelTestCase
             if ($battle->isOver()) {
                 break;
             }
+
+            foreach ($battle->getEvents() as $event) {
+                $this->assertNotNull($event->decorate($this->getMockGame($character)));
+            }
         }
 
         $this->assertTrue($battle->isOver());
@@ -111,6 +115,10 @@ class BattleTest extends CoreModelTestCase
 
             if ($battle->isOver()) {
                 break;
+            }
+
+            foreach ($battle->getEvents() as $event) {
+                $this->assertNotNull($event->decorate($this->getMockGame($character)));
             }
 
             $battle = $battle->serialize();

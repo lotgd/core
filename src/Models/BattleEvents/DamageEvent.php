@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models\BattleEvents;
 
+use LotGD\Core\Game;
 use LotGD\Core\Models\FighterInterface;
 
 /**

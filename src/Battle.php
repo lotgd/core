@@ -16,11 +16,7 @@ use LotGD\Core\{
     Models\FighterInterface
 };
 use LotGD\Core\Models\{
-    Buff,
-    BattleEvents\BuffMessageEvent,
-    BattleEvents\CriticalHitEvent,
-    BattleEvents\DamageEvent,
-    BattleEvents\DeathEvent
+    Buff, BattleEvents\BuffMessageEvent, BattleEvents\CriticalHitEvent, BattleEvents\DamageEvent, BattleEvents\DeathEvent, Scene
 };
 
 /**
@@ -103,22 +99,8 @@ class Battle
     }
     
     /**
-     * @ToDo Returns at some point battle actions
-     */
-    public function getActions()
-    {
-    }
-    
-    /**
-     * @ToDo Do some action
-     */
-    public function selectAction()
-    {
-    }
-    
-    /**
      * Returns a list of all battle events
-     * @return \LotGD\Core\Collection
+     * @return Collection
      */
     public function getEvents(): Collection
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Models\BattleEvents;
 
 use LotGD\Core\Exceptions\BattleEventException;
+use LotGD\Core\Game;
 use LotGD\Core\Models\FighterInterface;
 
 /**
@@ -44,7 +45,7 @@ class RegenerationBuffEvent extends BattleEvent
      */
     public function decorate(Game $game): string
     {
-        parent::decorate();
+        parent::decorate($game);
 
         if ($this->regeneration === 0) {
             return str_replace(

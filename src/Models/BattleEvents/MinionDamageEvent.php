@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Models\BattleEvents;
 
 use LotGD\Core\Exceptions\BattleEventException;
+use LotGD\Core\Game;
 use LotGD\Core\Models\FighterInterface;
 
 /**
@@ -39,7 +40,7 @@ class MinionDamageEvent extends BattleEvent
      */
     public function decorate(Game $game): string
     {
-        parent::decorate();
+        parent::decorate($game);
 
         return str_replace(
             [
