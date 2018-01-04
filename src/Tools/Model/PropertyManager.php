@@ -10,7 +10,10 @@ trait PropertyManager
 {
     private $propertyStorage = null;
 
-    public function loadProperties()
+    /**
+     * Loads properties
+     */
+    public function loadProperties(): void
     {
         if ($this->propertyStorage !== null) {
             return;
@@ -21,6 +24,12 @@ trait PropertyManager
         }
     }
 
+    /**
+     * Returns a property with its stored type.
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
     public function getProperty(string $name, $default = null)
     {
         $this->loadProperties();
@@ -32,7 +41,11 @@ trait PropertyManager
         }
     }
 
-    public function unsetProperty(string $name)
+    /**
+     * Deletes a property.
+     * @param string $name
+     */
+    public function unsetProperty(string $name): void
     {
         $this->loadProperties();
 
@@ -43,7 +56,12 @@ trait PropertyManager
         }
     }
 
-    public function setProperty(string $name, $value)
+    /**
+     * Sets a property to a given value
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setProperty(string $name, $value): void
     {
         $this->loadProperties();
 
