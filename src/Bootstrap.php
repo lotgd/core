@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use Doctrine\Common\EventManager as DoctrineEventManager;
+use Doctrine\ORM\Events as DoctrineEvents;
 use Doctrine\ORM\ {
     EntityManager,
     EntityManagerInterface,
@@ -17,10 +19,8 @@ use Monolog\ {
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application;
 
-use LotGD\Core\ {
-    ComposerManager,
-    BootstrapInterface,
-    Exceptions\InvalidConfigurationException
+use LotGD\Core\{
+    ComposerManager, BootstrapInterface, Doctrine\EntityPostLoadEventListener, Exceptions\InvalidConfigurationException
 };
 
 /**
@@ -70,6 +70,10 @@ class Bootstrap
             ->withEntityManager($entityManager)
             ->withCwd($cwd)
             ->create();
+
+        // Add Event listener to entity manager
+        $dem = $entityManager->getEventManager();
+        $dem->addEventListener([DoctrineEvents::postLoad], new EntityPostLoadEventListener($this->game));
 
         return $this->game;
     }

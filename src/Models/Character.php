@@ -11,14 +11,11 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\{
-    BuffList,
-    Game
+    BuffList, Game, GameAwareInterface
 };
 use LotGD\Core\Tools\Exceptions\BuffSlotOccupiedException;
 use LotGD\Core\Tools\Model\{
-    Creator,
-    PropertyManager,
-    SoftDeletable
+    Creator, GameAware, PropertyManager, SoftDeletable
 };
 
 /**
@@ -27,11 +24,12 @@ use LotGD\Core\Tools\Model\{
  * @Entity(repositoryClass="LotGD\Core\Models\Repositories\CharacterRepository")
  * @Table(name="characters")
  */
-class Character implements CharacterInterface, CreateableInterface
+class Character implements CharacterInterface, CreateableInterface, GameAwareInterface
 {
     use Creator;
     use SoftDeletable;
     use PropertyManager;
+    use GameAware;
 
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;

@@ -89,4 +89,66 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType("string", $user->getName());
         $this->assertSame("Monthy", $user->getName());
     }
+
+    public function testIfGameAwareEntitiesHaveAGAmeInstanceAssociatedAfterLoading()
+    {
+        $installationManager = $this->getMockBuilder(InstallationManager::class)
+            ->disableOriginalConstructor()
+            ->setMethods(["getInstallPath"])
+            ->getMock();
+        $installationManager->method("getInstallPath")->willReturn(__DIR__ . "/FakeModule");
+
+        $composer = $this->getMockBuilder(\Composer\Composer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(["getInstallationManager"])
+            ->getMock();
+        $composer->method("getInstallationManager")->willReturn($installationManager);
+
+        $fakeModulePackage = $this->getMockBuilder(AliasPackage::class)
+            ->disableOriginalConstructor()
+            ->setMethods(["getType", "getAutoload"])
+            ->getMock();
+        $fakeModulePackage->method("getType")->willReturn("lotgd-module");
+        $fakeModulePackage->method("getAutoload")->willReturn([
+            "psr-4" => [
+                "LotGD\\Core\\Tests\\FakeModule\\" => "FakeModule/"
+            ]
+        ]);
+
+        $composerManager = $this->getMockBuilder(ComposerManager::class)
+            ->disableOriginalConstructor()
+            ->setMethods(["getPackages", "getComposer", "translateNamespaceToPath"])
+            ->getMock();
+        $composerManager->method("getPackages")->willReturn([$fakeModulePackage]);
+        $composerManager->method("getComposer")->willReturn($composer);
+        $composerManager
+            ->expects($this->exactly(1))
+            ->method("translateNamespaceToPath")
+            ->with("LotGD\\Core\\Tests\\FakeModule\\Models\\")
+            ->willReturn(__DIR__ . "/FakeModule/Models");
+
+        $bootstrap = $this->getMockBuilder(Bootstrap::class)
+            ->setMethods(["createComposerManager"])
+            ->getMock();
+        $bootstrap->method("createComposerManager")->willReturn($composerManager);
+
+        // run tests
+        $game = $bootstrap->getGame(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']));
+
+        // A freshly created user entity should not rely
+        $user = new UserEntity();
+        $user->setName("Testus");
+        $user->setGame($game);
+
+        $this->assertSame($game, $user->returnGame());
+
+        $game->getEntityManager()->persist($user);
+        $game->getEntityManager()->flush();
+        $id = $user->getId();
+        $this->assertInternalType("int", $id);
+        $game->getEntityManager()->clear();
+        $user = $game->getEntityManager()->getRepository(UserEntity::class)->find($id);
+
+        $this->assertSame($game, $user->returnGame());
+    }
 }
