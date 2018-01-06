@@ -17,11 +17,19 @@ class EntityPostLoadEventListener
     /** @var Game $game */
     private $game;
 
+    /**
+     * EntityPostLoadEventListener constructor.
+     * @param Game $g
+     */
     public function __construct(Game $g)
     {
         $this->game = $g;
     }
 
+    /**
+     * Called upon event postLoad.
+     * @param LifecycleEventArgs $args
+     */
     public function postLoad(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();

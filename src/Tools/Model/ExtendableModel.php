@@ -5,6 +5,10 @@ namespace LotGD\Core\Tools\Model;
 
 use LotGD\Core\ModelExtender;
 
+/**
+ * Trait to add the __call class required for extendable models.
+ * @package LotGD\Core\Tools\Model
+ */
 trait ExtendableModel
 {
     public function __call($method, $arguments)

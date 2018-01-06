@@ -10,11 +10,20 @@ use ReflectionClass;
 use Doctrine\Common\Annotations\AnnotationReader;
 use LotGD\Core\Doctrine\Annotations\Extension;
 
+/**
+ * Contains method to help the extension of a model.
+ * @package LotGD\Core
+ */
 class ModelExtender
 {
+    /** @var AnnotationReader */
     private $reader;
+    /** @var array */
     private static $classes = [];
 
+    /**
+     * ModelExtender constructor.
+     */
     public function __construct()
     {
         $this->reader = new AnnotationReader();
@@ -65,6 +74,12 @@ class ModelExtender
         }
     }
 
+    /**
+     * Returns a callback registered in the model extender globally.
+     * @param string $modelClassName
+     * @param string $methodName
+     * @return callable|null
+     */
     public static function get(string $modelClassName, string $methodName): ?callable
     {
         if (empty(self::$classes[$modelClassName])) {

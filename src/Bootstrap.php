@@ -210,6 +210,9 @@ class Bootstrap
         }
     }
 
+    /**
+     * Runs the code to extend models.
+     */
     public function extendModels()
     {
         AnnotationRegistry::registerLoader("class_exists");

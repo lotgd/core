@@ -124,7 +124,7 @@ class LibraryConfiguration
     /**
      * Returns a subkey if it exists or null.
      * @param array $arguments
-     * @return type
+     * @return mixed
      */
     public function getSubKeyIfItExists(array $arguments)
     {
