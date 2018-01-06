@@ -126,7 +126,7 @@ class LibraryConfiguration
      * @param array $arguments
      * @return type
      */
-    protected function getSubKeyIfItExists(array $arguments)
+    public function getSubKeyIfItExists(array $arguments)
     {
         $parent = $this->rawConfig;
 
@@ -145,7 +145,7 @@ class LibraryConfiguration
      * Tries to iterate an array element given by the arguments
      * @param scalar $argument1,... array keys, by increasing depth
      */
-    protected function iterateKey(...$arguments)
+    public function iterateKey(...$arguments)
     {
         $result = $this->getSubKeyIfItExists($arguments);
 

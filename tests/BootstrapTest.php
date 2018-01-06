@@ -150,5 +150,6 @@ class BootstrapTest extends \PHPUnit_Framework_TestCase
         $user = $game->getEntityManager()->getRepository(UserEntity::class)->find($id);
 
         $this->assertSame($game, $user->returnGame());
+        $this->assertSame([$user->getName()], $user->getNameAsArray());
     }
 }

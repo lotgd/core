@@ -7,15 +7,18 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Game;
 use LotGD\Core\GameAwareInterface;
+use LotGD\Core\Models\ExtendableModelInterface;
+use LotGD\Core\Tools\Model\ExtendableModel;
 use LotGD\Core\Tools\Model\GameAware;
 
 /**
  * @Entity
  * @Table(name="Users")
  */
-class UserEntity implements GameAwareInterface
+class UserEntity implements GameAwareInterface, ExtendableModelInterface
 {
     use GameAware;
+    use ExtendableModel;
 
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;

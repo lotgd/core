@@ -18,7 +18,7 @@ trait GameAware
         $this->game = $game;
     }
 
-    private function getGame(): Game {
+    public function getGame(): Game {
         return $this->game;
     }
 }

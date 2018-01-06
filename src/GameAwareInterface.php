@@ -10,4 +10,5 @@ namespace LotGD\Core;
 interface GameAwareInterface
 {
     public function setGame(Game $g);
+    public function getGame(): Game;
 }
