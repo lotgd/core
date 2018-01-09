@@ -210,4 +210,53 @@ class ViewpointTest extends CoreModelTestCase
         $characterScene->addDescriptionParagraph("You enjoy being here.");
         $this->assertSame("You enjoy being here.", $characterScene->getDescription());
     }
+
+    public function testIfGetActionGroupByIdReturnsTheCorrectActionGroupOrNull()
+    {
+        $em = $this->getEntityManager();
+
+        $a1 = new Action(1);
+        $a2 = new Action(2);
+        $a3 = new Action(3);
+
+        $ag1 = new ActionGroup('id1', 'title1', 42);
+        $ag1->setActions([
+            $a1,
+            $a2,
+            $a3
+        ]);
+        $ag2 = new ActionGroup('id2', 'title2', 101);
+        $ag2->setActions([
+            new Action(4)
+        ]);
+
+        $actionGroups = [
+            $ag1,
+            $ag2
+        ];
+
+        $input = $em->getRepository(Viewpoint::class)->find(2);
+        $input->setActionGroups($actionGroups);
+        $input->save($em);
+
+        $em->clear();
+
+        /** @var Viewpoint $viewpoint */
+        $viewpoint = $em->getRepository(Viewpoint::class)->find(2);
+
+        $actionGroupId1 = $viewpoint->findActionGroupById("id1");
+        $actionGroupId2 = $viewpoint->findActionGroupById("id2");
+        $actionGroupId3 = $viewpoint->findActionGroupById("id3");
+
+        $this->assertInstanceOf(ActionGroup::class, $actionGroupId1);
+        $this->assertInstanceOf(ActionGroup::class, $actionGroupId2);
+        $this->assertNull($actionGroupId3);
+
+        $actions = $actionGroupId1->getActions();
+        foreach ($actions as $action) {
+            $this->assertSame($action, $viewpoint->findActionById($action->getId()));
+        }
+
+        $this->assertNull($viewpoint->findActionById("anId"));
+    }
 }

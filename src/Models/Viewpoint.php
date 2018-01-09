@@ -195,8 +195,8 @@ class Viewpoint implements CreateableInterface
      */
     public function addActionGroup(ActionGroup $group, ?string $after = null): void
     {
-        $groupid = $group->getId();
-        if ($this->findActionGroupById($groupid) == true) {
+        $groupId = $group->getId();
+        if ($this->findActionGroupById($groupId) == true) {
             throw new ArgumentException("Group {$group} is already contained in this viewpoint.");
         }
 
@@ -215,7 +215,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Finds an action group by id.
+     * Returns an action group by id or fails.
      * @param $actionGroupId
      * @return ActionGroup|null
      */
@@ -227,24 +227,8 @@ class Viewpoint implements CreateableInterface
                 return $g;
             }
         }
+
         return null;
-    }
-
-    /**
-     * Checks if the viewpoint has a certain action group.
-     * @param string $actionGroupId
-     * @return bool
-     */
-    public function hasActionGroup(string $actionGroupId): bool
-    {
-        $groups = $this->getActionGroups();
-        foreach ($groups as $g) {
-            if ($g->getId() == $actionGroupId) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -306,7 +290,7 @@ class Viewpoint implements CreateableInterface
     /**
      * Returns a single data field
      * @param string $fieldname Fieldname
-     * @param type $default default value
+     * @param mixed $default default value
      * @return mixed
      */
     public function getDataField(string $fieldname, $default = null)
@@ -325,9 +309,10 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Returns the action that corresponds to the given ID, if present.
+     * @param string $id
      * @return Action|null
      */
-    public function findActionById(string $id)
+    public function findActionById(string $id): ?Action
     {
         foreach ($this->getActionGroups() as $group) {
             foreach ($group->getActions() as $a) {
@@ -336,6 +321,7 @@ class Viewpoint implements CreateableInterface
                 }
             }
         }
+
         return null;
     }
 

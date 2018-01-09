@@ -21,7 +21,8 @@ class ViewpointDecorationEventData extends EventContextData
     {
         $mustHaveForm = ["viewpoint"];
         $doesHaveForm = array_keys($data);
-        sort($mustHaveForm); sort($doesHaveForm);
+        sort($mustHaveForm);
+        sort($doesHaveForm);
 
         if ($doesHaveForm !== $mustHaveForm) {
             throw new ArgumentException("A new ViewpointDecoration event must have a viewpoint..");

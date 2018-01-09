@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Basilius Sauter
- * Date: 04.01.2018
- * Time: 12:58
- */
 
 namespace LotGD\Core\Events;
 
@@ -27,7 +21,8 @@ class CharacterEventData extends EventContextData
     {
         $mustHaveForm = ["character"];
         $doesHaveForm = array_keys($data);
-        sort($mustHaveForm); sort($doesHaveForm);
+        sort($mustHaveForm);
+        sort($doesHaveForm);
 
         if ($doesHaveForm !== $mustHaveForm) {
             throw new ArgumentException("A new CharacterEventData event must have a character data field.");
