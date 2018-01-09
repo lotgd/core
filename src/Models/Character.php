@@ -15,7 +15,7 @@ use LotGD\Core\{
 };
 use LotGD\Core\Tools\Exceptions\BuffSlotOccupiedException;
 use LotGD\Core\Tools\Model\{
-    Creator, GameAware, PropertyManager, SoftDeletable
+    Creator, ExtendableModel, GameAware, PropertyManager, SoftDeletable
 };
 
 /**
@@ -24,12 +24,13 @@ use LotGD\Core\Tools\Model\{
  * @Entity(repositoryClass="LotGD\Core\Models\Repositories\CharacterRepository")
  * @Table(name="characters")
  */
-class Character implements CharacterInterface, CreateableInterface, GameAwareInterface
+class Character implements CharacterInterface, CreateableInterface, GameAwareInterface, ExtendableModelInterface
 {
     use Creator;
     use SoftDeletable;
     use PropertyManager;
     use GameAware;
+    use ExtendableModel;
 
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
@@ -221,18 +222,22 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
 
     /**
      * Returns the character's virtual attribute "attack"
+     * @param bool $ignoreBuffs
+     * @return int
      */
-    public function getAttack(Game $game, bool $ignoreBuffs = false): int
+    public function getAttack(bool $ignoreBuffs = false): int
     {
-        return $this->level * 2;
+        return $this->level;
     }
 
     /**
      * Returns the character's virtual attribute "defense"
+     * @param bool $ignoreBuffs
+     * @return int
      */
-    public function getDefense(Game $game, bool $ignoreBuffs = false): int
+    public function getDefense(bool $ignoreBuffs = false): int
     {
-        return $this->level * 2;
+        return $this->level;
     }
 
     /**

@@ -28,19 +28,21 @@ trait AutoScaleFighter
     
     /**
      * Returns the attack value based on the fighter's level
+     * @param bool $ignoreBuffs
      * @return int
      */
-    public function getAttack(Game $game, bool $ignoreBuffs = false): int
+    public function getAttack(bool $ignoreBuffs = false): int
     {
         $level = $this->getLevel();
         return (int)$level * 2 - 1;
     }
-    
+
     /**
      * Returns the defense value based on the fighter's level
+     * @param bool $ignoreBuffs
      * @return int
      */
-    public function getDefense(Game $game, bool $ignoreBuffs = false): int
+    public function getDefense(bool $ignoreBuffs = false): int
     {
         $level = $this->getlevel();
         return (int)floor($level*1.45);

@@ -71,12 +71,12 @@ trait MockCharacter
         throw new IsNullException();
     }
 
-    public function getAttack(Game $game, bool $ignoreBuffs = false): int
+    public function getAttack(bool $ignoreBuffs = false): int
     {
         throw new IsNullException();
     }
 
-    public function getDefense(Game $game, bool $ignoreBuffs = false): int
+    public function getDefense(bool $ignoreBuffs = false): int
     {
         throw new IsNullException();
     }

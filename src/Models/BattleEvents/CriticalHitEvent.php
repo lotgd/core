@@ -32,7 +32,7 @@ class CriticalHitEvent extends BattleEvent
      */
     public function decorate(Game $game): string
     {
-        $pureAttackersAttack = $this->attacker->getAttack($game, true);
+        $pureAttackersAttack = $this->attacker->getAttack(true);
 
         if ($this->criticalAttackValue > $pureAttackersAttack * 4) {
             return "You execute a MEGA power move!!!";

@@ -43,7 +43,7 @@ class Battle
     
     /**
      * Battle Configuration
-     * @var type
+     * @var array
      */
     protected $configuration = [
         "riposteEnabled" => true,
@@ -212,6 +212,7 @@ class Battle
     /**
      * Returns the winner of this fight
      * @return FighterInterface
+     * @throws BattleNotOverException if battle is not over.
      */
     public function getWinner(): FighterInterface
     {
@@ -225,6 +226,7 @@ class Battle
     /**
      * Returns the loser of this fight
      * @return FighterInterface
+     * @throws BattleNotOverException if battle is not over.
      */
     public function getLoser(): FighterInterface
     {
@@ -241,6 +243,8 @@ class Battle
      * @param int $n
      * @param bool $firstDamageRound Which damage rounds are calculated. Cannot be 0.
      * @return int Number of fights fought.
+     * @throws ArgumentException if firstDamageRound is 0.
+     * @throws BattleIsOverException
      */
     public function fightNRounds(int $n = 1, int $firstDamageRound = self::DAMAGEROUND_BOTH): int
     {
@@ -361,12 +365,12 @@ class Battle
         
         // Apply buff scaling for the attacker's attack - this needs to take into
         // account the attacker's goodguyAttackModifier and the defenders badguyAttackModifier
-        $attackersAttack = $attacker->getAttack($this->game)
+        $attackersAttack = $attacker->getAttack()
             * $attackersBuffs->getGoodguyAttackModifier()
             * $defendersBuffs->getBadguyAttackModifier();
         // It's the opposite for the defender's defense - it needs to take into account the
         // defender's goodguyDefenseModifier as well as the attacker's badguyDefenseModifier.
-        $defendersDefense = $defender->getDefense($this->game)
+        $defendersDefense = $defender->getDefense()
             * $defendersBuffs->getGoodguyDefenseModifier()
             * $attackersBuffs->getBadguyDefenseModifier()
             * $defenseAdjustement;
@@ -390,7 +394,7 @@ class Battle
         
         // If the attacker's attack after modification is bigger than before,
         // we call it a critical hit and apply the CriticalHitEvent.
-        if ($attackersAttack > $attacker->getAttack($this->game) && $this->isCriticalHitEnabled()) {
+        if ($attackersAttack > $attacker->getAttack() && $this->isCriticalHitEnabled()) {
             $events->add(new CriticalHitEvent($attacker, $attackersAttack));
         }
         

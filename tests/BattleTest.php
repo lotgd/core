@@ -56,8 +56,8 @@ class BattleTest extends CoreModelTestCase
 
         $this->assertSame(5, $monster->getLevel());
         $this->assertSame(52, $monster->getMaxHealth());
-        $this->assertSame(9, $monster->getAttack($this->getMockGame($character)));
-        $this->assertSame(7, $monster->getDefense($this->getMockGame($character)));
+        $this->assertSame(9, $monster->getAttack());
+        $this->assertSame(7, $monster->getDefense());
         $this->assertSame($monster->getMaxHealth(), $monster->getHealth());
     }
 
