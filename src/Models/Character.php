@@ -11,9 +11,9 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\{
-    BuffList, Game, GameAwareInterface
+    BuffList, Events\CharacterEventData, Game, GameAwareInterface
 };
-use LotGD\Core\Tools\Exceptions\BuffSlotOccupiedException;
+use LotGD\Core\Exceptions\BuffSlotOccupiedException;
 use LotGD\Core\Tools\Model\{
     Creator, ExtendableModel, GameAware, PropertyManager, SoftDeletable
 };
@@ -141,7 +141,7 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     /**
      * Sets the maximum health of a character to a given value. It also sets the
      * health if none has been set yet.
-     * @param int $maxhealth
+     * @param int $maxHealth
      */
     public function setMaxHealth(int $maxHealth)
     {
@@ -191,7 +191,7 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     /**
      * Heals the enemy
      * @param int $heal
-     * @param type $overheal True if healing bigger than maxhealth is desired.
+     * @param bool $overheal True if healing bigger than maxHealth is desired.
      */
     public function heal(int $heal, bool $overheal = false)
     {
@@ -227,7 +227,19 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
      */
     public function getAttack(bool $ignoreBuffs = false): int
     {
-        return $this->level;
+        $baseAttack = $this->level;
+
+        $hookData = $this->getGame()->getEventManager()->publish(
+            "h/lotgd/core/getCharacterAttack",
+            CharacterEventData::create([
+                "character" => $this,
+                "value" => $baseAttack
+            ])
+        );
+
+        $modifiedAttack = $hookData->get("value");
+
+        return $modifiedAttack;
     }
 
     /**
@@ -237,7 +249,19 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
      */
     public function getDefense(bool $ignoreBuffs = false): int
     {
-        return $this->level;
+        $baseDefense = $this->level;
+
+        $hookData = $this->getGame()->getEventManager()->publish(
+            "h/lotgd/core/getCharacterDefense",
+            CharacterEventData::create([
+                "character" => $this,
+                "value" => $baseDefense
+            ])
+        );
+
+        $modifiedDefense = $hookData->get("value");
+
+        return $modifiedDefense;
     }
 
     /**

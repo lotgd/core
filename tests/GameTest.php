@@ -76,7 +76,7 @@ class GameTest extends CoreModelTestCase
     /** @var string default data set */
     protected $dataset = "game";
 
-    private $g;
+    public $g;
 
     public function setUp()
     {
