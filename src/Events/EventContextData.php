@@ -25,7 +25,45 @@ class EventContextData
      */
     public static function create(array $data): self
     {
+        if (isset(static::$argumentConfig)) {
+            static::checkConfiguration($data);
+        }
+
         return new static($data);
+    }
+
+    public static function checkConfiguration($data)
+    {
+        $configuration = static::$argumentConfig;
+        $types = [
+            "mixed" => function ($x) {return true;},
+            "int" => function ($x) {return is_int($x);},
+            "float" => function ($x) {return is_float($x);},
+            "numeric" => function($x) {return is_numeric($x);},
+            "string" => function($x) {return is_string($x);},
+        ];
+
+        $keys = array_keys($data);
+        foreach ($keys as $key) {
+            if (!isset($configuration[$key])) {
+                throw new ArgumentException(sprintf("%s does not accept a field called %s", static::class, $key));
+            }
+        }
+        foreach ($configuration as $key => $config) {
+            if ($config["required"] === true and !isset($data[$key])) {
+                throw new ArgumentException(sprintf("%s must have a field called %s.", static::class, $key));
+            }
+
+            if (isset($types[$config["type"]])) {
+                if ($types[$config["type"]]($data[$key]) === false) {
+                    throw new ArgumentException(sprintf("The field %s of %s must be of type %s.", $key, static::class, $config["type"]));
+                }
+            } else {
+                if (!$data[$key] instanceof $config["type"]) {
+                    throw new ArgumentException(sprintf("The field %s of %s must be of type %s", $key, static::class, $config["type"]));
+                }
+            }
+        }
     }
 
     /**

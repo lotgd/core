@@ -1224,8 +1224,8 @@ class BattleTest extends CoreModelTestCase
         $battle = $this->provideBuffBattleParticipants(new Buff([
             "slot" => "test",
             "rounds" => 99,
-            "goodguyAttackModifier" => 2,
-            "goodguyDefenseModifier" => 2,
+            "goodguyAttackModifier" => 10,
+            "goodguyDefenseModifier" => 10,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 3);
 
