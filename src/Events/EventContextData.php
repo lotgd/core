@@ -32,6 +32,11 @@ class EventContextData
         return new static($data);
     }
 
+    /**
+     * Checks a field configuration given in self::$argumentConfig.
+     * @param $data
+     * @throws ArgumentException
+     */
     public static function checkConfiguration($data)
     {
         $configuration = static::$argumentConfig;
