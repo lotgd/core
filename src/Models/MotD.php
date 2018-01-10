@@ -67,7 +67,7 @@ class MotD implements CreateableInterface
      * Returns always the real author of the message, even if it is a
      * system message. Use $this->getSystemMessage() to check if it is a system
      * message or $this->getAppearentAuthor() to get the appearent author.
-     * @return \LotGD\Core\Models\Character
+     * @return CharacterInterface
      */
     public function getAuthor(): CharacterInterface
     {
@@ -76,7 +76,7 @@ class MotD implements CreateableInterface
     
     /**
      * Returns the appearent author of this message.
-     * @return \LotGD\Core\Models\CharacterInterface
+     * @return CharacterInterface
      */
     public function getApparantAuthor(): CharacterInterface
     {
@@ -89,7 +89,7 @@ class MotD implements CreateableInterface
     
     /**
      * Sets the author of this motd
-     * @param \LotGD\Core\Models\Character $author
+     * @param Character $author
      */
     public function setAuthor(Character $author)
     {

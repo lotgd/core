@@ -46,6 +46,7 @@ class Permission implements CreateableInterface
     /**
      * Sets this entity's id if it's not set yet.
      * @param string $id
+     * @throws ArgumentException
      */
     public function setId(string $id)
     {

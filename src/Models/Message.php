@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Exceptions\InvalidModelException;
 use LotGD\Core\Exceptions\ArgumentException;
+use LotGD\Core\Exceptions\ParentAlreadySetException;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\Saveable;
 
@@ -72,9 +73,9 @@ class Message
      *
      * This method has been made protected to prevent from accessing it directly. Use
      * the static methods self::send() and self::sendSystemMessage() instead.
-     * @param \LotGD\Core\Models\Character $from
+     * @param CharacterInterface $from
      * @param string $message
-     * @param \LotGD\Core\Models\Thread $thread
+     * @param MessageThread $thread
      * @param bool $systemMessage
      * @throws ArgumentException
      */
