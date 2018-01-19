@@ -43,7 +43,7 @@ class LibraryConfiguration
         if ($basePackage && $basePackage->getName() === $package->getName()) {
             // Whatever the base package is in this repo is at $cwd.
             $path = $cwd;
-        } else if ($package->getType() === "lotgd-module") {
+        } elseif (in_array($package->getType(), ["lotgd-module", "lotgd-crate"])) {
             // lotgd-modules are installed in the vendor directory.
             $installationManager = $composerManager->getComposer()->getInstallationManager();
             $path = $installationManager->getInstallPath($package);

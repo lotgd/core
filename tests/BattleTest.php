@@ -73,6 +73,9 @@ class BattleTest extends CoreModelTestCase
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
 
+        $this->assertSame($character, $battle->getPlayer());
+        $this->assertSame($monster, $battle->getMonster());
+
         for ($n = 0; $n < 99; $n++) {
             $oldPlayerHealth = $character->getHealth();
             $oldMonsterHealth = $monster->getHealth();
