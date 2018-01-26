@@ -73,6 +73,8 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
         "level",
     ];
 
+    private $propertyClass = CharacterProperty::class;
+
     /**
      * Creates a character at full health
      */

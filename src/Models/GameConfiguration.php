@@ -18,6 +18,8 @@ class GameConfiguration
     
     /** @var ArrayCollection */
     private $properties;
+
+
     
     /**
      * Constructor.

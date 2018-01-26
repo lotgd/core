@@ -95,11 +95,14 @@ class CharacterModelTest extends CoreModelTestCase
         $em = $this->getEntityManager();
 
         $characterEntity = Character::create($characterData);
+        $characterEntity->setProperty("a property", 16);
+        $this->assertSame(16, $characterEntity->getProperty("a property"));
         $characterEntity->save($em);
 
         $em->flush();
 
         $this->assertInternalType("int", $characterEntity->getId());
+        $this->assertSame(16, $characterEntity->getProperty("a property"));
 
         $em->flush();
     }

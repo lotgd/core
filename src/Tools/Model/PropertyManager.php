@@ -68,7 +68,11 @@ trait PropertyManager
         if (isset($this->propertyStorage[$name])) {
             $this->propertyStorage[$name]->setValue($value);
         } else {
-            $className = $this->properties->getTypeClass()->name;
+            if (isset($this->propertyClass)) {
+                $className = $this->propertyClass;
+            } else {
+                $className = $this->properties->getTypeClass()->name;
+            }
             $property = new $className();
             if (method_exists($property, "setOwner")) {
                 $property->setOwner($this);

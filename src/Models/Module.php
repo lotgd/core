@@ -34,6 +34,8 @@ class Module implements SaveableInterface
     /** @OneToMany(targetEntity="ModuleProperty", mappedBy="owner", cascade={"persist", "remove"}) */
     private $properties;
 
+    private $propertyClass = ModuleProperty::class;
+
     /**
      * Construct a new module entry.
      */
