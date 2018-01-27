@@ -388,8 +388,8 @@ class Battle
         $defendersDefense = (int) round($defendersDefense, 0);
         
         // Lets roll the
-        $attackersAtkRoll = $this->game->getDiceBag()->normal(0, $attackersAttack);
-        $defendersDefRoll = $this->game->getDiceBag()->normal(0, $defendersDefense);
+        $attackersAtkRoll = $this->game->getDiceBag()->pseudoBell(0, $attackersAttack);
+        $defendersDefRoll = $this->game->getDiceBag()->pseudoBell(0, $defendersDefense);
         $damage = $attackersAtkRoll - $defendersDefRoll;
         
         // If the attacker's attack after modification is bigger than before,

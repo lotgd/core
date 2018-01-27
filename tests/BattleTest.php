@@ -33,6 +33,7 @@ class BattleTest extends CoreModelTestCase
 
     public function getMockGame(Character $character): Game
     {
+        mt_srand(0);
         $game = $this->getMockBuilder(Game::class)
             ->disableOriginalConstructor()
             ->getMock();
