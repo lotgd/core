@@ -6,7 +6,7 @@ namespace LotGD\Core\Events;
 use LotGD\Core\Exceptions\ArgumentException;
 
 /**
- * EventContextDataContainer to provide a basic structure for managing contextual data of an event.
+ * EventContextData to provide a basic structure for managing contextual data of an event.
  *
  * This class must be immutable and returns always a new instance of itself for any change.
  * @package LotGD\Core\Events
