@@ -536,7 +536,7 @@ class BuffList
             if ($buff->getBadguyDamageReflection() !== 0.) {
                 if ($damage > 0) {
                     // Damage is > 0, so badguy takes damage, we can normally reflect
-                    $reflectedDamage = (int)round($buff->getGoodguyDamageReflection() * $damage, 0);
+                    $reflectedDamage = (int)round($buff->getBadguyDamageReflection() * $damage, 0);
                     if ($reflectedDamage === 0) {
                         $message = $buff->getNoEffectMessage();
                     } else {

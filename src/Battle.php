@@ -16,11 +16,7 @@ use LotGD\Core\{
     Models\FighterInterface
 };
 use LotGD\Core\Models\{
-    Buff,
-    BattleEvents\BuffMessageEvent,
-    BattleEvents\CriticalHitEvent,
-    BattleEvents\DamageEvent,
-    BattleEvents\DeathEvent
+    Buff, BattleEvents\BuffMessageEvent, BattleEvents\CriticalHitEvent, BattleEvents\DamageEvent, BattleEvents\DeathEvent, Scene
 };
 
 /**
@@ -47,7 +43,7 @@ class Battle
     
     /**
      * Battle Configuration
-     * @var type
+     * @var array
      */
     protected $configuration = [
         "riposteEnabled" => true,
@@ -61,31 +57,50 @@ class Battle
      * @param FighterInterface $player
      * @param FighterInterface $monster
      */
-    public function __construct(Game $game, FighterInterface $player, FighterInterface $monster)
+    public function __construct(Game $game, FighterInterface $player, ?FighterInterface $monster)
     {
         $this->game = $game;
         $this->player = $player;
         $this->monster = $monster;
         $this->events = new ArrayCollection();
     }
-    
+
     /**
-     * @ToDo Returns at some point battle actions
+     * Returns a string which contains the important fields that must be serialized.
+     * @return string
      */
-    public function getActions()
+    public function serialize(): string
     {
+        return serialize([
+            "monster" => $this->monster,
+            "result" => $this->result,
+            "round" => $this->round,
+            "configuration" => $this->configuration,
+        ]);
     }
-    
+
     /**
-     * @ToDo Do some action
+     * @param Game $game
+     * @param FighterInterface $player
+     * @param string $serialized
+     * @return Battle
      */
-    public function selectAction()
+    public static function unserialize(Game $game, FighterInterface $player, string $serialized): self
     {
+        $battle = new self($game, $player, null);
+        $unserialized = unserialize($serialized);
+
+        $battle->monster  = $unserialized["monster"];
+        $battle->result = $unserialized["result"];
+        $battle->round = $unserialized["round"];
+        $battle->configuration = $unserialized["configuration"];
+
+        return $battle;
     }
     
     /**
      * Returns a list of all battle events
-     * @return \LotGD\Core\Collection
+     * @return Collection
      */
     public function getEvents(): Collection
     {
@@ -197,6 +212,7 @@ class Battle
     /**
      * Returns the winner of this fight
      * @return FighterInterface
+     * @throws BattleNotOverException if battle is not over.
      */
     public function getWinner(): FighterInterface
     {
@@ -210,6 +226,7 @@ class Battle
     /**
      * Returns the loser of this fight
      * @return FighterInterface
+     * @throws BattleNotOverException if battle is not over.
      */
     public function getLoser(): FighterInterface
     {
@@ -226,6 +243,8 @@ class Battle
      * @param int $n
      * @param bool $firstDamageRound Which damage rounds are calculated. Cannot be 0.
      * @return int Number of fights fought.
+     * @throws ArgumentException if firstDamageRound is 0.
+     * @throws BattleIsOverException
      */
     public function fightNRounds(int $n = 1, int $firstDamageRound = self::DAMAGEROUND_BOTH): int
     {
@@ -346,12 +365,12 @@ class Battle
         
         // Apply buff scaling for the attacker's attack - this needs to take into
         // account the attacker's goodguyAttackModifier and the defenders badguyAttackModifier
-        $attackersAttack = $attacker->getAttack($this->game)
+        $attackersAttack = $attacker->getAttack()
             * $attackersBuffs->getGoodguyAttackModifier()
             * $defendersBuffs->getBadguyAttackModifier();
         // It's the opposite for the defender's defense - it needs to take into account the
         // defender's goodguyDefenseModifier as well as the attacker's badguyDefenseModifier.
-        $defendersDefense = $defender->getDefense($this->game)
+        $defendersDefense = $defender->getDefense()
             * $defendersBuffs->getGoodguyDefenseModifier()
             * $attackersBuffs->getBadguyDefenseModifier()
             * $defenseAdjustement;
@@ -369,13 +388,13 @@ class Battle
         $defendersDefense = (int) round($defendersDefense, 0);
         
         // Lets roll the
-        $attackersAtkRoll = $this->game->getDiceBag()->normal(0, $attackersAttack);
-        $defendersDefRoll = $this->game->getDiceBag()->normal(0, $defendersDefense);
+        $attackersAtkRoll = $this->game->getDiceBag()->pseudoBell(0, $attackersAttack);
+        $defendersDefRoll = $this->game->getDiceBag()->pseudoBell(0, $defendersDefense);
         $damage = $attackersAtkRoll - $defendersDefRoll;
         
         // If the attacker's attack after modification is bigger than before,
         // we call it a critical hit and apply the CriticalHitEvent.
-        if ($attackersAttack > $attacker->getAttack($this->game) && $this->isCriticalHitEnabled()) {
+        if ($attackersAttack > $attacker->getAttack() && $this->isCriticalHitEnabled()) {
             $events->add(new CriticalHitEvent($attacker, $attackersAttack));
         }
         

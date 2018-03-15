@@ -11,14 +11,11 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\{
-    BuffList,
-    Game
+    BuffList, Events\CharacterEventData, Game, GameAwareInterface
 };
-use LotGD\Core\Tools\Exceptions\BuffSlotOccupiedException;
+use LotGD\Core\Exceptions\BuffSlotOccupiedException;
 use LotGD\Core\Tools\Model\{
-    Creator,
-    PropertyManager,
-    SoftDeletable
+    Creator, ExtendableModel, GameAware, PropertyManager, SoftDeletable
 };
 
 /**
@@ -27,11 +24,13 @@ use LotGD\Core\Tools\Model\{
  * @Entity(repositoryClass="LotGD\Core\Models\Repositories\CharacterRepository")
  * @Table(name="characters")
  */
-class Character implements CharacterInterface, CreateableInterface
+class Character implements CharacterInterface, CreateableInterface, GameAwareInterface, ExtendableModelInterface
 {
     use Creator;
     use SoftDeletable;
     use PropertyManager;
+    use GameAware;
+    use ExtendableModel;
 
     /** @Id @Column(type="integer") @GeneratedValue */
     private $id;
@@ -73,6 +72,8 @@ class Character implements CharacterInterface, CreateableInterface
         "maxHealth",
         "level",
     ];
+
+    private $propertyClass = CharacterProperty::class;
 
     /**
      * Creates a character at full health
@@ -142,7 +143,7 @@ class Character implements CharacterInterface, CreateableInterface
     /**
      * Sets the maximum health of a character to a given value. It also sets the
      * health if none has been set yet.
-     * @param int $maxhealth
+     * @param int $maxHealth
      */
     public function setMaxHealth(int $maxHealth)
     {
@@ -192,7 +193,7 @@ class Character implements CharacterInterface, CreateableInterface
     /**
      * Heals the enemy
      * @param int $heal
-     * @param type $overheal True if healing bigger than maxhealth is desired.
+     * @param bool $overheal True if healing bigger than maxHealth is desired.
      */
     public function heal(int $heal, bool $overheal = false)
     {
@@ -223,18 +224,46 @@ class Character implements CharacterInterface, CreateableInterface
 
     /**
      * Returns the character's virtual attribute "attack"
+     * @param bool $ignoreBuffs
+     * @return int
      */
-    public function getAttack(Game $game, bool $ignoreBuffs = false): int
+    public function getAttack(bool $ignoreBuffs = false): int
     {
-        return $this->level * 2;
+        $baseAttack = $this->level;
+
+        $hookData = $this->getGame()->getEventManager()->publish(
+            "h/lotgd/core/getCharacterAttack",
+            CharacterEventData::create([
+                "character" => $this,
+                "value" => $baseAttack
+            ])
+        );
+
+        $modifiedAttack = $hookData->get("value");
+
+        return $modifiedAttack;
     }
 
     /**
      * Returns the character's virtual attribute "defense"
+     * @param bool $ignoreBuffs
+     * @return int
      */
-    public function getDefense(Game $game, bool $ignoreBuffs = false): int
+    public function getDefense(bool $ignoreBuffs = false): int
     {
-        return $this->level * 2;
+        $baseDefense = $this->level;
+
+        $hookData = $this->getGame()->getEventManager()->publish(
+            "h/lotgd/core/getCharacterDefense",
+            CharacterEventData::create([
+                "character" => $this,
+                "value" => $baseDefense
+            ])
+        );
+
+        $modifiedDefense = $hookData->get("value");
+
+        return $modifiedDefense;
     }
 
     /**

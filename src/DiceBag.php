@@ -1,6 +1,5 @@
 <?php
-
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace LotGD\Core;
 
@@ -12,6 +11,7 @@ class DiceBag
     /**
      * Returns true $p percent of the time, where $p is between 0 and 1.
      * @param float $p
+     * @return bool True if you are lucky, False if not.
      */
     public function chance(float $p): bool
     {
@@ -24,6 +24,7 @@ class DiceBag
      * Generates a uniformly randomly number between $min and $max.
      * @param float $min
      * @param float $max
+     * @return float random number between $min and $max
      */
     public function uniform(float $min, float $max): float
     {
@@ -31,9 +32,31 @@ class DiceBag
     }
 
     /**
+     * Generates a uniformly randomly integer between $min and $max.
+     * @param int $min
+     * @param int $max
+     * @return int random number between $min and $max
+     */
+    public function dice(int $min, int $max): int
+    {
+        if ($min == $max) {
+            return $min;
+        }
+
+        if ($min > $max) {
+            $a = $min;
+            $min = $max;
+            $max = $a;
+        }
+
+        return mt_rand($min, $max);
+    }
+
+    /**
      * Generates a normally distributed random number between $min and $max.
      * @param float $min
      * @param float $max
+     * @return float normally distributed random number
      */
     public function normal(float $min, float $max): float
     {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use DateTime;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -33,13 +34,15 @@ class Module implements SaveableInterface
     /** @OneToMany(targetEntity="ModuleProperty", mappedBy="owner", cascade={"persist", "remove"}) */
     private $properties;
 
+    private $propertyClass = ModuleProperty::class;
+
     /**
      * Construct a new module entry.
      */
     public function __construct(string $library)
     {
         $this->properties = new ArrayCollection();
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new DateTime();
         $this->library = $library;
     }
 
@@ -47,7 +50,7 @@ class Module implements SaveableInterface
      * Returns the time this module was added to the system.
      * @return DateTime
      */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }

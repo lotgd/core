@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\EventManager as DoctrineEventManager;
+use Doctrine\Common\Util\Debug;
+use Doctrine\ORM\Events as DoctrineEvents;
 use Doctrine\ORM\ {
     EntityManager,
     EntityManagerInterface,
@@ -17,10 +21,8 @@ use Monolog\ {
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application;
 
-use LotGD\Core\ {
-    ComposerManager,
-    BootstrapInterface,
-    Exceptions\InvalidConfigurationException
+use LotGD\Core\{
+    ComposerManager, BootstrapInterface, Doctrine\EntityPostLoadEventListener, Exceptions\InvalidConfigurationException
 };
 
 /**
@@ -30,7 +32,8 @@ class Bootstrap
 {
     private $logger;
     private $game;
-    private $libraryConfigurationManager = [];
+    /** @var  LibraryConfigurationManager */
+    private $libraryConfigurationManager;
     private $annotationDirectories = [];
 
     /**
@@ -70,6 +73,13 @@ class Bootstrap
             ->withEntityManager($entityManager)
             ->withCwd($cwd)
             ->create();
+
+        // Add Event listener to entity manager
+        $dem = $entityManager->getEventManager();
+        $dem->addEventListener([DoctrineEvents::postLoad], new EntityPostLoadEventListener($this->game));
+
+        // Run model extender
+        $this->extendModels();
 
         return $this->game;
     }
@@ -196,6 +206,24 @@ class Bootstrap
             $commands = $config->getDaenerysCommands();
             foreach ($commands as $command) {
                 $application->add(new $command($this->game));
+            }
+        }
+    }
+
+    /**
+     * Runs the code to extend models.
+     */
+    public function extendModels()
+    {
+        AnnotationRegistry::registerLoader("class_exists");
+
+        $modelExtender = new ModelExtender();
+
+        foreach ($this->libraryConfigurationManager->getConfigurations() as $config) {
+            $modelExtensions = $config->getSubKeyIfItExists(["modelExtensions"]);
+
+            if ($modelExtensions) {
+                $modelExtender->addMore($modelExtensions);
             }
         }
     }

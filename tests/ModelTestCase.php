@@ -3,16 +3,23 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Events as DoctrineEvents;
 use Doctrine\ORM\Mapping\AnsiQuoteStrategy;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
 
 use LotGD\Core\Configuration;
 use LotGD\Core\ComposerManager;
+use LotGD\Core\Doctrine\EntityPostLoadEventListener;
+use LotGD\Core\GameBuilder;
 use LotGD\Core\LibraryConfigurationManager;
 use LotGD\Core\Exceptions\InvalidConfigurationException;
+use LotGD\Core\ModelExtender;
+use Monolog\Handler\NullHandler;
+use Monolog\Logger;
 
 /**
  * Description of ModelTestCase
@@ -25,6 +32,7 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
     static private $em = null;
     /** @var \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection */
     private $connection = null;
+    public $g;
 
     /**
      * Returns a connection to test models
@@ -74,6 +82,45 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
     protected function getEntityManager(): EntityManagerInterface
     {
         return self::$em;
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+
+        // Make an empty logger for these tests. Feel free to change this
+        // to place log messages somewhere you can easily find them.
+        $logger  = new Logger('test');
+        $logger->pushHandler(new NullHandler());
+
+        // Create a Game object for use in these tests.
+        $this->g = (new GameBuilder())
+            ->withConfiguration(new Configuration(getenv('LOTGD_TESTS_CONFIG_PATH')))
+            ->withLogger($logger)
+            ->withEntityManager($this->getEntityManager())
+            ->withCwd(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']))
+            ->create();
+
+        // Add Event listener to entity manager
+        $dem = $this->getEntityManager()->getEventManager();
+        $dem->addEventListener([DoctrineEvents::postLoad], new EntityPostLoadEventListener($this->g));
+
+        // Run model extender
+        AnnotationRegistry::registerLoader("class_exists");
+
+        $modelExtender = new ModelExtender();
+        $libraryConfigurationManager = new LibraryConfigurationManager($this->g->getComposerManager(), getcwd());
+
+        foreach ($libraryConfigurationManager->getConfigurations() as $config) {
+            $modelExtensions = $config->getSubKeyIfItExists(["modelExtensions"]);
+
+            if ($modelExtensions) {
+                $modelExtender->addMore($modelExtensions);
+            }
+        }
     }
 
     protected function tearDown() {

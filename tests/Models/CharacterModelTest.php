@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
+use LotGD\Core\EventHandler;
+use LotGD\Core\EventManager;
+use LotGD\Core\Events\EventContext;
+use LotGD\Core\Game;
+use LotGD\Core\GameBuilder;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\CharacterProperty;
 use LotGD\Core\Tests\CoreModelTestCase;
@@ -90,11 +95,14 @@ class CharacterModelTest extends CoreModelTestCase
         $em = $this->getEntityManager();
 
         $characterEntity = Character::create($characterData);
+        $characterEntity->setProperty("a property", 16);
+        $this->assertSame(16, $characterEntity->getProperty("a property"));
         $characterEntity->save($em);
 
         $em->flush();
 
         $this->assertInternalType("int", $characterEntity->getId());
+        $this->assertSame(16, $characterEntity->getProperty("a property"));
 
         $em->flush();
     }
@@ -188,5 +196,41 @@ class CharacterModelTest extends CoreModelTestCase
             ->getQuery()->getSingleScalarResult());
 
         $this->assertSame(6, $total);
+    }
+
+    public function testIfAttackPublishesEvent()
+    {
+        $level = mt_rand(0, 100);
+        $character1 = Character::create(["name" => "Test", "maxHealth" => 10, "level" => $level]);
+        $character1->setGame($this->g);
+        $character2 = Character::create(["name" => "Test", "maxHealth" => 10, "level" => $level*2]);
+        $character2->setGame($this->g);
+
+        $detectionClass = new class implements EventHandler {
+            static $events_called = [];
+
+            public static function handleEvent(Game $g, EventContext $context): EventContext
+            {
+                $event = $context->getEvent();
+                $value = $context->getDataField("value");
+
+                self::$events_called[$event] = $value;
+
+                $context->setDataField("value", $value*2);
+                return $context;
+            }
+        };
+
+        /** @var EventManager $eventManager */
+        $eventManager = $this->g->getEventManager();
+
+        $eventManager->subscribe("#h/lotgd/core/getCharacterAttack#", get_class($detectionClass), "test");
+        $eventManager->subscribe("#h/lotgd/core/getCharacterDefense#", get_class($detectionClass), "test");
+
+        $this->assertSame($level*2, $character1->getAttack());
+        $this->assertSame($level*4, $character2->getDefense());
+
+        $this->assertSame($level, $detectionClass::$events_called["h/lotgd/core/getCharacterAttack"]);
+        $this->assertSame($level*2, $detectionClass::$events_called["h/lotgd/core/getCharacterDefense"]);
     }
 }

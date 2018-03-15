@@ -5,6 +5,7 @@ namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Models\Module;
 use LotGD\Core\Models\ModuleProperty;
+use LotGD\Core\ModuleManager;
 use LotGD\Core\Tests\CoreModelTestCase;
 
 /**
@@ -27,6 +28,15 @@ class ModuleTest extends CoreModelTestCase
         $this->assertEquals(new \DateTime('2016-05-01'), $scene->getCreatedAt());
 
         $em->flush();
+    }
+
+    public function testSetter()
+    {
+        $em = $this->getEntityManager();
+        $module = new Module("lotgd/test/blah");
+        $module->setProperty("test", 15);
+
+        $this->assertSame(15, $module->getProperty("test"));
     }
 
     public function testProperties()

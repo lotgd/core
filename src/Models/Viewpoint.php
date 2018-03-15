@@ -7,8 +7,11 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Action;
+use LotGD\Core\ActionGroup;
+use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\SceneBasics;
+use LotGD\Core\Tools\SceneDescription;
 
 /**
  * A Viewpoint is the current Scene a character is experiencing with
@@ -32,6 +35,9 @@ class Viewpoint implements CreateableInterface
     /** @ManyToOne(targetEntity="Scene") */
     private $scene;
 
+    /** @var SceneDescription */
+    private $_description;
+
     /** @var array */
     private static $fillable = [
         "owner"
@@ -53,6 +59,48 @@ class Viewpoint implements CreateableInterface
     public function setOwner(Character $owner)
     {
         $this->owner = $owner;
+    }
+
+    /**
+     * Sets the description of this viewpoint.
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
+        $this->_description = new SceneDescription($description);
+    }
+
+    /**
+     * Clears the description
+     */
+    public function clearDescription(): void
+    {
+        $this->description = "";
+        $this->_description = new SceneDescription("");
+    }
+
+    /**
+     * Returns the current description as a string
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Adds a paragraph to the existing description
+     * @param string $paragraph
+     */
+    public function addDescriptionParagraph(string $paragraph)
+    {
+        if ($this->_description === null) {
+            $this->_description = new SceneDescription($this->description);
+        }
+
+        $this->_description->addParagraph($paragraph);
+        $this->description = (string)$this->_description;
     }
 
     /**
@@ -140,11 +188,38 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Finds an action group by id.
+     * Adds a new action group to a viewpoint
+     * @param ActionGroup $group The new group to add.
+     * @param null|string $after, optional group id that comes before.
+     * @throws ArgumentException
+     */
+    public function addActionGroup(ActionGroup $group, ?string $after = null): void
+    {
+        $groupId = $group->getId();
+        if ($this->findActionGroupById($groupId) == true) {
+            throw new ArgumentException("Group {$group} is already contained in this viewpoint.");
+        }
+
+        if ($after === null) {
+            $this->actionGroups[] = $group;
+        } else {
+            $groups = [];
+            foreach ($this->actionGroups as $g) {
+                if ($g->getId() == $after) {
+                    $groups[] = $group;
+                }
+                $groups[] = $g;
+            }
+            $this->actionGroups = $groups;
+        }
+    }
+
+    /**
+     * Returns an action group by id or fails.
      * @param $actionGroupId
      * @return ActionGroup|null
      */
-    public function findActionGroupById(string $actionGroupId)
+    public function findActionGroupById(string $actionGroupId): ?ActionGroup
     {
         $groups = $this->getActionGroups();
         foreach ($groups as $g) {
@@ -152,6 +227,7 @@ class Viewpoint implements CreateableInterface
                 return $g;
             }
         }
+
         return null;
     }
 
@@ -214,7 +290,7 @@ class Viewpoint implements CreateableInterface
     /**
      * Returns a single data field
      * @param string $fieldname Fieldname
-     * @param type $default default value
+     * @param mixed $default default value
      * @return mixed
      */
     public function getDataField(string $fieldname, $default = null)
@@ -233,9 +309,10 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Returns the action that corresponds to the given ID, if present.
+     * @param string $id
      * @return Action|null
      */
-    public function findActionById(string $id)
+    public function findActionById(string $id): ?Action
     {
         foreach ($this->getActionGroups() as $group) {
             foreach ($group->getActions() as $a) {
@@ -244,6 +321,7 @@ class Viewpoint implements CreateableInterface
                 }
             }
         }
+
         return null;
     }
 

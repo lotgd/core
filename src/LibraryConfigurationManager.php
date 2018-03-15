@@ -52,7 +52,7 @@ class LibraryConfigurationManager
 
     /**
      * Return an array of the library configurations.
-     * @return array<LibraryConfiguration>
+     * @return LibraryConfiguration[]
      */
     public function getConfigurations(): array {
         return $this->configurations;

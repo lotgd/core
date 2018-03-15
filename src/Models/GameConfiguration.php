@@ -18,10 +18,12 @@ class GameConfiguration
     
     /** @var ArrayCollection */
     private $properties;
+
+
     
     /**
      * Constructor.
-     * @param EntityManagerInterface $em
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -42,7 +44,7 @@ class GameConfiguration
     /**
      * Sets and overwrites a configuration value saved by the name
      * @param string $configurationName
-     * @param type $configurationValue
+     * @param mixed $configurationValue
      */
     public function set(string $configurationName, $configurationValue)
     {

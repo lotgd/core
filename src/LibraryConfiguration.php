@@ -43,7 +43,7 @@ class LibraryConfiguration
         if ($basePackage && $basePackage->getName() === $package->getName()) {
             // Whatever the base package is in this repo is at $cwd.
             $path = $cwd;
-        } else if ($package->getType() === "lotgd-module") {
+        } elseif (in_array($package->getType(), ["lotgd-module", "lotgd-crate"])) {
             // lotgd-modules are installed in the vendor directory.
             $installationManager = $composerManager->getComposer()->getInstallationManager();
             $path = $installationManager->getInstallPath($package);
@@ -124,9 +124,9 @@ class LibraryConfiguration
     /**
      * Returns a subkey if it exists or null.
      * @param array $arguments
-     * @return type
+     * @return mixed
      */
-    protected function getSubKeyIfItExists(array $arguments)
+    public function getSubKeyIfItExists(array $arguments)
     {
         $parent = $this->rawConfig;
 
@@ -145,7 +145,7 @@ class LibraryConfiguration
      * Tries to iterate an array element given by the arguments
      * @param scalar $argument1,... array keys, by increasing depth
      */
-    protected function iterateKey(...$arguments)
+    public function iterateKey(...$arguments)
     {
         $result = $this->getSubKeyIfItExists($arguments);
 

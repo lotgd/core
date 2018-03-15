@@ -33,6 +33,7 @@ class BattleTest extends CoreModelTestCase
 
     public function getMockGame(Character $character): Game
     {
+        mt_srand(0);
         $game = $this->getMockBuilder(Game::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -56,8 +57,8 @@ class BattleTest extends CoreModelTestCase
 
         $this->assertSame(5, $monster->getLevel());
         $this->assertSame(52, $monster->getMaxHealth());
-        $this->assertSame(9, $monster->getAttack($this->getMockGame($character)));
-        $this->assertSame(7, $monster->getDefense($this->getMockGame($character)));
+        $this->assertSame(9, $monster->getAttack());
+        $this->assertSame(7, $monster->getDefense());
         $this->assertSame($monster->getMaxHealth(), $monster->getHealth());
     }
 
@@ -73,6 +74,9 @@ class BattleTest extends CoreModelTestCase
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
 
+        $this->assertSame($character, $battle->getPlayer());
+        $this->assertSame($monster, $battle->getMonster());
+
         for ($n = 0; $n < 99; $n++) {
             $oldPlayerHealth = $character->getHealth();
             $oldMonsterHealth = $monster->getHealth();
@@ -85,10 +89,47 @@ class BattleTest extends CoreModelTestCase
             if ($battle->isOver()) {
                 break;
             }
+
+            foreach ($battle->getEvents() as $event) {
+                $this->assertNotNull($event->decorate($this->getMockGame($character)));
+            }
         }
 
         $this->assertTrue($battle->isOver());
         $this->assertTrue($character->isAlive() xor $monster->isAlive());
+    }
+
+    /**
+     * Tests if a fight can happen if it is serialized between each round.
+     */
+    public function testFairBattleWithSerializationBetweenRounds()
+    {
+        $em = $this->getEntityManager();
+
+        $character = $em->getRepository(Character::class)->find(1);
+        $monster = $em->getRepository(Monster::class)->find(1);
+
+        $battle = new Battle($this->getMockGame($character), $character, $monster);
+        $battle = $battle->serialize();
+
+        for ($n = 0; $n < 99; $n++) {
+            $battle = Battle::unserialize($this->getMockGame($character), $character, $battle);
+
+            $battle->fightNRounds(1);
+
+            if ($battle->isOver()) {
+                break;
+            }
+
+            foreach ($battle->getEvents() as $event) {
+                $this->assertNotNull($event->decorate($this->getMockGame($character)));
+            }
+
+            $battle = $battle->serialize();
+        }
+
+        $this->assertTrue($battle->isOver());
+        $this->assertTrue($battle->getPlayer()->isAlive() xor $battle->getMonster()->isAlive());
     }
 
     /**
@@ -1187,8 +1228,8 @@ class BattleTest extends CoreModelTestCase
         $battle = $this->provideBuffBattleParticipants(new Buff([
             "slot" => "test",
             "rounds" => 99,
-            "goodguyAttackModifier" => 2,
-            "goodguyDefenseModifier" => 2,
+            "goodguyAttackModifier" => 10,
+            "goodguyDefenseModifier" => 10,
             "activateAt" => Buff::ACTIVATE_ROUNDSTART,
         ]), 3);
 

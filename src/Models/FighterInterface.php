@@ -18,8 +18,8 @@ interface FighterInterface
     public function getMaxHealth(): int;
     public function getHealth(): int;
     public function isAlive(): bool;
-    public function getAttack(Game $game, bool $ignoreBuffs = false): int;
-    public function getDefense(Game $game, bool $ignoreBuffs = false): int;
+    public function getAttack(bool $ignoreBuffs = false): int;
+    public function getDefense(bool $ignoreBuffs = false): int;
     public function damage(int $damage);
     public function heal(int $heal);
     public function setHealth(int $amount);

@@ -36,10 +36,10 @@ class MessageThread implements SaveableInterface
     /**
      * Constructor. Sets the (unique) threadKey.
      * @param string $threadKey
-     * @param type $participants
-     * @param type $readonly
+     * @param array $participants
+     * @param bool $readonly
      */
-    public function __construct(string $threadKey, array $participants, $readonly = false)
+    public function __construct(string $threadKey, array $participants, bool $readonly = false)
     {
         $this->threadKey = $threadKey;
         $this->readonly = $readonly;

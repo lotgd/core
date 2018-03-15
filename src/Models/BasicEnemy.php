@@ -11,13 +11,13 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 abstract class BasicEnemy implements FighterInterface
 {
     /** @Id @Column(type="integer") @GeneratedValue */
-    private $id;
+    protected $id;
     /** @Column(type="string", length=50); */
-    private $name;
+    protected $name;
     /** @Column(type="integer"); */
-    private $level;
+    protected $level;
     /** @var int */
-    private $health;
+    protected $health;
     
     /**
      * Returns the enemy's id

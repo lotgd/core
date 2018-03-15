@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Models\BattleEvents;
 
 use LotGD\Core\Exceptions\BattleEventException;
+use LotGD\Core\Game;
 
 /**
  * A representation of something that happened in battle.
