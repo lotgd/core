@@ -14,6 +14,11 @@ use LotGD\Core\Models\Message;
 use LotGD\Core\Models\MessageThread;
 use LotGD\Core\Models\SystemCharacter;
 
+/**
+ * Manages the message system overall
+ * Class MessageManager
+ * @package LotGD\Core
+ */
 class MessageManager
 {
     /**
