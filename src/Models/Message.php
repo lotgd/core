@@ -38,48 +38,21 @@ class Message
     /** @Column(type="boolean", nullable=false) */
     private $systemMessage = false;
     
-    /**
-     * Sends a message to a MessageThread
-     * @param \LotGD\Core\Models\Character $from
-     * @param string $message
-     * @param \LotGD\Core\Models\MessageThread $thread
-     * @param bool $systemMessage
-     * @return \LotGD\Core\Models\Message
-     */
-    public static function send(
-        Character $from,
-        string $message,
-        MessageThread $thread,
-        bool $systemMessage = false
-    ) {
-        $thread->addMessage(new self($from, $message, $thread, $systemMessage));
-    }
+
     
-    /**
-     * Sends a system message to a MessageThread
-     * @param string $message
-     * @param \LotGD\Core\Models\MessageThread $thread
-     * @return \LotGD\Core\Models\Message
-     */
-    public static function sendSystemMessage(
-        string $message,
-        MessageThread $thread
-    ) {
-        $thread->addMessage(new self(SystemCharacter::getInstance(), $message, $thread, true));
-    }
+
     
     /**
      * Constructs the message.
      *
-     * This method has been made protected to prevent from accessing it directly. Use
-     * the static methods self::send() and self::sendSystemMessage() instead.
+     * Use the static methods self::send() and self::sendSystemMessage() instead.
      * @param CharacterInterface $from
      * @param string $message
      * @param MessageThread $thread
      * @param bool $systemMessage
      * @throws ArgumentException
      */
-    protected function __construct(CharacterInterface $from, string $message, MessageThread $thread, bool $systemMessage)
+    public function __construct(CharacterInterface $from, string $message, MessageThread $thread, bool $systemMessage)
     {
         if ($from instanceof Character) {
             if ($from->isDeleted() === true) {

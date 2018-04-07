@@ -27,7 +27,7 @@ class GameBuilder
     private $composerManagerClass;
     private $eventManagerClass;
     private $diceBagClass;
-
+    private $messageManagerClass;
     /**
      * Creates the game instance with the prepared parameters.
      * @return Game
@@ -62,7 +62,8 @@ class GameBuilder
         $diceBag = $this->diceBagClass ?? DiceBag::class;
         $game->setDiceBag(new $diceBag());
 
-
+        $messageManager=$this->messageManagerClass ?? MessageManager::class;
+        $game->setMessageManager(new $messageManager());
         return $game;
     }
 
@@ -129,6 +130,17 @@ class GameBuilder
     public function useComposerManager(string $composerManagerFqcn): self
     {
         $this->composerManagerClass = $composerManagerFqcn;
+        return $this;
+    }
+
+    /**
+     * Sets the fqcn for the message manager to be used
+     * @param string $messageManagerFqcn
+     * @return self
+     */
+    public function useMessageManager(string $messageManagerFqcn): self
+    {
+        $this->messageManagerClass=$messageManagerFqcn;
         return $this;
     }
 

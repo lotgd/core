@@ -25,12 +25,14 @@ class Game
     private $eventManager;
     private $composerManager;
     private $moduleManager;
+    private $messageManager;
     private $logger;
     private $configuration;
     private $character;
     private $diceBag;
     private $cwd;
     private $timeKeeper;
+
 
     /**
      * Construct a game. You probably want to use Bootstrap to do this.
@@ -182,6 +184,24 @@ class Game
             $this->timeKeeper = new TimeKeeper($gameEpoch, new DateTime(), $gameOffsetSeconds, $gameDaysPerDay);
         }
         return $this->timeKeeper;
+    }
+
+    /**
+     * Returns the Message manager
+     * @return MessageManager
+     */
+    public function getMessageManager(): MessageManager
+    {
+        return $this->messageManager;
+    }
+
+    /**
+     * Sets the Message Manager
+     * @param MessageManager $messageManager
+     */
+    public function setMessageManager(MessageManager $messageManager) : void
+    {
+        $this->messageManager=$messageManager;
     }
 
     /**
