@@ -44,8 +44,7 @@ class Message
     
     /**
      * Constructs the message.
-     *
-     * Use the static methods self::send() and self::sendSystemMessage() instead.
+     * Use the Message Manager methods send() and sendSystemMessage() instead.
      * @param CharacterInterface $from
      * @param string $message
      * @param MessageThread $thread
