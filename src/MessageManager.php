@@ -1,13 +1,7 @@
 <?php
-/**
- * Handles the messages in the game
- * User: nekosune
- * Date: 07/04/2018
- * Time: 18:54
- */
+declare(strict_types=1);
 
 namespace LotGD\Core;
-
 
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Message;
@@ -36,11 +30,10 @@ class MessageManager
         MessageThread $thread,
         bool $systemMessage = false
     ) {
-        $message=new Message($from, $message, $thread, $systemMessage);
+        $message = new Message($from, $message, $thread, $systemMessage);
         $thread->addMessage($message);
         return $message;
     }
-
 
     /**
      * Sends a system message to a MessageThread
@@ -54,7 +47,7 @@ class MessageManager
         string $message,
         MessageThread $thread
     ) {
-        $message=new Message(SystemCharacter::getInstance(), $message, $thread, true);
+        $message = new Message(SystemCharacter::getInstance(), $message, $thread, true);
         $thread->addMessage($message);
         return $message;
     }

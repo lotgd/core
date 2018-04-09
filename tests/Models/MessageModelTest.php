@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
+use LotGD\Core\MessageManager;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\MessageThread;
 use LotGD\Core\Models\Message;
@@ -14,13 +15,15 @@ use LotGD\Core\Tests\CoreModelTestCase;
  */
 class MessageModelTest extends CoreModelTestCase
 {
+
     /** @var string default data set */
     protected $dataset = "messages";
     
     public function testSendMessageToSingleCharacter()
     {
         $em = $this->getEntityManager();
-        
+        $mm=new MessageManager();
+
         $character1 = $em->getRepository(Character::class)->find(1);
         $character2 = $em->getRepository(Character::class)->find(4);
         
@@ -28,10 +31,10 @@ class MessageModelTest extends CoreModelTestCase
         $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character2, $character1]);
         
         $this->assertSame($thread1, $thread2);
-        
-        Message::send($character1, "Hi, how are you?", $thread1);
-        Message::send($character2, "I'm fine, and you?", $thread1);
-        Message::send($character1, "Sorry, I need to leave~", $thread1);
+
+        $mm->send($character1, "Hi, how are you?", $thread1);
+        $mm->send($character2, "I'm fine, and you?", $thread1);
+        $mm->send($character1, "Sorry, I need to leave~", $thread1);
         
         $this->assertSame(3, count($thread1->getMessages()));
         
@@ -57,7 +60,8 @@ class MessageModelTest extends CoreModelTestCase
     public function testSendMessageToMultipleCharacters()
     {
         $em = $this->getEntityManager();
-        
+        $mm=new MessageManager();
+
         $character1 = $em->getRepository(Character::class)->find(1);
         $character2 = $em->getRepository(Character::class)->find(2);
         $character3 = $em->getRepository(Character::class)->find(3, CharacterRepository::INCLUDE_SOFTDELETED);
@@ -66,16 +70,16 @@ class MessageModelTest extends CoreModelTestCase
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2, $character3, $character4]);
         $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character4, $character2, $character1, $character3]);
         $this->assertSame($thread1, $thread2);
-        
-        Message::send($character1, "Multi-User-Message", $thread1);
-        Message::send($character2, "Multi-User-Message", $thread1);
+
+        $mm->send($character1, "Multi-User-Message", $thread1);
+        $mm->send($character2, "Multi-User-Message", $thread1);
         try {
             $exception = false;
-            Message::send($character3, "Multi-User-Message", $thread1);
+            $mm->send($character3, "Multi-User-Message", $thread1);
         } catch(\LotGD\Core\Exceptions\ArgumentException $e) {
             $exception = true;
         }
-        Message::send($character4, "Multi-User-Message", $thread1);
+        $mm->send($character4, "Multi-User-Message", $thread1);
         
         $this->assertTrue($exception);
         $this->assertSame(3, count($thread1->getMessages()));
@@ -105,7 +109,8 @@ class MessageModelTest extends CoreModelTestCase
     public function testSendSystemMessageToSingleCharacter()
     {
         $em = $this->getEntityManager();
-        
+        $mm=new MessageManager();
+
         $character1 = $em->getRepository(Character::class)->find(1);
         $character2 = $em->getRepository(Character::class)->find(2);
         
@@ -114,8 +119,8 @@ class MessageModelTest extends CoreModelTestCase
         
         $this->assertNotSame($thread1, $thread2);
         
-        Message::sendSystemMessage("This is a Systemmessage for Character 1.", $thread1);
-        Message::sendSystemMessage("This is a Systemmessage for Character 2.", $thread2);
+        $mm->sendSystemMessage("This is a Systemmessage for Character 1.", $thread1);
+        $mm->sendSystemMessage("This is a Systemmessage for Character 2.", $thread2);
         
         $em->flush();
         $em->clear();
@@ -133,12 +138,12 @@ class MessageModelTest extends CoreModelTestCase
         // needs to be able to get attached
         try {
             $exception = false;
-            Message::send($character1, "A normal message", $thread1);
+            $mm->send($character1, "A normal message", $thread1);
         } catch (\LotGD\Core\Exceptions\CoreException $ex) {
             $exception = true;
         }
-        
-        Message::sendSystemMessage("A second system Message", $thread1);
+
+        $mm->sendSystemMessage("A second system Message", $thread1);
         
         $this->assertTrue($exception);
         $this->assertSame(2, count($thread1->getMessages()));
@@ -147,7 +152,8 @@ class MessageModelTest extends CoreModelTestCase
     public function testSendSystemMessageToMultipleCharacters()
     {
         $em = $this->getEntityManager();
-        
+        $mm=new MessageManager();
+
         $character1 = $em->getRepository(Character::class)->find(1);
         $character2 = $em->getRepository(Character::class)->find(2);
         
@@ -155,8 +161,8 @@ class MessageModelTest extends CoreModelTestCase
         $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2]);
         
         $this->assertNotSame($thread1, $thread2);
-        
-        Message::sendSystemMessage("A system message to 2 recipients", $thread1);
+
+        $mm->sendSystemMessage("A system message to 2 recipients", $thread1);
         
         $em->flush();
         $em->clear();

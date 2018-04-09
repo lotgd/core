@@ -199,9 +199,9 @@ class Game
      * Sets the Message Manager
      * @param MessageManager $messageManager
      */
-    public function setMessageManager(MessageManager $messageManager) : void
+    public function setMessageManager(MessageManager $messageManager): void
     {
-        $this->messageManager=$messageManager;
+        $this->messageManager = $messageManager;
     }
 
     /**
