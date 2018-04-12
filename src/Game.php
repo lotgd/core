@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace LotGD\Core;
 
 use DateTime;
+use Doctrine\Common\Util\Debug;
 use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Events\NavigateToSceneData;
 use LotGD\Core\Events\NewViewpointData;

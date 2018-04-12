@@ -6,7 +6,7 @@ namespace LotGD\Core;
 /**
  * A grouping of navigation actions, like a submenu.
  */
-class ActionGroup
+class ActionGroup implements \Countable
 {
     const DefaultGroup = 'lotgd/core/default';
     const HiddenGroup = 'lotgd/core/hidden';
@@ -28,6 +28,15 @@ class ActionGroup
         $this->title = $title;
         $this->sortKey = $sortKey;
         $this->actions = [];
+    }
+
+    /**
+     * Returns the number of registered Actions for this group.
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->actions);
     }
 
     /**
