@@ -45,7 +45,7 @@ class CharacterRepository extends EntityRepository
     /**
      * Find a character by ID.
      */
-    public function find($id, int $deletes = self::SKIP_SOFTDELETED)
+    public function find($id, $lockMode = NULL, $lockVersion = NULL, int $deletes = self::SKIP_SOFTDELETED)
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select("c")
