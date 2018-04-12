@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace LotGD\Core\Models\Repositories;
 
+use Doctrine\Common\Util\Debug;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
