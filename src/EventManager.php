@@ -111,7 +111,8 @@ class EventManager
             'class' => $class,
             'library' => $library
         ]);
-        $e->save($this->g->getEntityManager());
+
+        $this->g->getEntityManager()->persist($e);
     }
 
     /**
