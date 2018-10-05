@@ -64,7 +64,7 @@ class MessageModelTest extends CoreModelTestCase
 
         $character1 = $em->getRepository(Character::class)->find(1);
         $character2 = $em->getRepository(Character::class)->find(2);
-        $character3 = $em->getRepository(Character::class)->find(3, NULL, NULL, CharacterRepository::INCLUDE_SOFTDELETED);
+        $character3 = $em->getRepository(Character::class)->findWithSoftDeleted(3);
         $character4 = $em->getRepository(Character::class)->find(4);
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2, $character3, $character4]);
@@ -92,7 +92,7 @@ class MessageModelTest extends CoreModelTestCase
         
         $character1 = $em->getRepository(Character::class)->find(1);
         $character2 = $em->getRepository(Character::class)->find(2);
-        $character3 = $em->getRepository(Character::class)->find(3, NULL, NULL, CharacterRepository::INCLUDE_SOFTDELETED);
+        $character3 = $em->getRepository(Character::class)->findWithSoftDeleted(3);
         $character4 = $em->getRepository(Character::class)->find(4);
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2, $character3, $character4]);
