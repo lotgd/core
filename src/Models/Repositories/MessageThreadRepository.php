@@ -10,6 +10,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use LotGD\Core\Models\MessageThread;
 
+use \Doctrine\Common\Util\Debug;
+
 /**
  * Repository for MessageThreads
  */
