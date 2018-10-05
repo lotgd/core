@@ -96,6 +96,7 @@ class EventManagerTest extends CoreModelTestCase
         $library = 'lotgd/tests';
 
         $em->subscribe($pattern, $class, $library);
+        $this->getEntityManager()->flush();
 
         $sub = EventSubscription::create([
             'pattern' => $pattern,

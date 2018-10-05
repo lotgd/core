@@ -159,6 +159,7 @@ class GameTest extends CoreModelTestCase
 
         $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/default-scene/', DefaultSceneProvider::class, 'lotgd/core/tests');
         $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/navigate-to\/.*/', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->getEntityManager()->flush();
 
         $v = $this->g->getViewpoint();
         // Run it twice to make sure no additional DB operations happen.
@@ -214,6 +215,7 @@ class GameTest extends CoreModelTestCase
 
         // subscribe event
         $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->getEntityManager()->flush();
 
         $action = new Action(7, null, ["foo" => "baz"]);
         $actionId = $action->getId();
@@ -243,6 +245,7 @@ class GameTest extends CoreModelTestCase
 
         // subscribe event
         $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->getEntityManager()->flush();
 
         $action = new Action(7, null, ["foo" => "baz"]);
         $actionId = $action->getId();

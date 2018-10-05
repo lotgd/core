@@ -79,7 +79,8 @@ class ModuleManager
 
             try {
                 $class::onRegister($this->g, $m);
-                $m->save($this->g->getEntityManager());
+                $this->g->getEntityManager()->persist($m);
+                $this->g->getEntityManager()->flush();
             } catch (Throwable $e) {
                 $this->g->getLogger()->error("Calling {$class}::onRegister failed with exception: {$e->getMessage()}");
                 unset($m);
