@@ -43,7 +43,7 @@ class CharacterRepository extends EntityRepository
     }
 
     /**
-     * Find a character by ID.
+     * Find a character by ID, excluding soft deleted ones.
      */
     public function find($id, $lockMode=null, $lockVersion=null)
     {
@@ -62,6 +62,12 @@ class CharacterRepository extends EntityRepository
         }
     }
 
+    /**
+     * Finds a character id ID, including soft deleted ones.
+     * @param $id
+     * @return mixed|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     public function findWithSoftDeleted($id) {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select("c")
