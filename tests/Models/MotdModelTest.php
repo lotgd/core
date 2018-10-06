@@ -22,7 +22,7 @@ class MotDModelTest extends CoreModelTestCase
         $author = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         
         // Test normal message
-        $motd1 = $em->getRepository(MotD::class)->find(1);
+        $motd1 = $em->getRepository(MotD::class)->find("20000000-0000-0000-0000-000000000001");
         $this->assertSame("This is the title", $motd1->getTitle());
         $this->assertSame("This is the body of the message", $motd1->getBody());
         $this->assertSame($author, $motd1->getAuthor());
@@ -30,14 +30,14 @@ class MotDModelTest extends CoreModelTestCase
         $this->assertFalse($motd1->getSystemMessage());
         
         // Test System message
-        $motd2 = $em->getRepository(MotD::class)->find(2);
+        $motd2 = $em->getRepository(MotD::class)->find("20000000-0000-0000-0000-000000000002");
         $this->assertTrue($motd2->getSystemMessage());
         $this->assertNotSame($motd2->getAuthor(), $motd2->getApparantAuthor());
         $this->assertSame($author, $motd2->getAuthor());
         $this->assertNotSame("Deleted Character Name", $motd2->getAuthor()->getDisplayName());
         
         // Test message with unknown author
-        $motd3 = $em->getRepository(Motd::class)->find(3);
+        $motd3 = $em->getRepository(Motd::class)->find("20000000-0000-0000-0000-000000000003");
         $this->assertSame("Deleted Testcharacter", $motd3->getAuthor()->getDisplayName());
     }
     
@@ -45,7 +45,7 @@ class MotDModelTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
         
-        $time1 = $em->getRepository(MotD::class)->find(1)->getCreationTime();
+        $time1 = $em->getRepository(MotD::class)->find("20000000-0000-0000-0000-000000000001")->getCreationTime();
         $time2 = new \DateTime("2016-05-03 14:19:12");
         $time3 = $time2->setTimezone(new \DateTimeZone("Europe/Zurich"));
         $time4 = new \DateTime("2016-05-03 14:19:12");
@@ -87,10 +87,9 @@ class MotDModelTest extends CoreModelTestCase
         $motdCreationArguments["author"] = $em->getRepository(Character::class)->find($motdCreationArguments["author"]);
         
         $motd = MotD::create($motdCreationArguments);
-        $motd->save($em);
-        
         $id = $motd->getId();
-        
+
+        $em->persist($motd);
         $em->flush();
         $em->clear();
         
