@@ -39,9 +39,6 @@ class Message
     private $systemMessage = false;
     
 
-    
-
-    
     /**
      * Constructs the message.
      * Use the Message Manager methods send() and sendSystemMessage() instead.
