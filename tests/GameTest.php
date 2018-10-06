@@ -128,7 +128,7 @@ class GameTest extends CoreModelTestCase
 
     public function testSetGetCharacter()
     {
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
 
         $this->g->setCharacter($c);
         $this->assertEquals($c, $this->g->getCharacter());
@@ -136,7 +136,7 @@ class GameTest extends CoreModelTestCase
 
     public function testGetViewpointException()
     {
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         $this->g->setCharacter($c);
 
         // There should'nt be any listeners to provide a default scene.
@@ -146,7 +146,7 @@ class GameTest extends CoreModelTestCase
 
     public function testGetViewpointStored()
     {
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(2);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         $this->g->setCharacter($c);
 
         $this->assertNotNull($this->g->getViewpoint());
@@ -154,7 +154,7 @@ class GameTest extends CoreModelTestCase
 
     public function testGetViewpointDefault()
     {
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         $this->g->setCharacter($c);
 
         $this->g->getEventManager()->subscribe('/h\/lotgd\/core\/default-scene/', DefaultSceneProvider::class, 'lotgd/core/tests');
@@ -176,7 +176,7 @@ class GameTest extends CoreModelTestCase
 
     public function testTakeActionNonExistant()
     {
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         $this->g->setCharacter($c);
 
         // For now, I cant seem to serialize a proper ActionGroup to store in
@@ -189,7 +189,7 @@ class GameTest extends CoreModelTestCase
 
     public function testTakeActionNavigate()
     {
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(3);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000003");
         $this->g->setCharacter($c);
 
         // For now, I cant seem to serialize a proper ActionGroup to store in
@@ -210,7 +210,7 @@ class GameTest extends CoreModelTestCase
     public function testIfActionParametersAreRelayedToEvent()
     {
         /* @var $c Character */
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(2);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         $this->g->setCharacter($c);
 
         // subscribe event
@@ -240,7 +240,7 @@ class GameTest extends CoreModelTestCase
     public function testIfActionParametersTakePriorityToOtherParameters()
     {
         /* @var $c Character */
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(2);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         $this->g->setCharacter($c);
 
         // subscribe event
@@ -288,7 +288,7 @@ class GameTest extends CoreModelTestCase
             return $values;
         };
 
-        $c = $this->getEntityManager()->getRepository(Character::class)->find(3);
+        $c = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000003");
         $this->g->setCharacter($c);
 
         $v0 = $this->g->getViewpoint();

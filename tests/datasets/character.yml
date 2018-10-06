@@ -1,18 +1,18 @@
 characters:
     -
-        id: 1
+        id: "10000000-0000-0000-0000-000000000001"
         name: "Testcharacter 1"
         displayName: "Testcharacter 1"
         health: 0
         maxhealth: 100
     -
-        id: 2
+        id: "10000000-0000-0000-0000-000000000002"
         name: "Testcharacter 2"
         displayName: "Testcharacter 2"
         health: 90
         maxhealth: 90
     -
-        id: 3
+        id: "10000000-0000-0000-0000-000000000003"
         name: "Testcharacter 3"
         displayName: "Testcharacter 3 (deleted)"
         health: 90
@@ -20,6 +20,6 @@ characters:
         deletedAt: "2011-11-11 11:11:11"
 character_properties:
     -
-        owner_id: 1
+        owner_id: "10000000-0000-0000-0000-000000000001"
         propertyName: "test"
         propertyValue: 's:5:"hallo";'

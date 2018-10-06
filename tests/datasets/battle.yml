@@ -1,48 +1,48 @@
 characters:
     -
-        id: 1
+        id: "d363c077-234a-433d-834e-f1a1d3b281d8"
         name: "Player"
         displayName: "The Player"
         health: 100
         maxhealth: 100
         level: 10
     -
-        id: 2
+        id: "4d01c29b-d825-4bc7-9e6e-63525155fd37"
         name: "High Level Char"
         displayName: "High Level Char"
         health: 1000
         maxhealth: 1000
         level: 100
     -
-        id: 3
+        id: "c3792b61-4e34-4710-9871-65a68ac30bb4"
         name: "Low Level Char"
         displayName: "Low Level Char"
         health: 10
         maxhealth: 10
         level: 1
     -
-        id: 4
+        id: "6565b418-55f5-4a6b-8d92-a9ef81329912"
         name: "Low Damage Char"
         displayName: "Low Damage Char"
         health: 500
         maxhealth: 500
         level: 0
     -
-        id: 10
+        id: "539e4bb0-84d1-49ed-a697-ff449991e9b7"
         name: "Level 10 Character"
         displayName: "Level 10 Character"
         health: 100
         maxhealth: 100
         level: 10
     -
-        id: 11
+        id: "24d71c26-f915-401c-8b3e-1932edf650ce"
         name: "Level 11 Character"
         displayName: "Level 11 Character"
         health: 110
         maxhealth: 110
         level: 11
     -
-        id: 13
+        id: "1a9f63f2-3006-4e12-b272-4fd6be518a93"
         name: "Level 13 Character"
         displayName: "Level 13 Character"
         health: 130
@@ -50,26 +50,26 @@ characters:
         level: 13
 monsters:
     -
-        id: 1
+        id: "de84c507-9673-44e7-b665-9e43416b9c2f"
         name: "Evil Monster"
         level: 5
     -
-        id: 2
+        id: "b636df29-f72d-4e2d-9850-982e783a9e94"
         name: "High Dragon"
         level: 100
     -
-        id: 3
+        id: "c004bcb6-a7c1-4f9a-abc2-1711c64e23a0"
         name: "Stone"
         level: 1
     -
-        id: 10
+        id: "f1d1f672-e308-420e-939f-cbb39285b222"
         name: "Level 10 Monster"
         level: 10
     -
-        id: 11
+        id: "7ca9c141-aaf8-44a5-9d04-b6f9923f3c66"
         name: "Level 11 Monster"
         level: 11
     -
-        id: 13
+        id: "09540b93-63c9-4d82-8501-f569f63dfc4c"
         name: "Level 13 Monster"
         level: 13

@@ -12,6 +12,7 @@ use LotGD\Core\Models\Character;
 use LotGD\Core\Models\CharacterProperty;
 use LotGD\Core\Tests\CoreModelTestCase;
 use LotGD\Core\Models\Repositories\CharacterRepository;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Tests the management of Characters
@@ -26,13 +27,13 @@ class CharacterModelTest extends CoreModelTestCase
      */
     public function testSoftDeletion()
     {
-        $chars = $this->getEntityManager()->getRepository(Character::class)->find(3);
+        $chars = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000003");
         $this->assertSame(null, $chars);
 
         $allChars = $this->getEntityManager()->getRepository(Character::class)->findAll();
         $this->assertSame(2, count($allChars));
 
-        $char = $this->getEntityManager()->getRepository(Character::class)->find(1);
+        $char = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         $char->delete($this->getEntityManager());
         $this->getEntityManager()->flush();
         $this->getEntityManager()->clear();
@@ -101,7 +102,7 @@ class CharacterModelTest extends CoreModelTestCase
 
         $em->flush();
 
-        $this->assertInternalType("int", $characterEntity->getId());
+        $this->assertInstanceOf(UuidInterface::class, $characterEntity->getId());
         $this->assertSame(16, $characterEntity->getProperty("a property"));
 
         $em->flush();
@@ -142,7 +143,7 @@ class CharacterModelTest extends CoreModelTestCase
         $rowsBefore = count($em->getRepository(Character::class)->findAll());
 
         // Delete one row
-        $character = $em->getRepository(Character::class)->find(1);
+        $character = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         $character->delete($em);
 
         $em->clear();
@@ -163,7 +164,7 @@ class CharacterModelTest extends CoreModelTestCase
         $em = $this->getEntityManager();
 
         // test default values
-        $firstCharacter = $em->getRepository(Character::class)->find(1);
+        $firstCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         $this->assertSame(5, $firstCharacter->getProperty("dragonkills", 5));
         $this->assertNotSame(5, $firstCharacter->getProperty("dragonkills", "5"));
         $this->assertSame("hanniball", $firstCharacter->getProperty("petname", "hanniball"));
@@ -226,6 +227,7 @@ class CharacterModelTest extends CoreModelTestCase
 
         $eventManager->subscribe("#h/lotgd/core/getCharacterAttack#", get_class($detectionClass), "test");
         $eventManager->subscribe("#h/lotgd/core/getCharacterDefense#", get_class($detectionClass), "test");
+        $this->getEntityManager()->flush();
 
         $this->assertSame($level*2, $character1->getAttack());
         $this->assertSame($level*4, $character2->getDefense());

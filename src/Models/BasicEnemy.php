@@ -4,13 +4,15 @@ declare(strict_types=1);
 namespace LotGD\Core\Models;
 
 use Doctrine\ORM\Mapping\MappedSuperclass;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * @MappedSuperclass
  */
 abstract class BasicEnemy implements FighterInterface
 {
-    /** @Id @Column(type="integer") @GeneratedValue */
+    /** @Id @Column(type="uuid", unique=True) */
     protected $id;
     /** @Column(type="string", length=50); */
     protected $name;
@@ -18,12 +20,20 @@ abstract class BasicEnemy implements FighterInterface
     protected $level;
     /** @var int */
     protected $health;
+
+    /**
+     * BasicEnemy constructor. Sets uuid upon creation.
+     * @throws \Exception
+     */
+    public function __construct() {
+        $this->id = Uuid::uuid4();
+    }
     
     /**
      * Returns the enemy's id
      * @return int
      */
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         return $this->id;
     }

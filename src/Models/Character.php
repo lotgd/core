@@ -17,6 +17,8 @@ use LotGD\Core\Exceptions\BuffSlotOccupiedException;
 use LotGD\Core\Tools\Model\{
     Creator, ExtendableModel, GameAware, PropertyManager, SoftDeletable
 };
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Model for a character
@@ -32,7 +34,7 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     use GameAware;
     use ExtendableModel;
 
-    /** @Id @Column(type="integer") @GeneratedValue */
+    /** @Id @Column(type="uuid", unique=True) */
     private $id;
     /** @Column(type="string", length=50); */
     private $name;
@@ -90,6 +92,8 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
      */
     public function __construct()
     {
+        $this->id = Uuid::uuid4();
+
         $this->properties = new ArrayCollection();
         $this->buffs = new ArrayCollection();
         $this->messageThreads = new ArrayCollection();
@@ -99,7 +103,7 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
      * Returns the entity's id
      * @return int The id
      */
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         return $this->id;
     }

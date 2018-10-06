@@ -40,8 +40,8 @@ class ViewpointTest extends CoreModelTestCase
         $em = $this->getEntityManager();
 
         // Test character with a characterScene
-        $testCharacter = $em->getRepository(Character::class)->find(2);
-        $this->assertSame(2, $testCharacter->getId());
+        $testCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
+        $this->assertSame("10000000-0000-0000-0000-000000000002", (string)$testCharacter->getId());
         $characterScene = $testCharacter->getViewpoint();
 
         $this->assertInstanceOf(Viewpoint::class, $characterScene);
@@ -49,8 +49,8 @@ class ViewpointTest extends CoreModelTestCase
         $this->assertSame("This is the village.", $characterScene->getDescription());
 
         // Test character without a characterScene
-        $testCharacter = $em->getRepository(Character::class)->find(1);
-        $this->assertSame(1, $testCharacter->getId());
+        $testCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $this->assertSame("10000000-0000-0000-0000-000000000001", (string)$testCharacter->getId());
         $characterScene = $testCharacter->getViewpoint();
 
         $this->assertNull($characterScene);
@@ -63,7 +63,7 @@ class ViewpointTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $testCharacter = $em->getRepository(Character::class)->find(2);
+        $testCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
 
         $testScene = $em->getRepository(Scene::class)->find(2);
 
@@ -95,13 +95,13 @@ class ViewpointTest extends CoreModelTestCase
             $ag2
         ];
 
-        $input = $em->getRepository(Viewpoint::class)->find(2);
+        $input = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
         $input->setActionGroups($actionGroups);
         $input->save($em);
 
         $em->clear();
 
-        $output = $em->getRepository(Viewpoint::class)->find(2);
+        $output = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
         $this->assertEquals($actionGroups, $output->getActionGroups());
 
         $this->assertEquals($ag2, $input->findActionGroupById('id2'));
@@ -124,13 +124,13 @@ class ViewpointTest extends CoreModelTestCase
 
         $attachments = [$a1, $a2];
 
-        $input = $em->getRepository(Viewpoint::class)->find(2);
+        $input = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
         $input->setAttachments($attachments);
         $input->save($em);
 
         $em->clear();
 
-        $output = $em->getRepository(Viewpoint::class)->find(2);
+        $output = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
         $this->assertEquals($attachments, $output->getAttachments());
         $this->assertEquals('baz', $output->getAttachments()[0]->getFoo());
         $this->assertEquals('fiz', $output->getAttachments()[1]->getFoo());
@@ -160,13 +160,13 @@ class ViewpointTest extends CoreModelTestCase
             $ag2
         ];
 
-        $input = $em->getRepository(Viewpoint::class)->find(2);
+        $input = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
         $input->setActionGroups($actionGroups);
         $input->save($em);
 
         $em->clear();
 
-        $output = $em->getRepository(Viewpoint::class)->find(2);
+        $output = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
 
         // Not finding the scene ID should change nothing.
         $output->removeActionsWithSceneId(1000);
@@ -189,7 +189,7 @@ class ViewpointTest extends CoreModelTestCase
     public function testChangingSceneDescription()
     {
         $em = $this->getEntityManager();
-        $testCharacter = $em->getRepository(Character::class)->find(2);
+        $testCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         $characterScene = $testCharacter->getViewpoint();
 
         $this->assertSame("This is the village.", $characterScene->getDescription());
@@ -201,7 +201,7 @@ class ViewpointTest extends CoreModelTestCase
     public function testClearingSceneDescription()
     {
         $em = $this->getEntityManager();
-        $testCharacter = $em->getRepository(Character::class)->find(2);
+        $testCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         $characterScene = $testCharacter->getViewpoint();
 
         $characterScene->clearDescription();
@@ -235,14 +235,14 @@ class ViewpointTest extends CoreModelTestCase
             $ag2
         ];
 
-        $input = $em->getRepository(Viewpoint::class)->find(2);
+        $input = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
         $input->setActionGroups($actionGroups);
         $input->save($em);
 
         $em->clear();
 
         /** @var Viewpoint $viewpoint */
-        $viewpoint = $em->getRepository(Viewpoint::class)->find(2);
+        $viewpoint = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
 
         $actionGroupId1 = $viewpoint->findActionGroupById("id1");
         $actionGroupId2 = $viewpoint->findActionGroupById("id2");

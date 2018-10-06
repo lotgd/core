@@ -24,8 +24,8 @@ class MessageModelTest extends CoreModelTestCase
         $em = $this->getEntityManager();
         $mm=new MessageManager();
 
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(4);
+        $character1 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $character2 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000004");
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2]);
         $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character2, $character1]);
@@ -42,8 +42,8 @@ class MessageModelTest extends CoreModelTestCase
         $em->flush();
         $em->clear();
         
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(4);
+        $character1 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $character2 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000004");
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2]);
         
@@ -62,10 +62,10 @@ class MessageModelTest extends CoreModelTestCase
         $em = $this->getEntityManager();
         $mm=new MessageManager();
 
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(2);
-        $character3 = $em->getRepository(Character::class)->findWithSoftDeleted(3);
-        $character4 = $em->getRepository(Character::class)->find(4);
+        $character1 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $character2 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
+        $character3 = $em->getRepository(Character::class)->findWithSoftDeleted("10000000-0000-0000-0000-000000000003");
+        $character4 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000004");
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2, $character3, $character4]);
         $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character4, $character2, $character1, $character3]);
@@ -89,11 +89,11 @@ class MessageModelTest extends CoreModelTestCase
         $this->assertSame(1, count($character4->getMessageThreads()));
         
         $em->flush();
-        
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(2);
-        $character3 = $em->getRepository(Character::class)->findWithSoftDeleted(3);
-        $character4 = $em->getRepository(Character::class)->find(4);
+
+        $character1 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $character2 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
+        $character3 = $em->getRepository(Character::class)->findWithSoftDeleted("10000000-0000-0000-0000-000000000003");
+        $character4 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000004");
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2, $character3, $character4]);
         
@@ -111,8 +111,8 @@ class MessageModelTest extends CoreModelTestCase
         $em = $this->getEntityManager();
         $mm=new MessageManager();
 
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(2);
+        $character1 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $character2 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character1]);
         $thread2 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character2]);
@@ -124,9 +124,9 @@ class MessageModelTest extends CoreModelTestCase
         
         $em->flush();
         $em->clear();
-        
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(2);
+
+        $character1 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $character2 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character1]);
         $thread2 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character2]);
@@ -154,8 +154,8 @@ class MessageModelTest extends CoreModelTestCase
         $em = $this->getEntityManager();
         $mm=new MessageManager();
 
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(2);
+        $character1 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $character2 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character1, $character2]);
         $thread2 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2]);
@@ -166,9 +166,9 @@ class MessageModelTest extends CoreModelTestCase
         
         $em->flush();
         $em->clear();
-        
-        $character1 = $em->getRepository(Character::class)->find(1);
-        $character2 = $em->getRepository(Character::class)->find(2);
+
+        $character1 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
+        $character2 = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
         
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateReadonlyFor([$character1, $character2]);
         

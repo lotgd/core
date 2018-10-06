@@ -6,6 +6,7 @@ namespace LotGD\Core;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\EventManager as DoctrineEventManager;
 use Doctrine\Common\Util\Debug;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\Events as DoctrineEvents;
 use Doctrine\ORM\ {
     EntityManager,
@@ -172,6 +173,11 @@ class Bootstrap
 
         // Create entity manager
         $entityManager = EntityManager::create(["pdo" => $pdo], $configuration);
+
+        // Register uuid type
+        try {
+            \Doctrine\DBAL\Types\Type::addType('uuid', 'Ramsey\Uuid\Doctrine\UuidType');
+        } catch (DBALException $e) {}
 
         // Create Schema and update database if needed
         $metaData = $entityManager->getMetadataFactory()->getAllMetadata();

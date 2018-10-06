@@ -1,15 +1,15 @@
 characters:
     -
-        id: 1
+        id: "10000000-0000-0000-0000-000000000001"
         name: "Char without a Scene"
         displayName: "A"
     -
-        id: 2
+        id: "10000000-0000-0000-0000-000000000002"
         name: "Char with a Scene"
         displayName: "B"
 viewpoints:
     -
-        owner_id: 2
+        owner_id: "10000000-0000-0000-0000-000000000002"
         title: "The Village"
         description: "This is the village."
         template: "lotgd/tests/village"

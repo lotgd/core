@@ -19,7 +19,7 @@ class MotDModelTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
         
-        $author = $em->getRepository(Character::class)->find(1);
+        $author = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         
         // Test normal message
         $motd1 = $em->getRepository(MotD::class)->find(1);
@@ -63,13 +63,13 @@ class MotDModelTest extends CoreModelTestCase
     {
         return [
             [[
-                "author" => 1,
+                "author" => "10000000-0000-0000-0000-000000000001",
                 "title" => "ABC_\"EFG",
                 "body" => "Lorem îpsum etc pp",
                 "systemMessage" => false,
             ]],
             [[
-                "author" => 1,
+                "author" => "10000000-0000-0000-0000-000000000001",
                 "title" => "AnotherOne",
                 "body" => "Test a Second One",
                 "systemMessage" => true,

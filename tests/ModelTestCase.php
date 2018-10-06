@@ -63,6 +63,9 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
 
                 self::$em = EntityManager::create(["pdo" => self::$pdo], $configuration);
 
+                // Register uuid type
+                \Doctrine\DBAL\Types\Type::addType('uuid', 'Ramsey\Uuid\Doctrine\UuidType');
+
                 // Create Schema
                 $metaData = self::$em->getMetadataFactory()->getAllMetadata();
                 $schemaTool = new SchemaTool(self::$em);

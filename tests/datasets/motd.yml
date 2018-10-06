@@ -1,18 +1,18 @@
 characters:
     -
-        id: 1
+        id: "10000000-0000-0000-0000-000000000001"
         name: "Testcharacter 1"
         displayName: "Testcharacter 1"
         health: 0
         maxhealth: 100
     -
-        id: 2
+        id: "10000000-0000-0000-0000-000000000002"
         name: "Testcharacter 2"
         displayName: "Testcharacter 2"
         health: 90
         maxhealth: 90
     -
-        id: 3
+        id: "10000000-0000-0000-0000-000000000003"
         name: "Testcharacter 1"
         displayName: "Deleted Testcharacter"
         health: 200
@@ -21,21 +21,21 @@ characters:
 motd:
     -
         id: 1
-        author_id: 1
+        author_id: "10000000-0000-0000-0000-000000000001"
         title: "This is the title"
         body: "This is the body of the message"
         creationTime: "2016-05-03 14:19:12"
         systemMessage: false
     -
         id: 2
-        author_id: 1
+        author_id: "10000000-0000-0000-0000-000000000001"
         title: "This is a system message"
         body: "This is the body of the system message"
         creationTime: "2016-05-04 14:19:12"
         systemMessage: true
     -
         id: 3
-        author_id: 3
+        author_id: "10000000-0000-0000-0000-000000000003"
         title: "This is an old message."
         body: "This is an old message."
         creationTime: "2002-12-09 15:13:59"

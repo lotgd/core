@@ -5,6 +5,7 @@ namespace LotGD\Core\Tests\Models;
 
 use Doctrine\Common\Collections\Collection;
 
+use Doctrine\Common\Util\Debug;
 use LotGD\Core\{
     Battle,
     DiceBag,
@@ -25,6 +26,9 @@ use LotGD\Core\Models\BattleEvents\{
 };
 
 use LotGD\Core\Tests\CoreModelTestCase;
+use Ramsey\Uuid\Codec\OrderedTimeCodec;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
 
 class BattleTest extends CoreModelTestCase
 {
@@ -52,8 +56,8 @@ class BattleTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $character = $em->getRepository(Character::class)->find(1);
-        $monster = $em->getRepository(Monster::class)->find(1);
+        $character = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
+        $monster = $em->getRepository(Monster::class)->find("de84c507-9673-44e7-b665-9e43416b9c2f");
 
         $this->assertSame(5, $monster->getLevel());
         $this->assertSame(52, $monster->getMaxHealth());
@@ -69,8 +73,8 @@ class BattleTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $character = $em->getRepository(Character::class)->find(1);
-        $monster = $em->getRepository(Monster::class)->find(1);
+        $character = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
+        $monster = $em->getRepository(Monster::class)->find("de84c507-9673-44e7-b665-9e43416b9c2f");
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
 
@@ -106,8 +110,8 @@ class BattleTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $character = $em->getRepository(Character::class)->find(1);
-        $monster = $em->getRepository(Monster::class)->find(1);
+        $character = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
+        $monster = $em->getRepository(Monster::class)->find("de84c507-9673-44e7-b665-9e43416b9c2f");
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
         $battle = $battle->serialize();
@@ -139,8 +143,8 @@ class BattleTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $highLevelPlayer = $em->getRepository(Character::class)->find(2);
-        $lowLevelMonster = $em->getRepository(Monster::class)->find(3);
+        $highLevelPlayer = $em->getRepository(Character::class)->find("4d01c29b-d825-4bc7-9e6e-63525155fd37");
+        $lowLevelMonster = $em->getRepository(Monster::class)->find("c004bcb6-a7c1-4f9a-abc2-1711c64e23a0");
 
         $battle = new Battle($this->getMockGame($highLevelPlayer), $highLevelPlayer, $lowLevelMonster);
 
@@ -172,8 +176,8 @@ class BattleTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $lowLevelPlayer = $em->getRepository(Character::class)->find(3);
-        $highLevelMonster = $em->getRepository(Monster::class)->find(2);
+        $lowLevelPlayer = $em->getRepository(Character::class)->find("c3792b61-4e34-4710-9871-65a68ac30bb4");
+        $highLevelMonster = $em->getRepository(Monster::class)->find("b636df29-f72d-4e2d-9850-982e783a9e94");
 
         $battle = new Battle($this->getMockGame($lowLevelPlayer), $lowLevelPlayer, $highLevelMonster);
 
@@ -205,8 +209,8 @@ class BattleTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $character = $em->getRepository(Character::class)->find(1);
-        $monster = $em->getRepository(Monster::class)->find(1);
+        $character = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
+        $monster = $em->getRepository(Monster::class)->find("de84c507-9673-44e7-b665-9e43416b9c2f");
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
 
@@ -220,8 +224,8 @@ class BattleTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $character = $em->getRepository(Character::class)->find(1);
-        $monster = $em->getRepository(Monster::class)->find(1);
+        $character = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
+        $monster = $em->getRepository(Monster::class)->find("de84c507-9673-44e7-b665-9e43416b9c2f");
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
 
@@ -236,8 +240,8 @@ class BattleTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $character = $em->getRepository(Character::class)->find(1);
-        $monster = $em->getRepository(Monster::class)->find(1);
+        $character = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
+        $monster = $em->getRepository(Monster::class)->find("de84c507-9673-44e7-b665-9e43416b9c2f");
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
 
@@ -257,23 +261,23 @@ class BattleTest extends CoreModelTestCase
             default:
             case 0:
                 // Fair Battle
-                $character = $em->getRepository(Character::class)->find(1);
-                $monster = $em->getRepository(Monster::class)->find(1);
+                $character = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
+                $monster = $em->getRepository(Monster::class)->find("de84c507-9673-44e7-b665-9e43416b9c2f");
                 break;
             case 1:
                 // very long battle
-                $character = $em->getRepository(Character::class)->find(4);
-                $monster = $em->getRepository(Monster::class)->find(3);
+                $character = $em->getRepository(Character::class)->find("6565b418-55f5-4a6b-8d92-a9ef81329912");
+                $monster = $em->getRepository(Monster::class)->find("c004bcb6-a7c1-4f9a-abc2-1711c64e23a0");
                 break;
             case 2:
                 // player should win battle
-                $character = $em->getRepository(Character::class)->find(13);
-                $monster = $em->getRepository(Monster::class)->find(11);
+                $character = $em->getRepository(Character::class)->find("1a9f63f2-3006-4e12-b272-4fd6be518a93");
+                $monster = $em->getRepository(Monster::class)->find("7ca9c141-aaf8-44a5-9d04-b6f9923f3c66");
                 break;
             case 3:
                 // player should lose battle
-                $character = $em->getRepository(Character::class)->find(11);
-                $monster = $em->getRepository(Monster::class)->find(13);
+                $character = $em->getRepository(Character::class)->find("24d71c26-f915-401c-8b3e-1932edf650ce");
+                $monster = $em->getRepository(Monster::class)->find("09540b93-63c9-4d82-8501-f569f63dfc4c");
                 break;
         }
 
@@ -1331,7 +1335,7 @@ class BattleTest extends CoreModelTestCase
     public function testBufflistGoodguyAttackModifier()
     {
         $em = $this->getEntityManager();
-        $player = $em->getRepository(Character::class)->find(1);
+        $player = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
         $game = $this->getMockGame($player);
 
         $player->addBuff(new Buff([
@@ -1360,7 +1364,7 @@ class BattleTest extends CoreModelTestCase
     public function testBufflistGoodguyDefenseModifier()
     {
         $em = $this->getEntityManager();
-        $player = $em->getRepository(Character::class)->find(1);
+        $player = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
         $game = $this->getMockGame($player);
 
         $player->addBuff(new Buff([
@@ -1389,7 +1393,7 @@ class BattleTest extends CoreModelTestCase
     public function testBufflistGoodguyDamageModifier()
     {
         $em = $this->getEntityManager();
-        $player = $em->getRepository(Character::class)->find(1);
+        $player = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
         $game = $this->getMockGame($player);
 
         $player->addBuff(new Buff([
@@ -1418,7 +1422,7 @@ class BattleTest extends CoreModelTestCase
     public function testBufflistBadguyAttackModifier()
     {
         $em = $this->getEntityManager();
-        $player = $em->getRepository(Character::class)->find(1);
+        $player = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
         $game = $this->getMockGame($player);
 
         $player->addBuff(new Buff([
@@ -1447,7 +1451,7 @@ class BattleTest extends CoreModelTestCase
     public function testBufflistBadguyDefenseModifier()
     {
         $em = $this->getEntityManager();
-        $player = $em->getRepository(Character::class)->find(1);
+        $player = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
         $game = $this->getMockGame($player);
 
         $player->addBuff(new Buff([
@@ -1476,7 +1480,7 @@ class BattleTest extends CoreModelTestCase
     public function testBufflistBadguyDamageModifier()
     {
         $em = $this->getEntityManager();
-        $player = $em->getRepository(Character::class)->find(1);
+        $player = $em->getRepository(Character::class)->find("d363c077-234a-433d-834e-f1a1d3b281d8");
         $game = $this->getMockGame($player);
 
         $player->addBuff(new Buff([

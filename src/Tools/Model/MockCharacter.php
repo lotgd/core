@@ -10,6 +10,7 @@ use LotGD\Core\{
 };
 use LotGD\Core\Exceptions\IsNullException;
 use LotGD\Core\Models\Viewpoint;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Provides basic implementation to mock CharacterInterface.
@@ -21,7 +22,7 @@ trait MockCharacter
         throw new IsNullException();
     }
 
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         throw new IsNullException();
     }
