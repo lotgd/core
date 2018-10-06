@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Model for the message of the day
@@ -20,7 +22,7 @@ class MotD implements CreateableInterface
     use Creator;
     use Deletor;
     
-    /** @Id @Column(type="integer") @GeneratedValue */
+    /** @Id @Column(type="uuid", unique=True) */
     private $id;
     /**
      * @ManyToOne(targetEntity="Character", cascade={"persist"}, fetch="EAGER")
@@ -49,6 +51,7 @@ class MotD implements CreateableInterface
      */
     public function __construct()
     {
+        $this->id = Uuid::uuid4();
         $this->creationTime = new \DateTime("now");
     }
     
@@ -56,7 +59,7 @@ class MotD implements CreateableInterface
      * Returns the entities ID
      * @return int
      */
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         return $this->id;
     }

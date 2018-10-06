@@ -20,21 +20,21 @@ characters:
         deletedAt: "2011-11-11 11:11:11"
 motd:
     -
-        id: 1
+        id: "20000000-0000-0000-0000-000000000001"
         author_id: "10000000-0000-0000-0000-000000000001"
         title: "This is the title"
         body: "This is the body of the message"
         creationTime: "2016-05-03 14:19:12"
         systemMessage: false
     -
-        id: 2
+        id: "20000000-0000-0000-0000-000000000002"
         author_id: "10000000-0000-0000-0000-000000000001"
         title: "This is a system message"
         body: "This is the body of the system message"
         creationTime: "2016-05-04 14:19:12"
         systemMessage: true
     -
-        id: 3
+        id: "20000000-0000-0000-0000-000000000003"
         author_id: "10000000-0000-0000-0000-000000000003"
         title: "This is an old message."
         body: "This is an old message."
