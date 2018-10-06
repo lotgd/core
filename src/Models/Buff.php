@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Exceptions\ArgumentException;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * A model representing a buff used to modify the flow of the battle.
@@ -23,7 +25,7 @@ class Buff
     const ACTIVATE_NONE = 0b0000;
     const ACTIVATE_ANY = 0b1111;
     
-    /** @Id @Column(type="integer") @GeneratedValue */
+    /** @Id @Column(type="uuid", unique=True) */
     private $id;
     /**
      * @ManyToOne(targetEntity="Character", inversedBy="buffs")
@@ -231,7 +233,7 @@ class Buff
      * Allowed buff values and their type
      * @var array
      */
-    private $buffArrayTemplate = [
+    private static $buffArrayTemplate = [
         "slot" => "string",
         "name" => "string",
         "startMessage" => "string",
@@ -282,13 +284,15 @@ class Buff
      */
     public function __construct(array $buffArray)
     {
+        $this->id = Uuid::uuid4();
+
         foreach ($buffArray as $attribute => $value) {
             // Throw exception if an attribute does not exist (to prevent spelling errors)
-            if (!isset($this->buffArrayTemplate[$attribute])) {
+            if (!isset(self::$buffArrayTemplate[$attribute])) {
                 throw new ArgumentException("{$attribute} is not a valid key for a buff.");
             }
             
-            switch ($this->buffArrayTemplate[$attribute]) {
+            switch (self::$buffArrayTemplate[$attribute]) {
                 case "string":
                     if (is_string($value) === false) {
                         throw new ArgumentException("{$attribute} needs to be a string.");
@@ -338,7 +342,7 @@ class Buff
     {
         $buffArray = [];
         
-        foreach ($this->buffArrayTemplate as $attribute => $type) {
+        foreach (self::$buffArrayTemplate as $attribute => $type) {
             $buffArray[$attribute] = $buff->$attribute;
         }
         
@@ -349,7 +353,7 @@ class Buff
      * Returns the id of the buff
      * @return int
      */
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         return $this->id;
     }
