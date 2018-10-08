@@ -15,14 +15,14 @@ class SceneConnection
 {
     /**
      * @Id
-     * @ManyToOne(targetEntity="Scene")
+     * @ManyToOne(targetEntity="Scene", inversedBy="outgoingConnections")
      * @JoinColumn(name="outgoingScene", referencedColumnName="id")
      */
     private $outgoingScene;
 
     /**
      * @Id
-     * @ManyToOne(targetEntity="Scene")
+     * @ManyToOne(targetEntity="Scene", inversedBy="incomingConnections")
      * @JoinColumn(name="incomingScene", referencedColumnName="id")
      */
     private $incomingScene;

@@ -18,24 +18,24 @@ viewpoints:
         actionGroups: "a:0:{}"
 scenes:
     -
-        id: 1
+        id: "30000000-0000-0000-0000-000000000001"
         title: "The Village"
         description: "This is the village."
         template: "lotgd/tests/village"
     -
-        id: 2
+        id: "30000000-0000-0000-0000-000000000002"
         title: "The Forest"
         description: "This is a very dangerous and dark forest"
         template: "lotgd/tests/forest"
     -
-        id: 3
+        id: "30000000-0000-0000-0000-000000000003"
         title: "The Weaponry"
         description: "This is the place where you can buy awesome weapons"
         template: "lotgd/tests/weaponry"
 scene_connections:
     -
-        outgoingScene: 1
-        incomingScene: 2
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        incomingScene: "30000000-0000-0000-0000-000000000002"
     -
-        outgoingScene: 1
-        incomingScene: 3
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        incomingScene: "30000000-0000-0000-0000-000000000003"

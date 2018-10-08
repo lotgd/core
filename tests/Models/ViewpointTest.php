@@ -65,7 +65,7 @@ class ViewpointTest extends CoreModelTestCase
 
         $testCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
 
-        $testScene = $em->getRepository(Scene::class)->find(2);
+        $testScene = $em->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
 
         $this->assertSame("The Village", $testCharacter->getViewpoint()->getTitle());
 
@@ -82,12 +82,12 @@ class ViewpointTest extends CoreModelTestCase
 
         $ag1 = new ActionGroup('id1', 'title1', 42);
         $ag1->setActions([
-            new Action(1),
-            new Action(2)
+            new Action("30000000-0000-0000-0000-000000000001"),
+            new Action("30000000-0000-0000-0000-000000000002")
         ]);
         $ag2 = new ActionGroup('id2', 'title2', 101);
         $ag2->setActions([
-            new Action(3)
+            new Action("30000000-0000-0000-0000-000000000003")
         ]);
 
         $actionGroups = [
@@ -107,7 +107,7 @@ class ViewpointTest extends CoreModelTestCase
         $this->assertEquals($ag2, $input->findActionGroupById('id2'));
         $this->assertNull($input->findActionGroupById('not-there'));
 
-        $testAction = new Action(4);
+        $testAction = new Action("30000000-0000-0000-0000-000000000004");
         $input->addActionToGroupId($testAction, 'not-there');
         $this->assertNull($input->findActionById($testAction->getId()));
 
@@ -140,9 +140,9 @@ class ViewpointTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $a1 = new Action(1);
-        $a2 = new Action(2);
-        $a3 = new Action(3);
+        $a1 = new Action("30000000-0000-0000-0000-000000000001");
+        $a2 = new Action("30000000-0000-0000-0000-000000000002");
+        $a3 = new Action("30000000-0000-0000-0000-000000000003");
 
         $ag1 = new ActionGroup('id1', 'title1', 42);
         $ag1->setActions([
@@ -152,7 +152,7 @@ class ViewpointTest extends CoreModelTestCase
         ]);
         $ag2 = new ActionGroup('id2', 'title2', 101);
         $ag2->setActions([
-            new Action(4)
+            new Action("30000000-0000-0000-0000-000000000004")
         ]);
 
         $actionGroups = [
@@ -169,7 +169,7 @@ class ViewpointTest extends CoreModelTestCase
         $output = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
 
         // Not finding the scene ID should change nothing.
-        $output->removeActionsWithSceneId(1000);
+        $output->removeActionsWithSceneId("30000000-0000-0000-0000-000000001000");
         $this->assertEquals($actionGroups, $output->getActionGroups());
 
         $ag1_output = new ActionGroup('id1', 'title1', 42);
@@ -182,7 +182,7 @@ class ViewpointTest extends CoreModelTestCase
             $ag1_output,
             $ag2
         ];
-        $output->removeActionsWithSceneId(2);
+        $output->removeActionsWithSceneId("30000000-0000-0000-0000-000000000002");
         $this->assertEquals($actionGroupsWithout2, $output->getActionGroups());
     }
 
@@ -215,9 +215,9 @@ class ViewpointTest extends CoreModelTestCase
     {
         $em = $this->getEntityManager();
 
-        $a1 = new Action(1);
-        $a2 = new Action(2);
-        $a3 = new Action(3);
+        $a1 = new Action("30000000-0000-0000-0000-000000000001");
+        $a2 = new Action("30000000-0000-0000-0000-000000000002");
+        $a3 = new Action("30000000-0000-0000-0000-000000000003");
 
         $ag1 = new ActionGroup('id1', 'title1', 42);
         $ag1->setActions([
@@ -227,7 +227,7 @@ class ViewpointTest extends CoreModelTestCase
         ]);
         $ag2 = new ActionGroup('id2', 'title2', 101);
         $ag2->setActions([
-            new Action(4)
+            new Action("30000000-0000-0000-0000-000000000004")
         ]);
 
         $actionGroups = [

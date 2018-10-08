@@ -22,74 +22,74 @@ viewpoints:
         actionGroups: "a:0:{}"
 scenes:
     -
-        id: 1
+        id: "30000000-0000-0000-0000-000000000001"
         title: "The Village"
         description: "This is the village."
         template: "lotgd/tests/village"
     -
-        id: 2
+        id: "30000000-0000-0000-0000-000000000002"
         title: "The Forest"
         description: "This is a very dangerous and dark forest"
         template: "lotgd/tests/forest"
     -
-        id: 3
+        id: "30000000-0000-0000-0000-000000000003"
         title: "The Weaponry"
         description: "This is the place where you can buy awesome weapons"
         template: "lotgd/tests/weaponry"
     -
-        id: 4
+        id: "30000000-0000-0000-0000-000000000004"
         title: "Parent Scene"
         description: "This is a parent scene that connects to two children."
         template: "lotgd/tests/none"
     -
-        id: 5
+        id: "30000000-0000-0000-0000-000000000005"
         title: "Child Scene 1"
         description: "This is a parent scene that connects to two children."
         template: "lotgd/tests/none"
     -
-        id: 6
+        id: "30000000-0000-0000-0000-000000000006"
         title: "Child Scene 2"
         description: "This is a parent scene that connects to two children."
         template: "lotgd/tests/none"
     -
-        id: 7
+        id: "30000000-0000-0000-0000-000000000007"
         title: "Parameter test"
         description: "This is a parameter test"
         template: "lotgd/tests/paramaters"
 scene_connection_groups:
     -
-        scene: 4
+        scene: "30000000-0000-0000-0000-000000000004"
         name: "lotgd/tests/none/child1"
         title: "Child 1"
     -
-        scene: 4
+        scene: "30000000-0000-0000-0000-000000000004"
         name: "lotgd/tests/none/child2"
         title: "Child 2"
 scene_connections:
     -
-        outgoingScene: 1
-        incomingScene: 2
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        incomingScene: "30000000-0000-0000-0000-000000000002"
         directionality: 0
     -
-        outgoingScene: 1
-        incomingScene: 3
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        incomingScene: "30000000-0000-0000-0000-000000000003"
         directionality: 0
     -
-        outgoingScene: 1
-        incomingScene: 4
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        incomingScene: "30000000-0000-0000-0000-000000000004"
         directionality: 0
     -
-        outgoingScene: 4
-        incomingScene: 5
+        outgoingScene: "30000000-0000-0000-0000-000000000004"
+        incomingScene: "30000000-0000-0000-0000-000000000005"
         outgoingConnectionGroupName: "lotgd/tests/none/child1"
         directionality: 0
     -
-        outgoingScene: 4
-        incomingScene: 6
+        outgoingScene: "30000000-0000-0000-0000-000000000004"
+        incomingScene: "30000000-0000-0000-0000-000000000006"
         outgoingConnectionGroupName: "lotgd/tests/none/child2"
         directionality: 0
     -
-        outgoingScene: 5
-        incomingScene: 6
+        outgoingScene: "30000000-0000-0000-0000-000000000005"
+        incomingScene: "30000000-0000-0000-0000-000000000006"
         directionality: 1
 

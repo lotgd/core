@@ -12,6 +12,8 @@ use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\SceneBasics;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * A scene is a location within the game, such as the Village or the Tavern. Designed
@@ -26,8 +28,8 @@ class Scene implements CreateableInterface, SceneConnectable
     use Deletor;
     use SceneBasics;
 
-    /** @Id @Column(type="integer") @GeneratedValue */
-    private $id;
+    /** @Id @Column(type="string", length=36, unique=True, name="id", options={"fixed" = true}) */
+    protected $id;
 
     /**
      * @OneToMany(targetEntity="SceneConnectionGroup", mappedBy="scene", cascade={"persist", "remove"})
@@ -61,6 +63,8 @@ class Scene implements CreateableInterface, SceneConnectable
      */
     public function __construct()
     {
+        $this->id = Uuid::uuid4()->toString();
+
         $this->connectionGroups = new ArrayCollection();
         $this->outgoingConnections = new ArrayCollection();
         $this->incomingConnections = new ArrayCollection();
@@ -70,7 +74,7 @@ class Scene implements CreateableInterface, SceneConnectable
      * Returns the primary ID for this scene.
      * @return int
      */
-    public function getId(): int
+    public function getId(): string
     {
         return $this->id;
     }

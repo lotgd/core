@@ -37,15 +37,16 @@ class DefaultSceneProvider implements EventHandler
                     ));
                 }
 
-                $context->setDataField("scene", $g->getEntityManager()->getRepository(Scene::class)->find(1));
+                $context->setDataField("scene", $g->getEntityManager()->getRepository(Scene::class)
+                    ->find("30000000-0000-0000-0000-000000000001"));
                 break;
             case 'h/lotgd/core/navigate-to/lotgd/tests/village':
                 $v = $context->getDataField('viewpoint');
 
                 self::$actionGroups = [new ActionGroup('default', 'Title', 0)];
                 self::$actionGroups[0]->setActions([
-                    new Action(2), // This is a real sceneId in game.yml
-                    new Action(101),
+                    new Action("30000000-0000-0000-0000-000000000002"), // This is a real sceneId in game.yml
+                    new Action("30000000-0000-0000-0000-000000000101"),
                 ]);
                 $v->setActionGroups(self::$actionGroups);
 
@@ -217,7 +218,7 @@ class GameTest extends CoreModelTestCase
         $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
         $this->getEntityManager()->flush();
 
-        $action = new Action(7, null, ["foo" => "baz"]);
+        $action = new Action("30000000-0000-0000-0000-000000000007", null, ["foo" => "baz"]);
         $actionId = $action->getId();
 
         $ag = new ActionGroup("group1", "Group 1", 5);
@@ -247,7 +248,7 @@ class GameTest extends CoreModelTestCase
         $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
         $this->getEntityManager()->flush();
 
-        $action = new Action(7, null, ["foo" => "baz"]);
+        $action = new Action("30000000-0000-0000-0000-000000000007", null, ["foo" => "baz"]);
         $actionId = $action->getId();
 
         $ag = new ActionGroup("group1", "Group 1", 5);
@@ -298,9 +299,9 @@ class GameTest extends CoreModelTestCase
         $this->assertSame([
             "Parent Scene",
             [
-                ActionGroup::DefaultGroup => [1],
-                "lotgd/tests/none/child1" => [5],
-                "lotgd/tests/none/child2" => [6],
+                ActionGroup::DefaultGroup => ["30000000-0000-0000-0000-000000000001"],
+                "lotgd/tests/none/child1" => ["30000000-0000-0000-0000-000000000005"],
+                "lotgd/tests/none/child2" => ["30000000-0000-0000-0000-000000000006"],
                 ActionGroup::HiddenGroup => [],
             ]
         ], $viewpointToArray($v1));
@@ -310,7 +311,10 @@ class GameTest extends CoreModelTestCase
         $this->assertSame([
             "Child Scene 1",
             [
-                ActionGroup::DefaultGroup => [6, 4],
+                ActionGroup::DefaultGroup => [
+                    "30000000-0000-0000-0000-000000000006",
+                    "30000000-0000-0000-0000-000000000004"
+                ],
                 ActionGroup::HiddenGroup => [],
             ]
         ], $viewpointToArray($v2));
@@ -320,7 +324,7 @@ class GameTest extends CoreModelTestCase
         $this->assertSame([
             "Child Scene 2",
             [
-                ActionGroup::DefaultGroup => [4],
+                ActionGroup::DefaultGroup => ["30000000-0000-0000-0000-000000000004"],
                 ActionGroup::HiddenGroup => [],
             ]
         ], $viewpointToArray($v3));

@@ -329,7 +329,7 @@ class Viewpoint implements CreateableInterface
      * Removes any actions that correspond to a given scene ID, if present.
      * @param int $id
      */
-    public function removeActionsWithSceneId(int $id)
+    public function removeActionsWithSceneId(string $id)
     {
         foreach ($this->getActionGroups() as $group) {
             $actions = $group->getActions();

@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Models\{Scene, SceneConnection, SceneConnectionGroup};
 use LotGD\Core\Tests\CoreModelTestCase;
@@ -54,6 +52,8 @@ class SceneModelTest extends CoreModelTestCase
 
         // create new scene, flush and clear. Number of scenes in db should be +1
         $newScene = Scene::create($this->getTestSceneData());
+        $id = $newScene->getId();
+
         $newScene->save($em);
         $this->flushAndClear();
         unset($newScene);
@@ -63,7 +63,7 @@ class SceneModelTest extends CoreModelTestCase
         $this->assertSame($n1 + 1, $n2);
 
         // fetch new scene, delete, flush and clear.
-        $newScene = $em->getRepository(Scene::class)->findOneBy($this->getTestSceneData());
+        $newScene = $em->getRepository(Scene::class)->find($id);
         $newScene->delete($em);
         $this->flushAndClear();
 
@@ -87,7 +87,7 @@ class SceneModelTest extends CoreModelTestCase
         // create new scene, connect to another one. Number of scenes must be +1, number of connections must be +1
         // this tests for cascade=persist
         $scene = Scene::create($this->getTestSceneData());
-        $scene->connect($em->getRepository(Scene::class)->find(1));
+        $scene->connect($em->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001"));
         $scene->save($em);
         $this->flushAndClear();
         unset($scene);
@@ -144,7 +144,7 @@ class SceneModelTest extends CoreModelTestCase
     public function testGetters()
     {
         $em = $this->getEntityManager();
-        $scene = $em->getRepository(Scene::class)->find(2);
+        $scene = $em->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
 
         $this->assertEquals("The Forest", $scene->getTitle());
         $this->assertEquals("This is a very dangerous and dark forest", $scene->getDescription());
@@ -154,7 +154,7 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfHasConnectionGroupReturnsTrueIfConnectionGroupExists()
     {
-        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find( "30000000-0000-0000-0000-000000000001");
 
         $this->assertTrue($scene->hasConnectionGroup("lotgd/tests/village/outside"));
         $this->assertTrue($scene->hasConnectionGroup("lotgd/tests/village/market"));
@@ -163,14 +163,14 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfHasConnectionGroupReturnsFalseIfConnectionGroupDoesNotExist()
     {
-        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find( "30000000-0000-0000-0000-000000000002");
 
         $this->assertFalse($scene2->hasConnectionGroup("lotgd/tests/village/outside"));
         $this->assertFalse($scene2->hasConnectionGroup("lotgd/tests/village/market"));
         $this->assertFalse($scene2->hasConnectionGroup("lotgd/tests/village/empty"));
 
 
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
 
         $this->assertFalse($scene1->hasConnectionGroup("lotgd/tests/village/23426"));
     }
@@ -178,7 +178,7 @@ class SceneModelTest extends CoreModelTestCase
     public function testIfAddConnectionGroupWorks()
     {
         $connectionGroup = new SceneConnectionGroup("lotgd/tests/village/new", "New Street");
-        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
 
         $this->assertFalse($scene->hasConnectionGroup("lotgd/tests/village/new"));
 
@@ -191,8 +191,9 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfAddConnectionGroupThrowsArgumentExceptionIfGroupIsAlreadyAssignedToItself()
     {
-        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(1);
-        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findOneBy(["scene" => 1, "name" => "lotgd/tests/village/outside"]);
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)
+            ->findOneBy(["scene" => "30000000-0000-0000-0000-000000000001", "name" => "lotgd/tests/village/outside"]);
 
         $this->expectException(ArgumentException::class);
         $scene->addConnectionGroup($connectionGroup);
@@ -200,8 +201,9 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfAddConnectionGroupThrowsArgumentExceptionIfGroupIsAlreadyAssignedToSomwhereElse()
     {
-        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(2);
-        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findOneBy(["scene" => 1, "name" => "lotgd/tests/village/outside"]);
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
+        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)
+            ->findOneBy(["scene" => "30000000-0000-0000-0000-000000000001", "name" => "lotgd/tests/village/outside"]);
 
         $this->expectException(ArgumentException::class);
         $scene->addConnectionGroup($connectionGroup);
@@ -209,8 +211,9 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testifDropConnectionGroupWorks()
     {
-        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(1);
-        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findOneBy(["scene" => 1, "name" => "lotgd/tests/village/outside"]);
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)
+            ->findOneBy(["scene" => "30000000-0000-0000-0000-000000000001", "name" => "lotgd/tests/village/outside"]);
 
         $this->assertTrue($scene->hasConnectionGroup("lotgd/tests/village/outside"));
 
@@ -223,8 +226,9 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfDropConnectionGroupThrowsArgumentExceptionIfEntityIsRemovedFromNonOwningScene()
     {
-        $scene = $this->getEntityManager()->getRepository(Scene::class)->find(2);
-        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)->findOneBy(["scene" => 1, "name" => "lotgd/tests/village/outside"]);
+        $scene = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
+        $connectionGroup = $this->getEntityManager()->getRepository(SceneConnectionGroup::class)
+            ->findOneBy(["scene" => "30000000-0000-0000-0000-000000000001", "name" => "lotgd/tests/village/outside"]);
 
         $this->expectException(ArgumentException::class);
         $scene->dropConnectionGroup($connectionGroup);
@@ -232,8 +236,8 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfGetConnectedScenesReturnsConnectedScenes()
     {
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
-        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
 
         $this->assertCount(3, $scene1->getConnectedScenes());
         $this->assertCount(1, $scene2->getConnectedScenes());
@@ -246,9 +250,9 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfIsConnectedToReturnsExpectedReturnValue()
     {
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
-        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
-        $scene5 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
+        $scene5 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000005");
 
         $this->assertTrue($scene1->isConnectedTo($scene2));
         $this->assertTrue($scene2->isConnectedTo($scene1));
@@ -260,8 +264,8 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfTwoScenesCanGetConnected()
     {
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
-        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000005");
 
         $scene1->connect($scene2);
 
@@ -275,8 +279,8 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfASceneConnectionGroupCanGetConnectedToAScene()
     {
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
-        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000005");
 
         $scene1->getConnectionGroup("lotgd/tests/village/outside")->connect($scene2);
 
@@ -290,8 +294,8 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfASceneCanGetConnectedToASceneConnectionGroup()
     {
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
-        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000005");
 
         $scene2->connect($scene1->getConnectionGroup("lotgd/tests/village/outside"));
 
@@ -305,8 +309,8 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfASceneConnectionGroupCanGetConnectedToAnotherSceneConnectionGroup()
     {
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
-        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(5);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000005");
         $scene2->addConnectionGroup(new SceneConnectionGroup("test/orphaned", "Orphan group"));
 
         $scene1
@@ -325,7 +329,7 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfConnectingASceneToItselfThrowsAnException()
     {
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
 
         $this->expectException(ArgumentException::class);
         $scene1->connect($scene1);
@@ -344,8 +348,8 @@ class SceneModelTest extends CoreModelTestCase
 
     public function testIfConnectingASceneToAnotherAlreadyConnectedSceneThrowsAnException()
     {
-        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find(1);
-        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find(2);
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+        $scene2 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
 
         $this->expectException(ArgumentException::class);
         $scene1->connect($scene2);

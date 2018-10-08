@@ -20,7 +20,7 @@ class Action
      * @param string|null $title
      * @param array $parameters
      */
-    public function __construct(int $destinationSceneId, ?string $title = null, array $parameters = [])
+    public function __construct(string $destinationSceneId, ?string $title = null, array $parameters = [])
     {
         $this->id = bin2hex(random_bytes(8));
         $this->destinationSceneId = $destinationSceneId;
@@ -43,7 +43,7 @@ class Action
      * go if they take this action.
      * @return int
      */
-    public function getDestinationSceneId(): int
+    public function getDestinationSceneId(): string
     {
         return $this->destinationSceneId;
     }
