@@ -42,6 +42,7 @@ class ModuleManager
     {
         $name = $library->getName();
         $package = $library->getComposerPackage();
+        $em = $this->g->getEntityManager();
 
         $this->g->getLogger()->debug("Registering module {$name}...");
 
@@ -52,6 +53,8 @@ class ModuleManager
             // TODO: handle error cases here.
             $this->g->getLogger()->debug("Creating module model for {$name}");
             $m = new ModuleModel($name);
+
+            $em->beginTransaction();
 
             $class = $library->getRootNamespace() . 'Module';
             try {
@@ -69,9 +72,16 @@ class ModuleManager
             }
 
             // Subscribe to the module's events.
-            $subscriptions = $library->getSubscriptionPatterns();
-            foreach ($subscriptions as $s) {
-                $this->g->getEventManager()->subscribe($s, $class, $name);
+            try {
+                $subscriptions = $library->getSubscriptionPatterns();
+                foreach ($subscriptions as $s) {
+                    $this->g->getEventManager()->subscribe($s, $class, $name);
+                }
+            } catch (\Throwable $e) {
+                $em->rollBack();
+                $em->clear();
+
+                throw $e;
             }
 
             // Run the module's onRegister handler.
@@ -80,10 +90,19 @@ class ModuleManager
             try {
                 $class::onRegister($this->g, $m);
                 $this->g->getEntityManager()->persist($m);
+
                 $this->g->getEntityManager()->flush();
+                $em->commit();
+                return;
             } catch (Throwable $e) {
+                $em->rollBack();
+                $em->clear();
+
                 $this->g->getLogger()->error("Calling {$class}::onRegister failed with exception: {$e->getMessage()}");
                 unset($m);
+
+                // Propagate the exception.
+                throw $e;
             }
         }
     }

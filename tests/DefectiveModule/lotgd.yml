@@ -1,3 +1,4 @@
 entityNamespace: "LotGD\\Core\\Tests\\FakeModule\\Models\\"
 subscriptionPatterns:
-    - "e/lotgd/core/tests/event"
+    - "e/lotgd/core/tests/defective-event"
+    - "e/lotgd/core/tests/gom-event"

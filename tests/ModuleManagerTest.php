@@ -13,6 +13,7 @@ use LotGD\Core\EventHandler;
 use LotGD\Core\EventManager;
 use LotGD\Core\EventSubscription;
 use LotGD\Core\LibraryConfiguration;
+use LotGD\Core\Models\Character;
 use LotGD\Core\ModuleManager;
 use LotGD\Core\Module;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
@@ -201,11 +202,53 @@ class ModuleManagerTest extends CoreModelTestCase
         $this->assertEquals($name, $modules[1]->getLibrary());
     }
 
+    public function testRegisterWithFailedEvents()
+    {
+        $class = FakeModule::class;
+        $name = 'lotgd/tests2';
+        $subscriptions = array(
+            '/pattern1/',
+            '#asasd/',
+        );
+        $library = $this->getMockBuilder(LibraryConfiguration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $library->method('getName')->willReturn($name);
+        $library->method('getRootNamespace')->willReturn('LotGD\\Core\\Tests\\FakeModule\\');
+        $library->method('getSubscriptionPatterns')->willReturn($subscriptions);
+
+        $eventManager = new EventManager($this->g);
+        $this->game->method('getEventManager')->willReturn($eventManager);
+
+        $eventsBefore = count($eventManager->getSubscriptions());
+
+        $subscriptionThrownException = false;
+        try {
+            $this->mm->register($library);
+        } catch(\Throwable $e) {
+            $subscriptionThrownException = true;
+        }
+
+        $this->assertTrue($subscriptionThrownException);
+
+        // Assert module has not been installed.
+        $modules = $this->mm->getModules();
+        $this->assertArrayNotHasKey(1, $modules);
+
+        // Assert events are not registered
+        $eventsAfter = count($eventManager->getSubscriptions());
+
+        // Randomly flush
+        $this->getEntityManager()->flush();
+
+        $this->assertSame($eventsBefore, $eventsAfter, "Events after failed subscription are actually more.");
+    }
+
     public function testRegisteringDefectiveModule()
     {
         $class = DefectiveModule::class;
         $name = "lotgd/tests3";
-        $subscriptions = [];
+        $subscriptions = ["#e/lotgd/core/tests/dat-event#"];
         $library = $this->getMockBuilder(LibraryConfiguration::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -213,11 +256,12 @@ class ModuleManagerTest extends CoreModelTestCase
         $library->method('getRootNamespace')->willReturn('LotGD\\Core\\Tests\\DefectiveModule\\');
         $library->method('getSubscriptionPatterns')->willReturn($subscriptions);
 
-        $eventManager = $this->getMockBuilder(EventManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        // Defective Module adds a character. Count the characters before.
+        $charactersBefore = count($this->getEntityManager()->getRepository(Character::class)->findAll());
 
+        $eventManager = new EventManager($this->g);
         $this->game->method('getEventManager')->willReturn($eventManager);
+
         $modulesBefore = $this->mm->getModules();
         try {
             // onRegister throws an exception. This exception needs to be captured and handled by mm->register without actually
@@ -229,7 +273,21 @@ class ModuleManagerTest extends CoreModelTestCase
         }
         $modulesAfter = $this->mm->getModules();
 
-        $this->assertFalse($exceptionCaptured);
+        $this->assertTrue($exceptionCaptured);
         $this->assertCount(count($modulesBefore), $modulesAfter);
+
+        // Make sure there are no event leftovers.
+        $subscriptions_db = $eventManager->getSubscriptions();
+        $found = 0;
+        foreach($subscriptions_db as $subscription) {
+            if (in_array($subscription->getPattern(), $subscriptions)) {
+                $found++;
+            }
+        }
+        $this->assertSame(0, $found);
+
+        // Count characters. Must stay the same!
+        $charactersAfter = count($this->getEntityManager()->getRepository(Character::class)->findAll());
+        $this->assertSame($charactersBefore, $charactersAfter, "Modules flushed did not get not added to the database.");
     }
 }
