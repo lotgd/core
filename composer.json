@@ -2,7 +2,7 @@
     "name": "lotgd/core",
     "description": "Core functionality for Legend of the Green Dragon, a text-based RPG game.",
     "license": "AGPL-3.0",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "autoload": {
         "psr-4": {
             "LotGD\\Core\\": "src/",
