@@ -16,7 +16,7 @@
         "php": "^7.1.0",
         "composer/composer": "*",
         "gedmo/doctrine-extensions": "*",
-        "doctrine/orm": "2.5.*",
+        "doctrine/orm": "^2.5",
         "monolog/monolog": "^1.12",
         "symfony/console": "^3.0|^4.0",
         "symfony/yaml": "^3.0|^4.0",
