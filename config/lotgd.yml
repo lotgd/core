@@ -3,6 +3,7 @@ database:
     name: daenerys
     user: root
     password:
+    disableAutoSchemaUpdate: false
 game:
     epoch: 2016-07-01 00:00:00.0 -8
     offsetSeconds: 0

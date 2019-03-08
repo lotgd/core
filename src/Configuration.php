@@ -20,6 +20,7 @@ class Configuration
     private $databaseName;
     private $databaseUser;
     private $databasePassword;
+    private $databaseAutoSchemaUpdate;
     private $logPath;
     private $gameEpoch;
     private $gameOffsetSeconds;
@@ -69,6 +70,12 @@ class Configuration
         $this->databaseUser = $user;
         $this->databasePassword = $passwd;
         $this->databaseName = $name;
+
+        if (empty($rawConfig['database']['disableAutoSchemaUpdate'])) {
+            $this->databaseAutoSchemaUpdate = true;
+        } else {
+            $this->databaseAutoSchemaUpdate = false;
+        }
 
         $gameEpoch = $rawConfig['game']['epoch'];
         $gameOffsetSeconds = $rawConfig['game']['offsetSeconds'];
@@ -155,6 +162,11 @@ class Configuration
     public function getDatabasePassword(): string
     {
         return $this->databasePassword;
+    }
+
+    public function getDatabaseAutoSchemaUpdate(): bool
+    {
+        return $this->databaseAutoSchemaUpdate;
     }
 
     /**

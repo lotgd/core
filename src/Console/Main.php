@@ -8,10 +8,7 @@ use Symfony\Component\Console\Application;
 use LotGD\Core\Bootstrap;
 use LotGD\Core\Game;
 use LotGD\Core\Console\Command\{
-    DatabaseInitCommand,
-    ModuleValidateCommand,
-    ModuleRegisterCommand,
-    ConsoleCommand
+    DatabaseInitCommand, DatabaseSchemaUpdateCommand, ModuleValidateCommand, ModuleRegisterCommand, ConsoleCommand
 };
 
 /**
@@ -42,6 +39,7 @@ class Main
         $this->application->add(new ModuleValidateCommand($this->game));
         $this->application->add(new ModuleRegisterCommand($this->game));
         $this->application->add(new DatabaseInitCommand($this->game));
+        $this->application->add(new DatabaseSchemaUpdateCommand($this->game));
         $this->application->add(new ConsoleCommand($this->game));
 
         // Add additional ones

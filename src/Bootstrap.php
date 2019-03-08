@@ -66,7 +66,7 @@ class Bootstrap
 
         list($dsn, $user, $password) = $config->getDatabaseConnectionDetails($cwd);
         $pdo = $this->connectToDatabase($dsn, $user, $password);
-        $entityManager = $this->createEntityManager($pdo);
+        $entityManager = $this->createEntityManager($pdo, $config);
 
         $this->game = (new GameBuilder())
             ->withConfiguration($config)
@@ -159,7 +159,7 @@ class Bootstrap
      * @param \PDO $pdo
      * @return EntityManagerInterface
      */
-    protected function createEntityManager(\PDO $pdo): EntityManagerInterface
+    protected function createEntityManager(\PDO $pdo, Configuration $config): EntityManagerInterface
     {
         $this->annotationDirectories = $this->generateAnnotationDirectories();
         $this->logger->addDebug("Adding annotation directories:");
@@ -180,9 +180,11 @@ class Bootstrap
         } catch (DBALException $e) {}
 
         // Create Schema and update database if needed
-        $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->updateSchema($metaData);
+        if ($config->getDatabaseAutoSchemaUpdate()) {
+            $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
+            $schemaTool = new SchemaTool($entityManager);
+            $schemaTool->updateSchema($metaData);
+        }
 
         return $entityManager;
     }
