@@ -44,9 +44,9 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     /** @Id @Column(type="uuid", unique=True) */
     private $id;
     /** @Column(type="string", length=50); */
-    private $name;
+    private $name = "";
     /** @Column(type="text"); */
-    private $displayName;
+    private $displayName = "";
     /** @Column(type="integer", options={"default":10}) */
     private $maxHealth = 10;
     /** @Column(type="integer", options={"default":10}) */
