@@ -310,7 +310,7 @@ class Game
                 }
 
                 $this->getLogger()->addDebug("  Adding navigation action for child sceneId={$connectedScene->getId()}");
-                $action = new Action($connectedScene->getId());
+                $action = new Action($connectedScene->getId(), $connectedScene->getTitle());
 
                 if ($connectionGroupName === null) {
                     $actionGroups[ActionGroup::DefaultGroup]->addAction($action);
