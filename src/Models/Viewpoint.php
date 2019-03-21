@@ -171,7 +171,7 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Returns all action groups.
-     * @return array
+     * @return ActionGroup[]
      */
     public function getActionGroups(): array
     {
@@ -180,7 +180,7 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Sets action groups.
-     * @param array $actionGroups
+     * @param ActionGroup[] $actionGroups
      */
     public function setActionGroups(array $actionGroups)
     {

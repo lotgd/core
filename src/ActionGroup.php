@@ -70,7 +70,7 @@ class ActionGroup implements \Countable
 
     /**
      * Returns the ordered array of actions.
-     * @return array<Action>
+     * @return Action[]
      */
     public function getActions(): array
     {
@@ -79,7 +79,7 @@ class ActionGroup implements \Countable
 
     /**
      * Sets the ordered array of actions.
-     * @param array<Action> $actions
+     * @param Action[] $actions
      */
     public function setActions(array $actions)
     {
