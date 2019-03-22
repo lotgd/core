@@ -4,10 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core;
 
 use Composer\{
-    Composer,
-    Factory,
-    IO\NullIO,
-    Package\CompletePackageInterface
+    Composer, Factory, IO\NullIO, Package\CompletePackageInterface, Package\PackageInterface
 };
 use Monolog\Logger;
 
@@ -73,7 +70,7 @@ class ComposerManager
 
     /**
      * Return all the packages installed in the current setup.
-     * @return array<Composer\PackageInterface>
+     * @return PackageInterface[]
      */
     public function getPackages(): array
     {
@@ -85,7 +82,7 @@ class ComposerManager
 
     /**
      * Return a list of the configured packages which are LotGD modules (type = 'lotgd-module').
-     * @return array Array of \Composer\PackageInterface.
+     * @return PackageInterface[]
      */
     public function getModulePackages(): array
     {
