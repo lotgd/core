@@ -164,6 +164,10 @@ class Configuration
         return $this->databasePassword;
     }
 
+    /**
+     * True if doctrine should not auto update.
+     * @return bool
+     */
     public function getDatabaseAutoSchemaUpdate(): bool
     {
         return $this->databaseAutoSchemaUpdate;
