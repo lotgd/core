@@ -298,7 +298,7 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     /**
      * Sets the current character viewpoint.
      */
-    public function setViewpoint(Viewpoint $v)
+    public function setViewpoint(?Viewpoint $v)
     {
         $this->viewpoint = $v;
     }

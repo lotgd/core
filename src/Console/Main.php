@@ -8,7 +8,13 @@ use Symfony\Component\Console\Application;
 use LotGD\Core\Bootstrap;
 use LotGD\Core\Game;
 use LotGD\Core\Console\Command\{
-    DatabaseInitCommand, DatabaseSchemaUpdateCommand, ModuleValidateCommand, ModuleRegisterCommand, ConsoleCommand
+    CharacterListCommand,
+    CharacterResetViewpointCommand,
+    DatabaseInitCommand,
+    DatabaseSchemaUpdateCommand,
+    ModuleValidateCommand,
+    ModuleRegisterCommand,
+    ConsoleCommand
 };
 
 /**
@@ -41,6 +47,8 @@ class Main
         $this->application->add(new DatabaseInitCommand($this->game));
         $this->application->add(new DatabaseSchemaUpdateCommand($this->game));
         $this->application->add(new ConsoleCommand($this->game));
+        $this->application->add(new CharacterListCommand($this->game));
+        $this->application->add(new CharacterResetViewpointCommand($this->game));
 
         // Add additional ones
         $this->bootstrap->addDaenerysCommands($this->application);
