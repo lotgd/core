@@ -59,7 +59,6 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
 
                 // Read db annotations from model files
                 $configuration = Setup::createAnnotationMetadataConfiguration($directories, true);
-                $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
 
                 self::$em = EntityManager::create(["pdo" => self::$pdo], $configuration);
 

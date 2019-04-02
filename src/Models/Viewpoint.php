@@ -3,7 +3,12 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Action;
@@ -24,7 +29,11 @@ class Viewpoint implements CreateableInterface
     use Creator;
     use SceneBasics;
 
-    /** @Id @OneToOne(targetEntity="Character", inversedBy="viewpoint", cascade="persist") */
+    /**
+     * @Id
+     * @OneToOne(targetEntity="Character", inversedBy="viewpoint", cascade="persist")
+     * @JoinColumn(fieldName="owner_id", referencedColumnName="id")
+     */
     private $owner;
     /** @Column(type="array") */
     private $actionGroups = [];
@@ -32,7 +41,10 @@ class Viewpoint implements CreateableInterface
     private $attachments = [];
     /** @Column(type="array") */
     private $data = [];
-    /** @ManyToOne(targetEntity="Scene") */
+    /**
+     * @ManyToOne(targetEntity="Scene")
+     * @JoinColumn(name="scene_id", referencedColumnName="id")
+     */
     private $scene;
 
     /** @var SceneDescription */

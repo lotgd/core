@@ -168,9 +168,6 @@ class Bootstrap
         }
         $configuration = Setup::createAnnotationMetadataConfiguration($this->annotationDirectories, true);
 
-        // Set a quote
-        $configuration->setQuoteStrategy(new AnsiQuoteStrategy());
-
         // Create entity manager
         $entityManager = EntityManager::create(["pdo" => $pdo], $configuration);
 

@@ -259,4 +259,18 @@ class ViewpointTest extends CoreModelTestCase
 
         $this->assertNull($viewpoint->findActionById("anId"));
     }
+
+    public function testIfViewpointCanGetRemovedAndDeleted()
+    {
+        $em = $this->getEntityManager();
+        $testCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
+        $this->getEntityManager()->remove($testCharacter->getViewpoint());
+        $testCharacter->setViewpoint(null);
+
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+
+        $viewpoint = $em->getRepository(Viewpoint::class)->findOneBy(["owner" => "10000000-0000-0000-0000-000000000002"]);
+        $this->assertNull($viewpoint, "Viewpoint is not null");
+    }
 }
