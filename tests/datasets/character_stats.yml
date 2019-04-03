@@ -1,0 +1,15 @@
+characters:
+    -
+        id: "10000000-0000-0000-0000-000000000001"
+        name: "Testcharacter 1"
+        displayName: "Testcharacter 1"
+        level: 1
+        health: 13
+        maxhealth: 100
+    -
+        id: "10000000-0000-0000-0000-000000000002"
+        name: "Testcharacter 2"
+        displayName: "Testcharacter 2"
+        level: 2
+        health: 90
+        maxhealth: 90
