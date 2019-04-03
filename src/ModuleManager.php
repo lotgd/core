@@ -162,7 +162,7 @@ class ModuleManager
      * @param string $library
      * @return Module
      */
-    public function getModule(string $library): ModuleModel
+    public function getModule(string $library): ?ModuleModel
     {
         return $this->g->getEntityManager()->getRepository(ModuleModel::class)->find($library);
     }
