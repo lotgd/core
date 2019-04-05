@@ -48,7 +48,6 @@ interface CharacterStatInterface
     public function getValueAsString(): string;
 
     /**
-     * @param $weight
      * @return int
      */
     public function getWeight(): int;
