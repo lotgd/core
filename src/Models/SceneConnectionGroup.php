@@ -73,12 +73,30 @@ class SceneConnectionGroup implements SceneConnectable
     }
 
     /**
+     * Sets the name-identifier of this connection group.
+     * @param string $name
+     */
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
+    /**
      * Returns the title of this connection group.
      * @return string
      */
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    /**
+     * Sets the title of this connection group.
+     * @param string $title
+     */
+    public function setTitle(string $title)
+    {
+        $this->title = $title;
     }
 
     /**
