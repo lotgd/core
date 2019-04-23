@@ -116,6 +116,15 @@ class Scene implements CreateableInterface, SceneConnectable
     }
 
     /**
+     * Returns all connection groups associated with this scene.
+     * @return Collection
+     */
+    public function getConnectionGroups(): Collection
+    {
+        return $this->connectionGroups;
+    }
+
+    /**
      * Adds a connection group to this scene.
      * @param SceneConnectionGroup $group
      * @throws ArgumentException
