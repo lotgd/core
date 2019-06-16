@@ -16,7 +16,7 @@ class Action
 
     /**
      * Construct a new action with the specified Scene as its destination.
-     * @param int $destinationSceneId
+     * @param string $destinationSceneId
      * @param string|null $title
      * @param array $parameters
      */
@@ -41,7 +41,7 @@ class Action
     /**
      * Return the database ID of the destination scene, where the user will
      * go if they take this action.
-     * @return int
+     * @return string
      */
     public function getDestinationSceneId(): string
     {
@@ -49,7 +49,7 @@ class Action
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getTitle(): ?string
     {
@@ -57,6 +57,7 @@ class Action
     }
 
     /**
+     * @param string $title
      * @return null|string
      */
     public function setTitle(?string $title)
