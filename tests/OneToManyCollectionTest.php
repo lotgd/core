@@ -162,11 +162,6 @@ class OneToManyCollectionTest extends CoreModelTestCase
         $this->assertFalse($oldElementFound);
     }
     
-    public function testCollectionFilterInterface()
-    {
-        
-    }
-    
     public function testTypeClass()
     {
         $collection = $this->getCollection();

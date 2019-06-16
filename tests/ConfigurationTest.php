@@ -10,8 +10,9 @@ use Monolog\Handler\NullHandler;
 
 use LotGD\Core\Configuration;
 use LotGD\Core\Exceptions\InvalidConfigurationException;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends TestCase
 {
     private $logger;
     private $configDir;

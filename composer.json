@@ -31,8 +31,8 @@
 
     ],
     "require-dev": {
-        "phpunit/phpunit": "^5.0",
-        "phpunit/dbunit": "^2.0",
-        "block8/php-docblock-checker": "2.0.0"
+        "phpunit/phpunit": "^7.0",
+        "phpunit/php-code-coverage": "*",
+        "dancryer/php-docblock-checker": "*"
     }
 }

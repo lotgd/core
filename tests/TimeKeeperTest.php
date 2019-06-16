@@ -5,12 +5,13 @@ namespace LotGD\Core\Tests;
 
 use DateTime;
 use LotGD\Core\TimeKeeper;
+use PHPUnit\Framework\TestCase;
 
 /**
 * @backupGlobals disabled
 * @backupStaticAttributes disabled
 */
-class TimeKeeperTests extends \PHPUnit_Framework_TestCase {
+class TimeKeeperTests extends TestCase {
     private $gameEpoch;
     private $gameOffsetSeconds;
     private $gameDaysPerDay;

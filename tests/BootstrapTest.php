@@ -13,8 +13,9 @@ use Monolog\Handler\NullHandler;
 use LotGD\Core\Bootstrap;
 use LotGD\Core\ComposerManager;
 use LotGD\Core\Tests\FakeModule\Models\UserEntity;
+use PHPUnit\Framework\TestCase;
 
-class BootstrapTest extends \PHPUnit_Framework_TestCase
+class BootstrapTest extends TestCase
 {
     private $logger;
 

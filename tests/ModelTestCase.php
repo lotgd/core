@@ -20,25 +20,25 @@ use LotGD\Core\Exceptions\InvalidConfigurationException;
 use LotGD\Core\ModelExtender;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Description of ModelTestCase
  */
-abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
+abstract class ModelTestCase extends TestCase
 {
     /** @var \PDO */
     static private $pdo = null;
     /** @var EntityManager */
     static private $em = null;
-    /** @var \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection */
     private $connection = null;
     public $g;
+    protected $tables = null;
 
     /**
      * Returns a connection to test models
-     * @return \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
      */
-    final public function getConnection(): \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
+    final public function getConnection()
     {
         if ($this->connection === null) {
             $configFilePath = getenv('LOTGD_TESTS_CONFIG_PATH');
@@ -71,10 +71,27 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
                 $schemaTool->updateSchema($metaData);
             }
 
-            $this->connection = $this->createDefaultDBConnection(self::$pdo, $config->getDatabaseName());
+            $this->connection = [self::$pdo, $config->getDatabaseName()];
         }
 
         return $this->connection;
+    }
+
+    protected function insertData($dataSet)
+    {
+        /** @var \PDO $pdo */
+        $pdo = $this->connection[0];
+
+        foreach ($dataSet as $table => $rows) {
+            $this->tables[] = $table;
+            foreach ($rows as $row) {
+                $fields = implode(",", array_keys($row));
+                $placeholders = substr(str_repeat("?,", count($row)), 0, -1);
+                $query = "INSERT INTO $table ($fields) VALUES ($placeholders)";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute(array_values($row));
+            }
+        }
     }
 
     /**
@@ -88,6 +105,14 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
 
     protected function setUp()
     {
+        $this->getConnection();
+
+        // Set up database content
+        if (method_exists($this, "getDataSet")) {
+            $dataSet = $this->getDataSet();
+            $this->insertData($dataSet);
+        }
+
         parent::setUp();
 
         $this->getEntityManager()->flush();
@@ -127,6 +152,14 @@ abstract class ModelTestCase extends \PHPUnit_Extensions_Database_TestCase
 
     protected function tearDown() {
         parent::tearDown();
+
+        /** @var \PDO $pdo */
+        $pdo = $this->connection[0];
+
+        foreach ($this->tables as $table) {
+            $stmt = $pdo->prepare("DELETE FROM $table WHERE 1");
+            $stmt->execute();
+        }
 
         // Clear out the cache so tests don't get confused.
         $this->getEntityManager()->clear();

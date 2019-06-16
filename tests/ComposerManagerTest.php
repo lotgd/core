@@ -10,8 +10,9 @@ use Monolog\Handler\NullHandler;
 
 use LotGD\Core\ComposerManager;
 use LotGD\Core\Tests\FakeModule\UserEntity;
+use PHPUnit\Framework\TestCase;
 
-class ComposerManagerTest extends \PHPUnit_Framework_TestCase
+class ComposerManagerTest extends TestCase
 {
     private $logger;
 

@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests;
 
 use LotGD\Core\DiceBag;
+use PHPUnit\Framework\TestCase;
 
 /**
 * @backupGlobals disabled
 * @backupStaticAttributes disabled
 */
-class DiceBagTests extends \PHPUnit_Framework_TestCase
+class DiceBagTests extends TestCase
 {
     public function testUniform()
     {

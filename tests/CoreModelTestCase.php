@@ -3,14 +3,19 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests;
 
+use Symfony\Component\Yaml\Yaml;
+
 class CoreModelTestCase extends ModelTestCase
 {
     /**
      * Returns a .yml dataset under this name
-     * @return \PHPUnit_Extensions_Database_DataSet_YamlDataSet
+     * @return array
      */
-    protected function getDataSet(): \PHPUnit_Extensions_Database_DataSet_YamlDataSet
+    protected function getDataSet(): array
     {
-        return new \PHPUnit_Extensions_Database_DataSet_YamlDataSet(implode(DIRECTORY_SEPARATOR, [__DIR__, 'datasets', $this->dataset . '.yml']));
+        $datasetFile = implode(DIRECTORY_SEPARATOR, [__DIR__, 'datasets', $this->dataset . '.yml']);
+        $dataset = Yaml::parseFile($datasetFile);
+
+        return $dataset;
     }
 }
