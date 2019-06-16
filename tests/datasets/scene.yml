@@ -51,3 +51,8 @@ scene_connections:
     -
         outgoingScene: "30000000-0000-0000-0000-000000000001"
         incomingScene: "30000000-0000-0000-0000-000000000004"
+scene_templates:
+    -
+        class: "LotGD\\Core\\Tests\\SceneTemplates\\NewSceneSceneTemplate"
+        module: "lotgd/core"
+        userAssignable: true

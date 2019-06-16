@@ -25,7 +25,7 @@ scenes:
         id: "30000000-0000-0000-0000-000000000001"
         title: "The Village"
         description: "This is the village."
-        template: "lotgd/tests/village"
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\VillageSceneTemplate"
     -
         id: "30000000-0000-0000-0000-000000000002"
         title: "The Forest"
@@ -40,22 +40,31 @@ scenes:
         id: "30000000-0000-0000-0000-000000000004"
         title: "Parent Scene"
         description: "This is a parent scene that connects to two children."
-        template: "lotgd/tests/none"
+        template:
     -
         id: "30000000-0000-0000-0000-000000000005"
         title: "Child Scene 1"
         description: "This is a parent scene that connects to two children."
-        template: "lotgd/tests/none"
+        template:
     -
         id: "30000000-0000-0000-0000-000000000006"
         title: "Child Scene 2"
         description: "This is a parent scene that connects to two children."
-        template: "lotgd/tests/none"
+        template:
     -
         id: "30000000-0000-0000-0000-000000000007"
         title: "Parameter test"
         description: "This is a parameter test"
-        template: "lotgd/tests/paramaters"
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\ParameterTestSceneTemplate"
+scene_templates:
+    -
+        class: "LotGD\\Core\\Tests\\SceneTemplates\\VillageSceneTemplate"
+        module: "lotgd/core"
+        userAssignable: true
+    -
+        class: "LotGD\\Core\\Tests\\SceneTemplates\\ParameterTestSceneTemplate"
+        module: "lotgd/core"
+        userAssignable: true
 scene_connection_groups:
     -
         scene: "30000000-0000-0000-0000-000000000004"

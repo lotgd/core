@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests\Models;
 
 use LotGD\Core\Exceptions\ArgumentException;
-use LotGD\Core\Models\{Scene, SceneConnection, SceneConnectionGroup};
+use LotGD\Core\Models\{Scene, SceneConnection, SceneConnectionGroup, SceneTemplate};
 use LotGD\Core\Tests\CoreModelTestCase;
+use LotGD\Core\Tests\SceneTemplates\NewSceneSceneTemplate;
 
 /**
  * Tests for creating scenes and moving them around.
@@ -38,7 +39,7 @@ class SceneModelTest extends CoreModelTestCase
         return [
             "title" => "A new scene",
             "description" => "This is a new scene",
-            "template" => "lotgd/test/new-scene"
+            "template" => $this->getEntityManager()->getRepository(SceneTemplate::class)->find(NewSceneSceneTemplate::class),
         ];
     }
 

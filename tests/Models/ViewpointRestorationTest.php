@@ -3,9 +3,13 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
+use Composer\Repository\RepositoryInterface;
+use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManager;
 use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
 use LotGD\Core\Models\Scene;
+use LotGD\Core\Models\SceneTemplate;
 use LotGD\Core\Models\Viewpoint;
 use LotGD\Core\Tests\CoreModelTestCase;
 
@@ -29,10 +33,18 @@ class ViewpointRestorationTest extends CoreModelTestCase
 
     protected function getViewpoint()
     {
+        $sceneTemplateMock = $this->createMock(SceneTemplate::class);
+
         $sceneMock = $this->createMock(Scene::class);
         $sceneMock->method("getTitle")->willReturn("Scene Mock Title");
         $sceneMock->method("getDescription")->willReturn("Scene Mock Description");
-        $sceneMock->method("getTemplate")->willReturn("lotgd/scene-mock-template");
+        $sceneMock->method("getTemplate")->willReturn($sceneTemplateMock);
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->method("find")->willReturn($sceneTemplateMock);
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->method("getRepository")->willReturn($repository);
 
         $actionGroup = $this->getActionGroup();
 
@@ -40,31 +52,39 @@ class ViewpointRestorationTest extends CoreModelTestCase
         $viewpoint->changeFromScene($sceneMock);
         $viewpoint->setActionGroups([$actionGroup]);
 
-        return $viewpoint;
+        return [$entityManager, $viewpoint];
     }
 
     protected function getAlternativeViewpoint()
     {
+        $sceneTemplateMock = $this->createMock(SceneTemplate::class);
+
         $sceneMock = $this->createMock(Scene::class);
         $sceneMock->method("getTitle")->willReturn("Another Scene Mock Title");
         $sceneMock->method("getDescription")->willReturn("Another Scene Mock Description");
-        $sceneMock->method("getTemplate")->willReturn("lotgd/scene-mock-template/another");
+        $sceneMock->method("getTemplate")->willReturn($sceneTemplateMock);
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->method("find")->willReturn($sceneTemplateMock);
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->method("getRepository")->willReturn($repository);
 
         $viewpoint = new Viewpoint();
         $viewpoint->changeFromScene($sceneMock);
 
-        return $viewpoint;
+        return [$entityManager, $viewpoint];
     }
 
     public function testIfViewpointAfterUnserializationIsEqualToBeforeItsSerialization()
     {
-        $viewpoint = $this->getViewpoint();
-        $viewpointRestoration = $this->getViewpoint()->getSnapshot();
+        [$entityManager, $viewpoint] = $this->getViewpoint();
+        $viewpointRestoration = $viewpoint->getSnapshot();
         $serialized = serialize($viewpointRestoration);
         $viewpointRestored = unserialize($serialized);
 
-        $newViewpoint = $this->getAlternativeViewpoint();
-        $newViewpoint->changeFromSnapshot($viewpointRestored);
+        [$entityManager2, $newViewpoint] = $this->getAlternativeViewpoint();
+        $newViewpoint->changeFromSnapshot($entityManager, $viewpointRestored);
 
         $this->assertSame($viewpoint->getTitle(), $newViewpoint->getTitle());
         $this->assertSame($viewpoint->getDescription(), $newViewpoint->getDescription());

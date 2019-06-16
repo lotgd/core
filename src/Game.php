@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Events\NavigateToSceneData;
 use LotGD\Core\Events\NewViewpointData;
 use LotGD\Core\Exceptions\ActionNotFoundException;
-
 use LotGD\Core\Exceptions\CharacterNotFoundException;
 use LotGD\Core\Exceptions\InvalidConfigurationException;
 use LotGD\Core\Exceptions\SceneNotFoundException;
@@ -338,6 +337,13 @@ class Game
 
             $viewpoint->setActionGroups(\array_values($actionGroups));
 
+            $sceneTemplate = $scene->getTemplate();
+            $templateClass = $sceneTemplate ? $sceneTemplate->getClass() : BasicSceneTemplate::class;
+
+            if (!is_a($templateClass, SceneTemplateInterface::class, true)) {
+                throw new \Exception("Scene template must implement ".SceneTemplateInterface::class);
+            }
+
             // Let and installed listeners (ie modules) make modifications to the
             // new viewpoint, including the ability to redirect the user to
             // a different scene, by setting $context['redirect'] to a new scene.
@@ -349,7 +355,7 @@ class Game
                 'redirect' => null,
             ]);
 
-            $hook = 'h/lotgd/core/navigate-to/' . $scene->getTemplate();
+            $hook = "h/lotgd/core/navigate-to/".$templateClass::getNavigationEvent();
             $contextData = $this->getEventManager()->publish($hook, $contextData);
 
             $scene = $contextData->get('redirect');
@@ -379,13 +385,15 @@ class Game
         if ($action === null) {
             throw new ActionNotFoundException("Invalid actionId={$actionId} for current viewpoint.");
         }
-        $actionParameters = $action->getParameters();
 
+        $actionParameters = $action->getParameters();
         $sceneId = $action->getDestinationSceneId();
+
+        /** @var Scene $scene */
         $scene = $this->getEntityManager()->getRepository(Scene::class)->find([
             'id' => $sceneId,
         ]);
-        if ($scene == null) {
+        if ($scene === null) {
             throw new SceneNotFoundException("Cannot find sceneId={$sceneId} specified by actionId={$actionId}.");
         }
 

@@ -23,7 +23,7 @@ class SceneTemplate
     /** @Id @Column(type="string", length=255, unique=True, name="class") */
     protected $class;
 
-    /** @Column(type="string", length=255, unique=True, name="id") */
+    /** @Column(type="string", length=255, name="module") */
     protected $module;
 
     /** @Column(type="boolean", options={"default": True}) */
@@ -46,6 +46,14 @@ class SceneTemplate
 
         $this->class = $class;
         $this->module = $module;
+    }
+
+    /**
+     * @return string The class name of the template.
+     */
+    public function getClass(): string
+    {
+        return $this->class;
     }
 
     /**
