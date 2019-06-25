@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
@@ -17,14 +17,14 @@ class SystemCharacter implements CharacterInterface
 {
     use MockCharacter;
 
-    static $instance = null;
-    static $characterName = "System";
+    public static $instance = null;
+    public static $characterName = "System";
 
     /**
      * Return an instance of SystemCharacter.
      * @return SystemCharacter
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         self::$instance = self::$instance ?? new self();
 

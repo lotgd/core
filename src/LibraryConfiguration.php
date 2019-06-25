@@ -1,12 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace LotGD\Core;
 
 use Composer\Package\PackageInterface;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Yaml\Yaml;
-
-use LotGD\Core\ComposerManager;
 
 /**
  * Represents the configuration of a LotGD library (like the core, crate or module),
@@ -43,7 +41,7 @@ class LibraryConfiguration
         if ($basePackage && $basePackage->getName() === $package->getName()) {
             // Whatever the base package is in this repo is at $cwd.
             $path = $cwd;
-        } elseif (in_array($package->getType(), ["lotgd-module", "lotgd-crate"])) {
+        } elseif (\in_array($package->getType(), ["lotgd-module", "lotgd-crate"])) {
             // lotgd-modules are installed in the vendor directory.
             $installationManager = $composerManager->getComposer()->getInstallationManager();
             $path = $installationManager->getInstallPath($package);
@@ -52,15 +50,15 @@ class LibraryConfiguration
             $path = $cwd;
         }
 
-        $confFile = $path . DIRECTORY_SEPARATOR . 'lotgd.yml';
+        $confFile = $path . \DIRECTORY_SEPARATOR . 'lotgd.yml';
 
         $this->rootNamespace = $this->findRootNamespace($package);
-        if (file_exists($confFile)) {
-            $this->rawConfig = Yaml::parse(file_get_contents($confFile));
+        if (\file_exists($confFile)) {
+            $this->rawConfig = Yaml::parse(\file_get_contents($confFile));
         } else {
             $name = $package->getName();
             $type = $package->getType();
-            throw new \Exception("Library {$name} of type {$type} does not have a lotgd.yml in it's root ($confFile).");
+            throw new \Exception("Library {$name} of type {$type} does not have a lotgd.yml in it's root (${confFile}).");
         }
 
         $this->findEntityDirectory();
@@ -87,25 +85,25 @@ class LibraryConfiguration
     }
 
     /**
-     * Searches for a root namespace
+     * Searches for a root namespace.
      *
      * This function searches the package's configuration to find it's root namespace.
      * For this, it uses the following order:
      *  - check psr-4 autoload configuration. If used, it takes the first element
      *  - check psr-0 autoload configuration. If used, it takes the first element
      * @param PackageInterface $package
-     * @return string
      * @throws \Exception if no namespace has been found
+     * @return string
      */
     protected function findRootNamespace(PackageInterface $package): string
     {
         $autoload = $package->getAutoload();
-        if (isset($autoload["psr-4"]) && count($autoload["psr-4"]) > 0) {
-            return key($autoload["psr-4"]);
+        if (isset($autoload["psr-4"]) && \count($autoload["psr-4"]) > 0) {
+            return \key($autoload["psr-4"]);
         }
 
-        if (isset($autoload["psr-0"]) && count($autoload["psr-0"]) > 0) {
-            return key($autoload["psr-0"]);
+        if (isset($autoload["psr-0"]) && \count($autoload["psr-0"]) > 0) {
+            return \key($autoload["psr-0"]);
         }
 
         $name = $package->getName();
@@ -142,14 +140,14 @@ class LibraryConfiguration
     }
 
     /**
-     * Tries to iterate an array element given by the arguments
+     * Tries to iterate an array element given by the arguments.
      * @param scalar $argument1,... array keys, by increasing depth
      */
     public function iterateKey(...$arguments)
     {
         $result = $this->getSubKeyIfItExists($arguments);
 
-        if (is_array($result)) {
+        if (\is_array($result)) {
             foreach ($result as $key => $val) {
                 yield $key => $val;
             }
@@ -157,9 +155,9 @@ class LibraryConfiguration
     }
 
     /**
-     * Returns a subkey of an array if it exists or null
-     * @param scalar $argument1,... array keys, by increasing depth
-     * @return type
+     * Returns a subkey of an array if it exists or null.
+     * @param mixed ...$arguments
+     * @return mixed
      */
     protected function getConfig(...$arguments)
     {
@@ -177,12 +175,12 @@ class LibraryConfiguration
 
         $entityNamespace = $this->getConfig("entityNamespace");
 
-        if (is_null($entityNamespace) === false) {
+        if (\is_null($entityNamespace) === false) {
             $entityDirectory = $this->composerManager->translateNamespaceToPath($entityNamespace);
 
             if ($entityDirectory === null) {
                 throw new \Exception("Could not translate namespace {$entityNamespace} into a directory.");
-            } else if (is_dir($entityDirectory) === false) {
+            } elseif (\is_dir($entityDirectory) === false) {
                 throw new \Exception("Path {$entityDirectory}, translated from namespace {$entityNamespace}, is not a valid directory.");
             }
 
@@ -209,7 +207,7 @@ class LibraryConfiguration
     }
 
     /**
-     * Searches the config file for daenerys commands and, if found, adds the class name to a list
+     * Searches the config file for daenerys commands and, if found, adds the class name to a list.
      */
     protected function findDaenerysCommands()
     {
@@ -222,16 +220,16 @@ class LibraryConfiguration
     }
 
     /**
-     * Returns true if this configuration has daenerys commands
+     * Returns true if this configuration has daenerys commands.
      * @return bool
      */
     public function hasDaenerysCommands(): bool
     {
-        return count($this->daenerysCommands) > 0 ? true : false;
+        return \count($this->daenerysCommands) > 0 ? true : false;
     }
 
     /**
-     * Returns a list of daenerys commands
+     * Returns a list of daenerys commands.
      */
     public function getDaenerysCommands(): array
     {

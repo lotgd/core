@@ -15,7 +15,7 @@ trait SoftDeletable
     private $deletedAt;
     
     /**
-     * Deletes the entity
+     * Deletes the entity.
      * @param EntityManagerInterface $em
      */
     public function delete(EntityManagerInterface $em)
@@ -25,7 +25,7 @@ trait SoftDeletable
     }
     
     /**
-     * Restores an entity back
+     * Restores an entity back.
      * @param EntityManagerInterface $em
      */
     public function restore(EntityManagerInterface $em)
@@ -35,7 +35,7 @@ trait SoftDeletable
     }
     
     /**
-     * Sets deletedAt to a specific date
+     * Sets deletedAt to a specific date.
      * @param DateTime $deletedAt
      */
     public function setDeletedAt(DateTime $deletedAt = null)
@@ -44,7 +44,7 @@ trait SoftDeletable
     }
     
     /**
-     * Returns when the entry got deleted
+     * Returns when the entry got deleted.
      * @return DateTime
      */
     public function getDeletedAt(): DateTime
@@ -53,11 +53,11 @@ trait SoftDeletable
     }
     
     /**
-     * Returns true if this entity is soft deleted
+     * Returns true if this entity is soft deleted.
      * @return bool
      */
     public function isDeleted(): bool
     {
-        return is_null($this->deletedAt) ? false : true;
+        return \is_null($this->deletedAt) ? false : true;
     }
 }

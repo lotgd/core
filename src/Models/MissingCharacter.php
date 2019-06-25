@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
@@ -16,7 +16,7 @@ class MissingCharacter implements CharacterInterface
     private $displayname;
     
     /**
-     * Sets the name of the missing character, defautls to "Nobody"
+     * Sets the name of the missing character, defautls to "Nobody".
      * @param string $displayname
      */
     public function __construct(string $displayname = "Nobody")
@@ -25,7 +25,7 @@ class MissingCharacter implements CharacterInterface
     }
     
     /**
-     * Returns the name
+     * Returns the name.
      * @return string
      */
     public function getDisplayName(): string
@@ -34,7 +34,7 @@ class MissingCharacter implements CharacterInterface
     }
     
     /**
-     * Returns the name
+     * Returns the name.
      * @return string
      */
     public function getName(): string

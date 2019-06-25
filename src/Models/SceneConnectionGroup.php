@@ -6,9 +6,6 @@ namespace LotGD\Core\Models;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
-use LotGD\Core\Tools\Model\Creator;
-use LotGD\Core\Tools\Model\Deletor;
-
 /**
  *
  * @Entity

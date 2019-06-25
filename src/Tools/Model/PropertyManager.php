@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace LotGD\Core\Tools\Model;
 
 /**
- * Provides method and doctrine annotation for a property submodel
+ * Provides method and doctrine annotation for a property submodel.
  */
 trait PropertyManager
 {
     private $propertyStorage = null;
 
     /**
-     * Loads properties
+     * Loads properties.
      */
     public function loadProperties(): void
     {
@@ -36,9 +36,8 @@ trait PropertyManager
 
         if (isset($this->propertyStorage[$name])) {
             return $this->propertyStorage[$name]->getValue();
-        } else {
-            return $default;
         }
+        return $default;
     }
 
     /**
@@ -57,7 +56,7 @@ trait PropertyManager
     }
 
     /**
-     * Sets a property to a given value
+     * Sets a property to a given value.
      * @param string $name
      * @param mixed $value
      */
@@ -74,7 +73,7 @@ trait PropertyManager
                 $className = $this->properties->getTypeClass()->name;
             }
             $property = new $className();
-            if (method_exists($property, "setOwner")) {
+            if (\method_exists($property, "setOwner")) {
                 $property->setOwner($this);
             }
             $property->setName($name);

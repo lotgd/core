@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Tools\Model;
 
 /**
- * Provides scene basics
+ * Provides scene basics.
  */
 trait SceneBasics
 {
@@ -16,7 +16,7 @@ trait SceneBasics
     private $template = "{No template set}";
 
     /**
-     * Sets scene title
+     * Sets scene title.
      * @param string $title
      */
     public function setTitle(string $title)
@@ -25,7 +25,7 @@ trait SceneBasics
     }
 
     /**
-     * Returns scene title
+     * Returns scene title.
      * @return string
      */
     public function getTitle(): string
@@ -34,7 +34,7 @@ trait SceneBasics
     }
 
     /**
-     * Sets scene description
+     * Sets scene description.
      * @param string $description
      */
     public function setDescription(string $description)
@@ -43,7 +43,7 @@ trait SceneBasics
     }
 
     /**
-     * Returns scene description
+     * Returns scene description.
      * @return string
      */
     public function getDescription(): string
@@ -52,7 +52,7 @@ trait SceneBasics
     }
 
     /**
-     * Sets scene template
+     * Sets scene template.
      * @param string $template
      */
     public function setTemplate(string $template)
@@ -61,7 +61,7 @@ trait SceneBasics
     }
 
     /**
-     * Returns scene template
+     * Returns scene template.
      * @return string
      */
     public function getTemplate(): string

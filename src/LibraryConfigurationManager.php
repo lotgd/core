@@ -1,11 +1,7 @@
 <?php
+declare(strict_types=1);
 
 namespace LotGD\Core;
-
-use Composer\Package\PackageInterface;
-use Symfony\Component\Console\Application;
-
-use LotGD\Core\ComposerManager;
 
 /**
  * Handle the library configurations for the installed core, crate and modules.
@@ -38,7 +34,7 @@ class LibraryConfigurationManager
      * format.
      * @return LibraryConfiguration|null
      */
-    public function getConfigurationForLibrary(string $library)
+    public function getConfigurationForLibrary(string $library): ?LibraryConfiguration
     {
         $configs = $this->getConfigurations();
 
@@ -54,7 +50,8 @@ class LibraryConfigurationManager
      * Return an array of the library configurations.
      * @return LibraryConfiguration[]
      */
-    public function getConfigurations(): array {
+    public function getConfigurations(): array
+    {
         return $this->configurations;
     }
 

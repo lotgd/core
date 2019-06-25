@@ -3,21 +3,17 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
-use Doctrine\Common\Collections\{
-    ArrayCollection,
-    Collection
-};
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use LotGD\Core\{
-    DiceBag,
-    Exceptions\ArgumentException,
-    Exceptions\BattleIsOverException,
-    Exceptions\BattleNotOverException,
-    Models\FighterInterface
-};
-use LotGD\Core\Models\{
-    Buff, BattleEvents\BuffMessageEvent, BattleEvents\CriticalHitEvent, BattleEvents\DamageEvent, BattleEvents\DeathEvent, Scene
-};
+use LotGD\Core\Exceptions\ArgumentException;
+use LotGD\Core\Exceptions\BattleIsOverException;
+use LotGD\Core\Exceptions\BattleNotOverException;
+use LotGD\Core\Models\BattleEvents\CriticalHitEvent;
+use LotGD\Core\Models\BattleEvents\DamageEvent;
+use LotGD\Core\Models\BattleEvents\DeathEvent;
+use LotGD\Core\Models\Buff;
+use LotGD\Core\Models\FighterInterface;
 
 /**
  * Class for managing and running battles between 2 participants.
@@ -42,7 +38,7 @@ class Battle
     protected $round = 0;
     
     /**
-     * Battle Configuration
+     * Battle Configuration.
      * @var array
      */
     protected $configuration = [
@@ -71,7 +67,7 @@ class Battle
      */
     public function serialize(): string
     {
-        return serialize([
+        return \serialize([
             "monster" => $this->monster,
             "result" => $this->result,
             "round" => $this->round,
@@ -88,9 +84,9 @@ class Battle
     public static function unserialize(Game $game, FighterInterface $player, string $serialized): self
     {
         $battle = new self($game, $player, null);
-        $unserialized = unserialize($serialized);
+        $unserialized = \unserialize($serialized);
 
-        $battle->monster  = $unserialized["monster"];
+        $battle->monster = $unserialized["monster"];
         $battle->result = $unserialized["result"];
         $battle->round = $unserialized["round"];
         $battle->configuration = $unserialized["configuration"];
@@ -99,7 +95,7 @@ class Battle
     }
     
     /**
-     * Returns a list of all battle events
+     * Returns a list of all battle events.
      * @return Collection
      */
     public function getEvents(): Collection
@@ -108,7 +104,7 @@ class Battle
     }
     
     /**
-     * Disables ripostes
+     * Disables ripostes.
      */
     public function disableRiposte()
     {
@@ -116,7 +112,7 @@ class Battle
     }
     
     /**
-     * Enables ripostes
+     * Enables ripostes.
      */
     public function enableRiposte()
     {
@@ -124,7 +120,7 @@ class Battle
     }
     
     /**
-     * Returns true if ripostes are enabled
+     * Returns true if ripostes are enabled.
      * @return bool
      */
     public function isRiposteEnabled(): bool
@@ -133,7 +129,7 @@ class Battle
     }
     
     /**
-     * Enables level adjustement
+     * Enables level adjustement.
      */
     public function enableLevelAdjustement()
     {
@@ -141,7 +137,7 @@ class Battle
     }
     
     /**
-     * Disables level adjustement
+     * Disables level adjustement.
      */
     public function disableLevelAdjustement()
     {
@@ -149,7 +145,7 @@ class Battle
     }
     
     /**
-     * Returns true if level adjustements are enabled
+     * Returns true if level adjustements are enabled.
      * @return bool
      */
     public function isLevelAdjustementEnabled(): bool
@@ -158,7 +154,7 @@ class Battle
     }
     
     /**
-     * Returns true if critical hit events are enabled
+     * Returns true if critical hit events are enabled.
      * @return bool
      */
     public function isCriticalHitEnabled(): bool
@@ -167,7 +163,7 @@ class Battle
     }
     
     /**
-     * Disable critical hits
+     * Disable critical hits.
      */
     public function disableCriticalHit()
     {
@@ -175,7 +171,7 @@ class Battle
     }
     
     /**
-     * enables critical hits
+     * enables critical hits.
      */
     public function enableCriticalHit()
     {
@@ -192,7 +188,7 @@ class Battle
     }
     
     /**
-     * Returns the player instance
+     * Returns the player instance.
      * @return FighterInterface
      */
     public function getPlayer(): FighterInterface
@@ -201,7 +197,7 @@ class Battle
     }
     
     /**
-     * Returns the montser instance
+     * Returns the montser instance.
      * @return FighterInterface
      */
     public function getMonster(): FighterInterface
@@ -210,9 +206,9 @@ class Battle
     }
     
     /**
-     * Returns the winner of this fight
-     * @return FighterInterface
+     * Returns the winner of this fight.
      * @throws BattleNotOverException if battle is not over.
+     * @return FighterInterface
      */
     public function getWinner(): FighterInterface
     {
@@ -224,9 +220,9 @@ class Battle
     }
     
     /**
-     * Returns the loser of this fight
-     * @return FighterInterface
+     * Returns the loser of this fight.
      * @throws BattleNotOverException if battle is not over.
+     * @return FighterInterface
      */
     public function getLoser(): FighterInterface
     {
@@ -242,9 +238,9 @@ class Battle
      * of actual rounds fought.
      * @param int $n
      * @param int $firstDamageRound Which damage rounds are calculated. Cannot be 0.
-     * @return int Number of fights fought.
      * @throws ArgumentException if firstDamageRound is 0.
      * @throws BattleIsOverException
+     * @return int Number of fights fought.
      */
     public function fightNRounds(int $n = 1, int $firstDamageRound = self::DAMAGEROUND_BOTH): int
     {
@@ -265,11 +261,11 @@ class Battle
             }
         }
         
-        return $count+1;
+        return $count + 1;
     }
     
     /**
-     * Fights exactly 1 round
+     * Fights exactly 1 round.
      * @param int $firstDamageRound
      */
     protected function fightOneRound(int $firstDamageRound)
@@ -285,7 +281,7 @@ class Battle
         $offenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_PLAYER ? $this->turn($this->player, $this->monster) : new ArrayCollection();
         $defenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_MONSTER ? $this->turn($this->monster, $this->player) : new ArrayCollection();
 
-        $events = new ArrayCollection(array_merge($offenseTurnEvents->toArray(), $defenseTurnEvents->toArray()));
+        $events = new ArrayCollection(\array_merge($offenseTurnEvents->toArray(), $defenseTurnEvents->toArray()));
         $eventsToAdd = new ArrayCollection();
 
         foreach ($events as $event) {
@@ -315,7 +311,7 @@ class Battle
         $monsterBuffExpiringEvents = $this->monster->getBuffs()->expireOneRound();
         
         $this->events = new ArrayCollection(
-            array_merge(
+            \array_merge(
                 $this->events->toArray(),
                 $playerBuffStartEvents->toArray(),
                 $monsterBuffStartEvents->toArray(),
@@ -385,8 +381,8 @@ class Battle
         }
         
         // Conversion from float to int, since the random number generator takes int values.
-        $attackersAttack = (int) round($attackersAttack, 0);
-        $defendersDefense = (int) round($defendersDefense, 0);
+        $attackersAttack = (int)\round($attackersAttack, 0);
+        $defendersDefense = (int)\round($defendersDefense, 0);
         
         // Lets roll the
         $attackersAtkRoll = $this->game->getDiceBag()->pseudoBell(0, $attackersAttack);
@@ -414,10 +410,10 @@ class Battle
             $damage = 0;
         } elseif ($attackerIsInvulnurable) {
             // Attaker is invulnurable, damage is always > 0 (there is no riposte)
-            $damage = abs($damage);
+            $damage = \abs($damage);
         } elseif ($defenderIsInvulnurable) {
             // Defender is invulnurable, damage is always < 0 (defender always ripostes)
-            $damage = - abs($damage);
+            $damage = -\abs($damage);
         }
         
         if ($damage < 0) {
@@ -439,7 +435,7 @@ class Battle
         }
         
         // Round the damage value and convert to int.
-        $damage = (int)round($damage, 0);
+        $damage = (int)\round($damage, 0);
         
         // Add the damage event
         $events->add(new DamageEvent($attacker, $defender, $damage));
@@ -455,7 +451,7 @@ class Battle
         $defendersDamageDependentBuffEvents = $defendersBuffs->processDamageDependentBuffs(Buff::ACTIVATE_DEFENSE, -$damage, $this->game, $defender, $attacker);
         
         return new ArrayCollection(
-            array_merge(
+            \array_merge(
                 $attackersBuffStartEvents->toArray(),
                 $attackersDirectBuffEvents->toArray(),
                 $defendersBuffStartEvents->toArray(),

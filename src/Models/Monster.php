@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Tools\Model\AutoScaleFighter;
 
 /**
- * The Monster entity
+ * The Monster entity.
  *
  * @Entity
  * @Table(name="monsters")

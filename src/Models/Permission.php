@@ -13,7 +13,7 @@ use LotGD\Core\Tools\Model\Deletor;
 /**
  * Represents a permission.
  *
- * @Entity()
+ * @Entity
  * @Table(name="permissions")
  */
 class Permission implements CreateableInterface
@@ -28,10 +28,10 @@ class Permission implements CreateableInterface
     /** @Column(type="string") */
     private $name;
     
-    static $fillable = [
+    public static $fillable = [
         "id",
         "library",
-        "name"
+        "name",
     ];
     
     /**
@@ -52,8 +52,7 @@ class Permission implements CreateableInterface
     {
         if (empty($this->id)) {
             $this->id = $id;
-        }
-        else {
+        } else {
             throw new ArgumentException("Cannot reset id.");
         }
     }

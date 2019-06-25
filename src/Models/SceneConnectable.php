@@ -15,5 +15,5 @@ interface SceneConnectable
      * @param int $directionality
      * @return SceneConnection
      */
-    public function connect(SceneConnectable $connectable, int $directionality): SceneConnection;
+    public function connect(self $connectable, int $directionality): SceneConnection;
 }

@@ -12,7 +12,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * Model for the message of the day
+ * Model for the message of the day.
  *
  * @Entity
  * @Table(name="motd")
@@ -56,7 +56,7 @@ class MotD implements CreateableInterface
     }
     
     /**
-     * Returns the entities ID
+     * Returns the entities ID.
      * @return int
      */
     public function getId(): UuidInterface
@@ -65,7 +65,7 @@ class MotD implements CreateableInterface
     }
     
     /**
-     * Returns the character who wrote this motd
+     * Returns the character who wrote this motd.
      *
      * Returns always the real author of the message, even if it is a
      * system message. Use $this->getSystemMessage() to check if it is a system
@@ -85,13 +85,12 @@ class MotD implements CreateableInterface
     {
         if ($this->getSystemMessage() === true) {
             return SystemCharacter::getInstance();
-        } else {
-            return $this->getAuthor();
         }
+        return $this->getAuthor();
     }
     
     /**
-     * Sets the author of this motd
+     * Sets the author of this motd.
      * @param Character $author
      */
     public function setAuthor(Character $author)
@@ -100,7 +99,7 @@ class MotD implements CreateableInterface
     }
     
     /**
-     * Returns the title of the message
+     * Returns the title of the message.
      * @return string
      */
     public function getTitle(): string
@@ -109,7 +108,7 @@ class MotD implements CreateableInterface
     }
     
     /**
-     * Sets the title of the message
+     * Sets the title of the message.
      * @param string $title
      */
     public function setTitle(string $title)
@@ -118,7 +117,7 @@ class MotD implements CreateableInterface
     }
     
     /**
-     * Returns the body of the message
+     * Returns the body of the message.
      * @return string
      */
     public function getBody(): string
@@ -127,7 +126,7 @@ class MotD implements CreateableInterface
     }
     
     /**
-     * Sets the body of the message
+     * Sets the body of the message.
      * @param string $body
      */
     public function setBody(string $body)
@@ -154,7 +153,7 @@ class MotD implements CreateableInterface
     }
     
     /**
-     * Returns true if the motd is a system message
+     * Returns true if the motd is a system message.
      * @return bool
      */
     public function getSystemMessage(): bool
@@ -163,7 +162,7 @@ class MotD implements CreateableInterface
     }
     
     /**
-     * Set to true of the message should be a system message
+     * Set to true of the message should be a system message.
      * @param bool $isSystemMessage
      */
     public function setSystemMessage(bool $isSystemMessage = true)

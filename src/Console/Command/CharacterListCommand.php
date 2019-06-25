@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-
 namespace LotGD\Core\Console\Command;
-
 
 use LotGD\Core\Models\Character;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +10,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to list all characters.
- * @package LotGD\Core\Console\Command
  */
 class CharacterListCommand extends BaseCommand
 {
@@ -22,7 +19,8 @@ class CharacterListCommand extends BaseCommand
     protected function configure()
     {
         $this->setName('character:list')
-            ->setDescription('Lists all characters');
+            ->setDescription('Lists all characters')
+        ;
     }
 
     /**
@@ -38,7 +36,7 @@ class CharacterListCommand extends BaseCommand
             $table[1][] = [
                 $character->getId(),
                 $character->getDisplayName(),
-                $character->getLevel()
+                $character->getLevel(),
             ];
         }
 

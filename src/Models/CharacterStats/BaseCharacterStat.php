@@ -1,13 +1,10 @@
 <?php
 declare(strict_types=1);
 
-
 namespace LotGD\Core\Models\CharacterStats;
 
-
 /**
- * Class BaseCharacterStat
- * @package LotGD\Core\Models\CharacterStats
+ * Class BaseCharacterStat.
  */
 class BaseCharacterStat implements CharacterStatInterface
 {
@@ -63,7 +60,7 @@ class BaseCharacterStat implements CharacterStatInterface
     /** @inheritdoc */
     public function getValueAsString(): string
     {
-        return sprintf("%s", $this->getValue());
+        return \sprintf("%s", $this->getValue());
     }
 
     /** @inheritdoc */

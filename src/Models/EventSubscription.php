@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 

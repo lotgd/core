@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command;
 
-use Composer\Repository\RepositoryInterface;
-use LotGD\Core\ModuleManager;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
+
 use LotGD\Core\LibraryConfiguration;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -24,7 +22,8 @@ class ModuleRegisterCommand extends BaseCommand
     protected function configure()
     {
         $this->setName('module:register')
-             ->setDescription('Register and initialize any newly installed modules');
+            ->setDescription('Register and initialize any newly installed modules')
+        ;
     }
 
     /**

@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-
 namespace LotGD\Core\Models;
-
 
 use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Exceptions\CharacterStatGroupExistsException;
@@ -11,8 +9,7 @@ use LotGD\Core\Exceptions\CharacterStatGroupNotFoundException;
 use LotGD\Core\Game;
 
 /**
- * Class CharacterStats
- * @package LotGD\Core\Models
+ * Class CharacterStats.
  */
 class CharacterStats
 {
@@ -39,13 +36,13 @@ class CharacterStats
     }
 
     /**
-     * @return \Generator|CharacterStatGroup[]
+     * @return CharacterStatGroup[]|\Generator
      */
     public function iterate(): \Generator
     {
         // First, sort stat set by weight if not sorted yet
         if (!$this->sorted) {
-            uasort($this->stat_groups, function (CharacterStatGroup $a, CharacterStatGroup $b) {
+            \uasort($this->stat_groups, function (CharacterStatGroup $a, CharacterStatGroup $b) {
                 return $a->getWeight() <=> $b->getWeight();
             });
             $this->sorted = true;
@@ -73,8 +70,8 @@ class CharacterStats
 
     /**
      * @param string $id
-     * @return CharacterStatGroup
      * @throws CharacterStatGroupNotFoundException
+     * @return CharacterStatGroup
      */
     public function getCharacterStatGroup(string $id): CharacterStatGroup
     {

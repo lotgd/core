@@ -17,7 +17,8 @@ class ModuleValidateCommand extends BaseCommand
     protected function configure()
     {
         $this->setName('module:validate')
-             ->setDescription('Validate installed modules');
+            ->setDescription('Validate installed modules')
+        ;
     }
 
     /**
@@ -27,14 +28,13 @@ class ModuleValidateCommand extends BaseCommand
     {
         $results = $this->game->getModuleManager()->validate();
 
-        if (count($results) > 0) {
+        if (\count($results) > 0) {
             foreach ($results as $r) {
                 $output->writeln($r);
             }
             return 1;
-        } else {
-            $output->writeln("<info>LotGD modules validated</info>");
-            return 0;
         }
+        $output->writeln("<info>LotGD modules validated</info>");
+        return 0;
     }
 }

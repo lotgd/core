@@ -35,43 +35,43 @@ class Buff
     /** @Column(type="string") */
     private $slot;
     /**
-     * Name of the buff
+     * Name of the buff.
      * @var string
      * @Column(type="string")
      */
     private $name;
     /**
-     * The message given upon activation of the buff
+     * The message given upon activation of the buff.
      * @var string
      * @Column(type="text")
      */
     private $startMessage = "";
     /**
-     * The message given every round
+     * The message given every round.
      * @var string
      * @Column(type="text")
      */
     private $roundMessage = "";
     /**
-     * The message given if the buff ends
+     * The message given if the buff ends.
      * @var string
      * @Column(type="text")
      */
     private $endMessage = "";
     /**
-     * The message given if the effect has success
+     * The message given if the effect has success.
      * @var string
      * @Column(type="text")
      */
     private $effectSucceedsMessage = "";
     /**
-     * The message given if the effect fails
+     * The message given if the effect fails.
      * @var string
      * @Column(type="text")
      */
     private $effectFailsMessage = "";
     /**
-     * The message given if the effect has no effect
+     * The message given if the effect has no effect.
      * @var string
      * @Column(type="text")
      */
@@ -83,13 +83,13 @@ class Buff
      */
     private $newDayMessage = "";
     /**
-     * A value determining when the buffs activates
+     * A value determining when the buffs activates.
      * @var int
      * @Column(type="integer")
      */
     private $activateAt;
     /**
-     * True if the buff survives a new day
+     * True if the buff survives a new day.
      * @var bool
      * @Column(type="boolean")
      */
@@ -109,67 +109,67 @@ class Buff
      */
     private $rounds = 1;
     /**
-     * Number of healthpoints the badguy regenerates
+     * Number of healthpoints the badguy regenerates.
      * @var int
      * @Column(type="integer")
      */
     private $badguyRegeneration = 0;
     /**
-     * Number of healthpoints the goodguy regenerates
+     * Number of healthpoints the goodguy regenerates.
      * @var int
      * @Column(type="integer")
      */
     private $goodguyRegeneration = 0;
     /**
-     * Fraction of damage applied to the badguy that gets converted to health ("absorb") for the goodguy
+     * Fraction of damage applied to the badguy that gets converted to health ("absorb") for the goodguy.
      * @var float
      * @Column(type="float")
      */
     private $badguyLifetap = 0;
     /**
-     * Fraction of damage applied to the goodguy that gets converted to health for the badguy
+     * Fraction of damage applied to the goodguy that gets converted to health for the badguy.
      * @var float
      * @Column(type="float")
      */
     private $goodguyLifetap = 0;
     /**
-     * Fraction of damage that is reflected to the goodguy if damage is applied to the badguy
+     * Fraction of damage that is reflected to the goodguy if damage is applied to the badguy.
      * @var float
      * @Column(type="float")
      */
     private $badguyDamageReflection = 0;
     /**
-     * Fraction of damage that is reflected to the badguy if damage is applied to the goodguy
+     * Fraction of damage that is reflected to the badguy if damage is applied to the goodguy.
      * @var float
      * @Column(type="float")
      */
     private $goodguyDamageReflection = 0;
     /**
-     * Number of minions
+     * Number of minions.
      * @var int
      * @Column(type="integer")
      */
     private $numberOfMinions = 0;
     /**
-     * Minium damage done to the badguy by the minions (if $numberOfMinions > 0)
+     * Minium damage done to the badguy by the minions (if $numberOfMinions > 0).
      * @var int
      * @Column(type="integer")
      */
     private $minionMinBadguyDamage = 0;
     /**
-     * Maximum damage done to the badguy by the minions (if $numberOfMinions > 0)
+     * Maximum damage done to the badguy by the minions (if $numberOfMinions > 0).
      * @var int
      * @Column(type="integer")
      */
     private $minionMaxBadguyDamage = 0;
-     /**
-     * Minium damage done to the goodguy by the minions (if $numberOfMinions > 0)
+    /**
+     * Minium damage done to the goodguy by the minions (if $numberOfMinions > 0).
      * @var int
      * @Column(type="integer")
      */
     private $minionMinGoodguyDamage = 0;
     /**
-     * Maximum damage done to the goodguy by the minions (if $numberOfMinions > 0)
+     * Maximum damage done to the goodguy by the minions (if $numberOfMinions > 0).
      * @var int
      * @Column(type="integer")
      */
@@ -181,56 +181,56 @@ class Buff
      */
     private $badguyDamageModifier = 1;
     /**
-     * Modifies the badguy's attack value
+     * Modifies the badguy's attack value.
      * @var float
      * @Column(type="float")
      */
     private $badguyAttackModifier = 1;
     /**
-     * Modified the badguy's defense value
+     * Modified the badguy's defense value.
      * @var float
      * @Column(type="float")
      */
     private $badguyDefenseModifier = 1;
     /**
-     * True if the badguy stays invulnurable during the buffs duration
+     * True if the badguy stays invulnurable during the buffs duration.
      * @var bool
      * @Column(type="boolean")
      */
     private $badguyInvulnurable = false;
     /**
-     * Modifies the damage applied to the goodguy
+     * Modifies the damage applied to the goodguy.
      * @var float
      * @Column(type="float")
      */
     private $goodguyDamageModifier = 1;
     /**
-     * Modifies the goodguy's attack value
+     * Modifies the goodguy's attack value.
      * @var float
      * @Column(type="float")
      */
     private $goodguyAttackModifier = 1;
     /**
-     * Modifies the goodguy's defense value
+     * Modifies the goodguy's defense value.
      * @var float
      * @Column(type="float")
      */
     private $goodguyDefenseModifier = 1;
     /**
-     * True if the goodguy stays invulnurable during the buffs duration
+     * True if the goodguy stays invulnurable during the buffs duration.
      * @var bool
      * @Column(type="boolean")
      */
     private $goodguyInvulnurable = false;
     /**
-     * True if the buff has already been started
+     * True if the buff has already been started.
      * @var bool
      * @Column(type="boolean")
      */
     private $hasBeenStarted = false;
     
     /**
-     * Allowed buff values and their type
+     * Allowed buff values and their type.
      * @var array
      */
     private static $buffArrayTemplate = [
@@ -278,7 +278,7 @@ class Buff
     ];
     
     /**
-     * Creates a new buff entity using an array
+     * Creates a new buff entity using an array.
      * @param array $buffArray
      * @throws ArgumentException
      */
@@ -294,21 +294,21 @@ class Buff
             
             switch (self::$buffArrayTemplate[$attribute]) {
                 case "string":
-                    if (is_string($value) === false) {
+                    if (\is_string($value) === false) {
                         throw new ArgumentException("{$attribute} needs to be a string.");
                     }
                     break;
                     
                 case "int":
-                    if (is_int($value) === false) {
+                    if (\is_int($value) === false) {
                         throw new ArgumentException("{$attribute} needs to be a int.");
                     }
                     break;
                     
                 case "float":
-                    if (is_float($value) === false) {
+                    if (\is_float($value) === false) {
                         // Convert to float if it is an integer.
-                        if (is_int($value) === false) {
+                        if (\is_int($value) === false) {
                             throw new ArgumentException("{$attribute} needs to be a float.");
                         }
                         
@@ -317,7 +317,7 @@ class Buff
                     break;
                     
                 case "boolean":
-                    if (is_bool($value) === false) {
+                    if (\is_bool($value) === false) {
                         throw new ArgumentException("{$attribute} needs to be boolean.");
                     }
                     break;
@@ -327,7 +327,7 @@ class Buff
         }
         
         foreach ($this->required as $required) {
-            if (is_null($this->$required)) {
+            if (\is_null($this->{$required})) {
                 throw new ArgumentException("{$required} needs to be inside of the buffArray!");
             }
         }
@@ -338,19 +338,19 @@ class Buff
      * @param \LotGD\Core\Models\Buff $buff
      * @return \LotGD\Core\Models\Buff
      */
-    public static function constructFromTemplate(Buff $buff): Buff
+    public static function constructFromTemplate(self $buff): self
     {
         $buffArray = [];
         
         foreach (self::$buffArrayTemplate as $attribute => $type) {
-            $buffArray[$attribute] = $buff->$attribute;
+            $buffArray[$attribute] = $buff->{$attribute};
         }
         
-        return new Buff($buffArray);
+        return new self($buffArray);
     }
     
     /**
-     * Returns the id of the buff
+     * Returns the id of the buff.
      * @return int
      */
     public function getId(): UuidInterface
@@ -359,7 +359,7 @@ class Buff
     }
     
     /**
-     * Returns the Character this buff has been applied to
+     * Returns the Character this buff has been applied to.
      * @return \LotGD\Core\Models\Character
      */
     public function getCharacter(): Character
@@ -368,7 +368,7 @@ class Buff
     }
     
     /**
-     * Returns the slot this buff occupies
+     * Returns the slot this buff occupies.
      * @return string
      */
     public function getSlot(): string
@@ -377,7 +377,7 @@ class Buff
     }
     
     /**
-     * Returns the buff's name
+     * Returns the buff's name.
      * @return string
      */
     public function getName(): string
@@ -386,7 +386,7 @@ class Buff
     }
     
     /**
-     * Returns the message displayed upon buff activation
+     * Returns the message displayed upon buff activation.
      * @return string
      */
     public function getStartMessage(): string
@@ -395,7 +395,7 @@ class Buff
     }
     
     /**
-     * Returns the message displayed every round
+     * Returns the message displayed every round.
      * @return string
      */
     public function getRoundMessage(): string
@@ -413,7 +413,7 @@ class Buff
     }
     
     /**
-     * Returns the message displayed when the buff's effect succeeds
+     * Returns the message displayed when the buff's effect succeeds.
      * @return string
      */
     public function getEffectSucceedsMessage(): string
@@ -422,7 +422,7 @@ class Buff
     }
     
     /**
-     * Returns the message displayed when the buff's effect fails
+     * Returns the message displayed when the buff's effect fails.
      * @return string
      */
     public function getEffectFailsMessage(): string
@@ -431,7 +431,7 @@ class Buff
     }
     
     /**
-     * Returns the message displayed when the buff has no effect at all
+     * Returns the message displayed when the buff has no effect at all.
      * @return string
      */
     public function getNoEffectMessage(): string
@@ -458,7 +458,7 @@ class Buff
     }
     
     /**
-     * Checks if this buff gets activated
+     * Checks if this buff gets activated.
      * @param int $flag
      * @return bool
      */
@@ -466,9 +466,8 @@ class Buff
     {
         if ($flag === self::ACTIVATE_NONE) {
             return $this->activateAt == self::ACTIVATE_NONE ? true : false;
-        } else {
-            return ($this->activateAt & $flag) == true;
         }
+        return ($this->activateAt & $flag) == true;
     }
     
     /**
@@ -490,7 +489,7 @@ class Buff
     }
 
     /**
-     * Returns the number of rounds left
+     * Returns the number of rounds left.
      * @return int
      */
     public function getRounds(): int
@@ -499,7 +498,7 @@ class Buff
     }
     
     /**
-     * Sets the number of rounds left
+     * Sets the number of rounds left.
      * @param int $rounds
      */
     public function setRounds(int $rounds)
@@ -508,7 +507,7 @@ class Buff
     }
     
     /**
-     * Decreases the number of rounds left
+     * Decreases the number of rounds left.
      * @param int $roundsToDecrease
      */
     public function decreaseRounds(int $roundsToDecrease = 1)
@@ -521,7 +520,7 @@ class Buff
     }
     
     /**
-     * Returns the amount of health the badguy gets healed
+     * Returns the amount of health the badguy gets healed.
      * @return int
      */
     public function getBadguyRegeneration(): int
@@ -530,7 +529,7 @@ class Buff
     }
     
     /**
-     * Returns the number of health the goodguy gets healed
+     * Returns the number of health the goodguy gets healed.
      * @return int
      */
     public function getGoodguyRegeneration(): int
@@ -539,7 +538,7 @@ class Buff
     }
     
     /**
-     * Returns the fraction of life that gets absorbed from the damage applied to the badguy
+     * Returns the fraction of life that gets absorbed from the damage applied to the badguy.
      * @return float
      */
     public function getBadguyLifetap(): float
@@ -548,7 +547,7 @@ class Buff
     }
     
     /**
-     * Returns the fraction of life that gets absorbed from the damage applied to the goodguy
+     * Returns the fraction of life that gets absorbed from the damage applied to the goodguy.
      * @return float
      */
     public function getGoodguyLifetap(): float
@@ -557,7 +556,7 @@ class Buff
     }
 
     /**
-     * Returns the fraction of the damage applied to the badguy that gets reflected to the goodguy
+     * Returns the fraction of the damage applied to the badguy that gets reflected to the goodguy.
      * @return float
      */
     public function getBadguyDamageReflection(): float
@@ -566,7 +565,7 @@ class Buff
     }
     
     /**
-     * Returns the fraction of the damage applied to the goodguy that gets reflected to the badguy
+     * Returns the fraction of the damage applied to the goodguy that gets reflected to the badguy.
      * @return float
      */
     public function getGoodguyDamageReflection(): float
@@ -575,7 +574,7 @@ class Buff
     }
     
     /**
-     * Returns the number of minions
+     * Returns the number of minions.
      * @return int
      */
     public function getNumberOfMinions(): int
@@ -584,7 +583,7 @@ class Buff
     }
     
     /**
-     * Returns the minium damage a minion afflicts to the badguy
+     * Returns the minium damage a minion afflicts to the badguy.
      * @return int
      */
     public function getMinionMinBadguyDamage(): int
@@ -593,7 +592,7 @@ class Buff
     }
     
     /**
-     * Returns the maximum damage a minion afflicts to the goodguy
+     * Returns the maximum damage a minion afflicts to the goodguy.
      * @return int
      */
     public function getMinionMaxGoodguyDamage(): int
@@ -602,7 +601,7 @@ class Buff
     }
     
     /**
-     * Returns the minium damage a minion afflicts to the goodguy
+     * Returns the minium damage a minion afflicts to the goodguy.
      * @return int
      */
     public function getMinionMinGoodguyDamage(): int
@@ -611,7 +610,7 @@ class Buff
     }
     
     /**
-     * Returns the maximum damage a minion afflicts to the badguy
+     * Returns the maximum damage a minion afflicts to the badguy.
      * @return int
      */
     public function getMinionMaxBadguyDamage(): int
@@ -620,7 +619,7 @@ class Buff
     }
     
     /**
-     * Returns a factor which modifies the damage applied TO the badguy
+     * Returns a factor which modifies the damage applied TO the badguy.
      * @return float
      */
     public function getBadguyDamageModifier(): float
@@ -629,7 +628,7 @@ class Buff
     }
     
     /**
-     * Returns a factor which modifies the badguy's attack value
+     * Returns a factor which modifies the badguy's attack value.
      * @return float
      */
     public function getBadguyAttackModifier(): float
@@ -638,7 +637,7 @@ class Buff
     }
     
     /**
-     * Returns a factor which modified the badguy's defense value
+     * Returns a factor which modified the badguy's defense value.
      * @return float
      */
     public function getBadguyDefenseModifier(): float
@@ -647,7 +646,7 @@ class Buff
     }
     
     /**
-     * Returns true if the badguy is invulnurable
+     * Returns true if the badguy is invulnurable.
      * @return bool
      */
     public function badguyIsInvulnurable(): bool
@@ -656,7 +655,7 @@ class Buff
     }
     
     /**
-     * Returns a factor which modifies the damage applied TO the goodguy
+     * Returns a factor which modifies the damage applied TO the goodguy.
      * @return float
      */
     public function getGoodguyDamageModifier(): float
@@ -665,7 +664,7 @@ class Buff
     }
     
     /**
-     * Returns a factor which modifies the goodguy's attack value
+     * Returns a factor which modifies the goodguy's attack value.
      * @return float
      */
     public function getGoodguyAttackModifier(): float
@@ -674,7 +673,7 @@ class Buff
     }
     
     /**
-     * Returns a factor which modified the goodguy's defense value
+     * Returns a factor which modified the goodguy's defense value.
      * @return float
      */
     public function getGoodguyDefenseModifier(): float
@@ -683,7 +682,7 @@ class Buff
     }
     
     /**
-     * Returns true if the goodguy is invulnurable
+     * Returns true if the goodguy is invulnurable.
      * @return bool
      */
     public function goodguyIsInvulnurable(): bool
@@ -692,7 +691,7 @@ class Buff
     }
     
     /**
-     * Returns true if the buff has already been started
+     * Returns true if the buff has already been started.
      * @return bool
      */
     public function hasBeenStarted(): bool

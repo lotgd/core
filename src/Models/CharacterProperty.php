@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Tools\Model\Properties;
 
 /**
- * Properties for Characters
+ * Properties for Characters.
  * @Entity
  * @Table(name="character_properties")
  */
@@ -21,7 +21,7 @@ class CharacterProperty
     private $owner;
 
     /**
-     * Returns the owner
+     * Returns the owner.
      * @return \LotGD\Core\Models\Character
      */
     public function getOwner(): Character
@@ -30,7 +30,7 @@ class CharacterProperty
     }
 
     /**
-     * Sets the owner
+     * Sets the owner.
      * @param \LotGD\Core\Models\Character $owner
      */
     public function setOwner(Character $owner)

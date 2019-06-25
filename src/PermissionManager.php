@@ -5,7 +5,6 @@ namespace LotGD\Core;
 
 use LotGD\Core\Exceptions\PermissionIdNotFoundException;
 use LotGD\Core\Models\Actor;
-use LotGD\Core\Models\PermissionableInterface;
 use LotGD\Core\Models\Permission;
 
 /**
@@ -67,9 +66,8 @@ class PermissionManager
     ): bool {
         if ($actor->hasPermissionSet($permissionId)) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -84,9 +82,8 @@ class PermissionManager
     ): bool {
         if ($actor->hasPermissionSet($permissionId)) {
             return $actor->getPermission($permissionId)->checkState(static::Allowed);
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -101,16 +98,15 @@ class PermissionManager
     ): bool {
         if ($actor->hasPermissionSet($permissionId)) {
             return $actor->getPermission($permissionId)->checkState(static::Denied);
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
      * Retrieves a permission entity from the database by a permission id.
      * @param string $permissionId
-     * @return Permission
      * @throws PermissionIdNotFoundException
+     * @return Permission
      */
     private function findPermission(string $permissionId): Permission
     {
@@ -119,9 +115,8 @@ class PermissionManager
 
         if ($result) {
             return $result;
-        } else {
-            throw new PermissionIdNotFoundException("Permission {$permissionId} was not found.");
         }
+        throw new PermissionIdNotFoundException("Permission {$permissionId} was not found.");
     }
 
     /**

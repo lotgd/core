@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-
 namespace LotGD\Core\Models\CharacterStats;
-
 
 interface CharacterStatInterface
 {

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command;
 
-use Symfony\Component\Console\Command\Command;
-
 use LotGD\Core\Game;
+
+use Symfony\Component\Console\Command\Command;
 
 /**
  * Parent class for daenerys tool commands.

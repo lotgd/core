@@ -25,12 +25,13 @@ abstract class BasicEnemy implements FighterInterface
      * BasicEnemy constructor. Sets uuid upon creation.
      * @throws \Exception
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->id = Uuid::uuid4();
     }
     
     /**
-     * Returns the enemy's id
+     * Returns the enemy's id.
      * @return int
      */
     public function getId(): UuidInterface
@@ -39,7 +40,7 @@ abstract class BasicEnemy implements FighterInterface
     }
     
     /**
-     * Returns the enemy's name
+     * Returns the enemy's name.
      * @return string
      */
     public function getName(): string
@@ -66,7 +67,7 @@ abstract class BasicEnemy implements FighterInterface
     }
     
     /**
-     * Returns the enemy's current health
+     * Returns the enemy's current health.
      * @return int
      */
     public function getHealth(): int
@@ -79,7 +80,7 @@ abstract class BasicEnemy implements FighterInterface
     }
     
     /**
-     * Sets the enemy's current health
+     * Sets the enemy's current health.
      * @param int $health
      */
     public function setHealth(int $health)
@@ -105,7 +106,7 @@ abstract class BasicEnemy implements FighterInterface
     }
     
     /**
-     * Heals the enemy
+     * Heals the enemy.
      * @param int $heal
      * @param type $overheal True if healing bigger than maxhealth is desired.
      */
@@ -126,8 +127,7 @@ abstract class BasicEnemy implements FighterInterface
     {
         if ($this->getHealth() > 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 }

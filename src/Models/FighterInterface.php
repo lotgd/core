@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
-use LotGD\Core\{
-    BuffList,
-    Game
-};
+use LotGD\Core\BuffList;
 
 /**
  * Interface for models that should be able to participate in fights.

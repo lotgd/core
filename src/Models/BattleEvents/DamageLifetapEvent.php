@@ -66,10 +66,10 @@ class DamageLifetapEvent extends BattleEvent
     {
         parent::decorate($game);
 
-        return str_replace(
+        return \str_replace(
             [
                 "{target}",
-                "{damage}"
+                "{damage}",
             ],
             [
                 $this->target->getDisplayName(),

@@ -28,7 +28,7 @@ class SceneConnection
     private $incomingScene;
 
     /**
-     * @Column(type="integer", options={"default":0})
+     * @Column(type="integer", options={"default"= 0})
      */
     private $directionality = 0;
 
@@ -60,7 +60,7 @@ class SceneConnection
 
     /**
      * Sets the connection group name identifier of the outgoing connection.
-     * @param null|string $name The identifier name of the outgoing connection group.
+     * @param string|null $name The identifier name of the outgoing connection group.
      */
     public function setOutgoingConnectionGroupName(?string $name): void
     {
@@ -69,7 +69,7 @@ class SceneConnection
 
     /**
      * Returns the connection from name identifier of the outgoing connection.
-     * @return null|string
+     * @return string|null
      */
     public function getOutgoingConnectionGroupName(): ?string
     {
@@ -87,7 +87,7 @@ class SceneConnection
 
     /**
      * Sets the connection group name identifier of the incoming connection.
-     * @param null|string $name The identifier name of the incoming connection group.
+     * @param string|null $name The identifier name of the incoming connection group.
      */
     public function setIncomingConnectionGroupName(?string $name)
     {
@@ -96,7 +96,7 @@ class SceneConnection
 
     /**
      * Returns the connection group name identifier of the incoming connection.
-     * @return null|string
+     * @return string|null
      */
     public function getIncomingConnectionGroupName(): ?string
     {
@@ -121,8 +121,7 @@ class SceneConnection
     {
         if ($this->directionality === $directionality) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 }

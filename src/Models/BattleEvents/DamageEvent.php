@@ -7,7 +7,7 @@ use LotGD\Core\Game;
 use LotGD\Core\Models\FighterInterface;
 
 /**
- * BattleEvent
+ * BattleEvent.
  */
 class DamageEvent extends BattleEvent
 {
@@ -52,7 +52,7 @@ class DamageEvent extends BattleEvent
         if ($this->damage !== 0) {
             // Only damage the victim if there is an actual effect
             $victim = $this->damage > 0 ? $this->defender : $this->attacker;
-            $victim->damage(abs($this->damage));
+            $victim->damage(\abs($this->damage));
         }
     }
 
@@ -69,21 +69,17 @@ class DamageEvent extends BattleEvent
         if ($this->damage === 0) {
             if ($this->attacker === $game->getCharacter()) {
                 return "You try to hit {$defendersName} but MISS!";
-            } else {
-                return "{$attackersName} tries to hit you but they MISS!";
             }
+            return "{$attackersName} tries to hit you but they MISS!";
         } elseif ($this->damage > 0) {
             if ($this->attacker === $game->getCharacter()) {
                 return "You hit {$defendersName} for {$this->damage} points of damage!";
-            } else {
-                return "{$attackersName} hits you for {$this->damage} points of damage!";
             }
-        } else {
-            if ($this->attacker === $game->getCharacter()) {
-                return "You try to hit {$defendersName} but are RIPOSTED for {$this->damage} points of damage";
-            } else {
-                return "{$attackersName} tries to hit you but you RIPOSTE for {$this->damage} points of damage";
-            }
+            return "{$attackersName} hits you for {$this->damage} points of damage!";
         }
+        if ($this->attacker === $game->getCharacter()) {
+            return "You try to hit {$defendersName} but are RIPOSTED for {$this->damage} points of damage";
+        }
+        return "{$attackersName} tries to hit you but you RIPOSTE for {$this->damage} points of damage";
     }
 }

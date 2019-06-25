@@ -3,29 +3,21 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
-use Doctrine\Common\Collections\{
-    ArrayCollection,
-    Collection
-};
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use LotGD\Core\Exceptions\{
-    ArgumentException,
-    BuffListAlreadyActivatedException
-};
-use LotGD\Core\Models\{
-    Buff,
-    Character,
-    FighterInterface,
-    BattleEvents\BuffMessageEvent,
-    BattleEvents\DamageLifetapEvent,
-    BattleEvents\DamageReflectionEvent,
-    BattleEvents\RegenerationBuffEvent,
-    BattleEvents\MinionDamageEvent
-};
-
+use LotGD\Core\Exceptions\ArgumentException;
+use LotGD\Core\Exceptions\BuffListAlreadyActivatedException;
+use LotGD\Core\Models\BattleEvents\BuffMessageEvent;
+use LotGD\Core\Models\BattleEvents\DamageLifetapEvent;
+use LotGD\Core\Models\BattleEvents\DamageReflectionEvent;
+use LotGD\Core\Models\BattleEvents\MinionDamageEvent;
+use LotGD\Core\Models\BattleEvents\RegenerationBuffEvent;
+use LotGD\Core\Models\Buff;
+use LotGD\Core\Models\FighterInterface;
 
 /**
- * Description of BuffList
+ * Description of BuffList.
  */
 class BuffList
 {
@@ -35,9 +27,9 @@ class BuffList
     /** @var ArrayCollection */
     protected $usedBuffs;
 
-    /** @var boolean True of the modifiers have already been calculated */
+    /** @var bool True of the modifiers have already been calculated */
     protected $modifiersCalculated = false;
-    /** @var boolean True if the badguy is invulnurable */
+    /** @var bool True if the badguy is invulnurable */
     protected $badguyInvulnurable = false;
     /** @var float */
     protected $badguyDamageModifier = 1.;
@@ -45,7 +37,7 @@ class BuffList
     protected $badguyAttackModifier = 1.;
     /** @var float */
     protected $badguyDefenseModifier = 1.;
-    /** @var boolean True if the goodguy is invulnurable */
+    /** @var bool True if the goodguy is invulnurable */
     protected $goodguyInvulnurable = false;
     /** @var float */
     protected $goodguyDamageModifier = 1.;
@@ -58,7 +50,7 @@ class BuffList
     protected $loaded = false;
 
     /**
-     * Initiates some variables
+     * Initiates some variables.
      * @param Collection $buffs
      */
     public function __construct(Collection $buffs)
@@ -69,7 +61,7 @@ class BuffList
     }
 
     /**
-     * Loads all buffs (since it's a lazy correlation)
+     * Loads all buffs (since it's a lazy correlation).
      */
     public function loadBuffs()
     {
@@ -97,7 +89,7 @@ class BuffList
     }
 
     /**
-     * Marks the given buff as used
+     * Marks the given buff as used.
      * @param Buff $buff
      */
     protected function useBuff(Buff $buff)
@@ -106,7 +98,7 @@ class BuffList
     }
 
     /**
-     * Returns the buff's start or round message
+     * Returns the buff's start or round message.
      * @param Buff $buff
      * @return string
      */
@@ -125,7 +117,7 @@ class BuffList
     }
 
     /**
-     * Resets the buff usage for a new round
+     * Resets the buff usage for a new round.
      */
     public function resetBuffUsage()
     {
@@ -140,19 +132,19 @@ class BuffList
      */
     public function hasBuffsInUse(): bool
     {
-        return count($this->usedBuffs) > 0 ? true : false;
+        return \count($this->usedBuffs) > 0 ? true : false;
     }
 
     /**
      * Activates all buffs that activate upon the given activation parameter.
      * @param int $activation
-     * @return Collection
      * @throws ArgumentException
      * @throws BuffListAlreadyActivatedException
+     * @return Collection
      */
     public function activate(int $activation): Collection
     {
-        if ($activation%2 !== 0 && $activation !== 1) {
+        if ($activation % 2 !== 0 && $activation !== 1) {
             throw new ArgumentException("You can only activate one activation type at a time.");
         }
 
@@ -187,7 +179,7 @@ class BuffList
     }
 
     /**
-     * Decreases the rounds left on all used buffs
+     * Decreases the rounds left on all used buffs.
      * @return Collection A Collection containing expire messages (if there are any)
      */
     public function expireOneRound(): Collection
@@ -262,10 +254,9 @@ class BuffList
     }
 
     /**
-     * Calculates all total modifiers
-     * @return type
+     * Calculates all total modifiers.
      */
-    protected function calculateModifiers()
+    protected function calculateModifiers(): void
     {
         if ($this->modifiersCalculated === true) {
             return;
@@ -303,14 +294,13 @@ class BuffList
             // Only look at buffs that are activated in battle.
             if ($buff->getsActivatedAt(Buff::ACTIVATE_NONE)) {
                 continue;
-            } else {
-                yield $buff;
             }
+            yield $buff;
         }
     }
 
     /**
-     * Returns the badguy attack modifier calculated over the whole bufflist
+     * Returns the badguy attack modifier calculated over the whole bufflist.
      * @return float
      */
     public function getBadguyAttackModifier(): float
@@ -319,8 +309,8 @@ class BuffList
         return $this->badguyAttackModifier;
     }
 
-     /**
-     * Returns the badguy defense modifier calculated over the whole bufflist
+    /**
+     * Returns the badguy defense modifier calculated over the whole bufflist.
      * @return float
      */
     public function getBadguyDefenseModifier(): float
@@ -330,7 +320,7 @@ class BuffList
     }
 
     /**
-     * Returns the badguy damage modifier calculated over the whole bufflist
+     * Returns the badguy damage modifier calculated over the whole bufflist.
      * @return float
      */
     public function getBadguyDamageModifier(): float
@@ -340,7 +330,7 @@ class BuffList
     }
 
     /**
-     * Returns true if the badguy is invulnurable
+     * Returns true if the badguy is invulnurable.
      * @return bool
      */
     public function badguyIsInvulnurable(): bool
@@ -350,7 +340,7 @@ class BuffList
     }
 
     /**
-     * Returns the badguy attack modifier calculated over the whole bufflist
+     * Returns the badguy attack modifier calculated over the whole bufflist.
      * @return float
      */
     public function getGoodguyAttackModifier(): float
@@ -359,8 +349,8 @@ class BuffList
         return $this->goodguyAttackModifier;
     }
 
-     /**
-     * Returns the badguy defense modifier calculated over the whole bufflist
+    /**
+     * Returns the badguy defense modifier calculated over the whole bufflist.
      * @return float
      */
     public function getGoodguyDefenseModifier(): float
@@ -369,8 +359,8 @@ class BuffList
         return $this->goodguyDefenseModifier;
     }
 
-     /**
-     * Returns the badguy damage modifier calculated over the whole bufflist
+    /**
+     * Returns the badguy damage modifier calculated over the whole bufflist.
      * @return float
      */
     public function getGoodguyDamageModifier(): float
@@ -380,7 +370,7 @@ class BuffList
     }
 
     /**
-     * Returns true if the goodguy is invulnurable
+     * Returns true if the goodguy is invulnurable.
      * @return bool
      */
     public function goodguyIsInvulnurable(): bool
@@ -390,7 +380,7 @@ class BuffList
     }
 
     /**
-     * Processes buffs that do direct damage or regeneration
+     * Processes buffs that do direct damage or regeneration.
      * @param int $activation
      * @param Game $game
      * @param FighterInterface $goodguy
@@ -478,7 +468,7 @@ class BuffList
 
                     $events[] = new MinionDamageEvent(
                         $target,
-                        (int)round($damage, 0),
+                        (int)\round($damage, 0),
                         $message
                     );
                 }
@@ -491,7 +481,7 @@ class BuffList
     }
 
     /**
-     * Processes buffs that are dependant on the damage done in one round
+     * Processes buffs that are dependant on the damage done in one round.
      * @param int $activation
      * @param int $damage Positive damage is applied to the badguy, negative damage is applied to the goodguy
      * @param Game $game
@@ -519,7 +509,7 @@ class BuffList
                     $reflectedDamage = 0;
                     $message = $buff->getNoEffectMessage();
                 } else {
-                    $reflectedDamage = (int)round($buff->getGoodguyDamageReflection() * $damage * -1, 0);
+                    $reflectedDamage = (int)\round($buff->getGoodguyDamageReflection() * $damage * -1, 0);
                     if ($reflectedDamage === 0) {
                         $message = $buff->getNoEffectMessage();
                     } else {
@@ -537,7 +527,7 @@ class BuffList
             if ($buff->getBadguyDamageReflection() !== 0.) {
                 if ($damage > 0) {
                     // Damage is > 0, so badguy takes damage, we can normally reflect
-                    $reflectedDamage = (int)round($buff->getBadguyDamageReflection() * $damage, 0);
+                    $reflectedDamage = (int)\round($buff->getBadguyDamageReflection() * $damage, 0);
                     if ($reflectedDamage === 0) {
                         $message = $buff->getNoEffectMessage();
                     } else {
@@ -566,7 +556,7 @@ class BuffList
                     $message = $buff->getEffectFailsMessage();
                 } elseif ($damage < 0) {
                     // Damage is < 0, goodguy takes damage. We act upon this.
-                    $healAmount = (int)round($damage * -$buff->getBadguyLifetap(), 0);
+                    $healAmount = (int)\round($damage * -$buff->getBadguyLifetap(), 0);
                     if ($healAmount === 0) {
                         $message = $buff->getNoEffectMessage();
                     } else {
@@ -587,7 +577,7 @@ class BuffList
             if ($buff->getBadguyLifetap() !== 0.) {
                 if ($damage > 0) {
                     // Damage is > 0, badguy takes damage. We act upon this to heal goodguy.
-                    $healAmount = (int)round($damage * $buff->getBadguyLifetap(), 0);
+                    $healAmount = (int)\round($damage * $buff->getBadguyLifetap(), 0);
                     if ($healAmount === 0) {
                         $message = $buff->getNoEffectMessage();
                     } else {

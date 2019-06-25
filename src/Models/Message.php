@@ -5,18 +5,14 @@ namespace LotGD\Core\Models;
 
 use DateTime;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 
-use LotGD\Core\Exceptions\InvalidModelException;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Exceptions\ParentAlreadySetException;
-use LotGD\Core\Tools\Model\Deletor;
-use LotGD\Core\Tools\Model\Saveable;
 
 /**
- * Model for messages
+ * Model for messages.
  * @Entity
  * @Table(name="messages")
  */
@@ -38,7 +34,6 @@ class Message
     /** @Column(type="boolean", nullable=false) */
     private $systemMessage = false;
     
-
     /**
      * Constructs the message.
      * Use the Message Manager methods send() and sendSystemMessage() instead.
@@ -58,7 +53,7 @@ class Message
         } elseif ($systemMessage === false) {
             // This should not happen since the constructor is not a public method
             throw new ArgumentException(
-                sprintf(
+                \sprintf(
                     'If $from is not an instance of %s, $systemMessage must be true',
                     Character::class
                 )
@@ -72,7 +67,7 @@ class Message
     }
     
     /**
-     * Returns the id
+     * Returns the id.
      * @return int
      */
     public function getId(): int
@@ -81,16 +76,15 @@ class Message
     }
     
     /**
-     * Returns the true character of the message
+     * Returns the true character of the message.
      * @return \LotGD\Core\Models\CharacterInterface
      */
     public function getAuthor(): CharacterInterface
     {
-        if (is_null($this->author)) {
+        if (\is_null($this->author)) {
             return SystemCharacter::getInstance();
-        } else {
-            return $this->author;
         }
+        return $this->author;
     }
     
     /**
@@ -104,13 +98,12 @@ class Message
     {
         if ($this->isSystemMessage()) {
             return SystemCharacter::getInstance();
-        } else {
-            return $this->getAuthor();
         }
+        return $this->getAuthor();
     }
     
     /**
-     * Returns the message
+     * Returns the message.
      * @return string
      */
     public function getMessage(): string
@@ -119,7 +112,7 @@ class Message
     }
     
     /**
-     * Returns the thread this message belongs to
+     * Returns the thread this message belongs to.
      * @return \LotGD\Core\Models\MessageThread
      */
     public function getThread(): MessageThread
@@ -137,7 +130,7 @@ class Message
      */
     public function setThread(MessageThread $thread)
     {
-        if (is_null($this->thread) === false) {
+        if (\is_null($this->thread) === false) {
             throw new ParentAlreadySetException("A message's thread cannot be changed.");
         }
         
@@ -145,7 +138,7 @@ class Message
     }
     
     /**
-     * Returns the datetime this message was created at
+     * Returns the datetime this message was created at.
      * @return DateTime
      */
     public function getCreatedAt(): DateTime
@@ -154,7 +147,7 @@ class Message
     }
     
     /**
-     * Returns true if the message is a system message
+     * Returns true if the message is a system message.
      * @return bool
      */
     public function isSystemMessage(): bool

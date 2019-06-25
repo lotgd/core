@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Doctrine;
 
-use Doctrine\Common\Util\Debug;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use LotGD\Core\Game;
 use LotGD\Core\GameAwareInterface;
 
 /**
- * Class EntityPostLoadEventListener
- * @package LotGD\Core\Doctrine
+ * Class EntityPostLoadEventListener.
  */
 class EntityPostLoadEventListener
 {

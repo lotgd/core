@@ -5,10 +5,10 @@ namespace LotGD\Core;
 
 use DateTime;
 
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
-
 use LotGD\Core\Exceptions\InvalidConfigurationException;
+use Symfony\Component\Yaml\Exception\ParseException;
+
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * The configuration information for a LotGD game. Configuration is read from
@@ -42,8 +42,8 @@ class Configuration
 
         // Log dir path is relative to config directory.
         $logPath = $rawConfig['logs']['path'] ?? '';
-        $realLogPath = dirname($configFilePath) . DIRECTORY_SEPARATOR . $logPath;
-        if ($realLogPath === false || strlen($realLogPath) == 0 || is_dir($realLogPath) === false) {
+        $realLogPath = \dirname($configFilePath) . \DIRECTORY_SEPARATOR . $logPath;
+        if ($realLogPath === false || \strlen($realLogPath) == 0 || \is_dir($realLogPath) === false) {
             throw new InvalidConfigurationException("Invalid or missing log path: {$realLogPath}");
         }
         $this->logPath = $realLogPath;
@@ -53,10 +53,10 @@ class Configuration
         $passwd = $rawConfig['database']['password'] ?? '';
         $name = $rawConfig['database']['name'] ?? '';
 
-        if ($dsn === false || strlen($dsn) == 0) {
+        if ($dsn === false || \strlen($dsn) == 0) {
             throw new InvalidConfigurationException("Invalid or missing data source name: {$dsn}");
         }
-        if ($user === false || strlen($user) == 0) {
+        if ($user === false || \strlen($user) == 0) {
             throw new InvalidConfigurationException("Invalid or missing database user: {$user}");
         }
         if ($passwd === false) {
@@ -105,12 +105,12 @@ class Configuration
      */
     protected function retrieveRawConfig(string $configFilePath): array
     {
-        return Yaml::parse(file_get_contents($configFilePath));
+        return Yaml::parse(\file_get_contents($configFilePath));
     }
     
     /**
      * Returns database connection details needed for pdo to establish a connection.
-     * 
+     *
      * This function takes optionally replaces the string %cwd% in the database dsn and
      * replaces it with the first parameter. This is important to normalize the database location
      * across different working directories. Alternatively, SQLite databse names can also directly
@@ -121,7 +121,7 @@ class Configuration
     public function getDatabaseConnectionDetails(string $cwd = ""): array
     {
         return [
-            str_replace("%cwd%", $cwd . DIRECTORY_SEPARATOR, $this->getDatabaseDSN()),
+            \str_replace("%cwd%", $cwd . \DIRECTORY_SEPARATOR, $this->getDatabaseDSN()),
             $this->getDatabaseUser(),
             $this->getDatabasePassword(),
         ];

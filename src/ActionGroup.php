@@ -1,5 +1,5 @@
 <?php
-declare (strict_types=1);
+declare(strict_types=1);
 
 namespace LotGD\Core;
 
@@ -36,7 +36,7 @@ class ActionGroup implements \Countable
      */
     public function count(): int
     {
-        return count($this->actions);
+        return \count($this->actions);
     }
 
     /**

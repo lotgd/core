@@ -22,7 +22,7 @@ class Action
      */
     public function __construct(string $destinationSceneId, ?string $title = null, array $parameters = [])
     {
-        $this->id = bin2hex(random_bytes(8));
+        $this->id = \bin2hex(\random_bytes(8));
         $this->destinationSceneId = $destinationSceneId;
         $this->title = $title;
         $this->parameters = $parameters;
@@ -49,7 +49,7 @@ class Action
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getTitle(): ?string
     {
@@ -58,15 +58,15 @@ class Action
 
     /**
      * @param string $title
-     * @return null|string
+     * @return string|null
      */
-    public function setTitle(?string $title)
+    public function setTitle(?string $title): ?string
     {
         $this->title = $title;
     }
 
     /**
-     * Returns all parameters for this action
+     * Returns all parameters for this action.
      * @return array
      */
     public function getParameters(): array
@@ -75,9 +75,8 @@ class Action
     }
 
     /**
-     * Sets all parameters for this action
+     * Sets all parameters for this action.
      * @param array $parameters
-     * @return void
      */
     public function setParameters(array $parameters): void
     {

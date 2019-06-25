@@ -3,16 +3,14 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
-
+use Doctrine\Common\Annotations\AnnotationReader;
+use LotGD\Core\Doctrine\Annotations\Extension;
 use LotGD\Core\Doctrine\Annotations\ExtensionMethod;
 use LotGD\Core\Exceptions\ArgumentException;
 use ReflectionClass;
-use Doctrine\Common\Annotations\AnnotationReader;
-use LotGD\Core\Doctrine\Annotations\Extension;
 
 /**
  * Contains method to help the extension of a model.
- * @package LotGD\Core
  */
 class ModelExtender
 {
@@ -32,8 +30,9 @@ class ModelExtender
     /**
      * @param string[] $classes
      */
-    public function addMore(array $classes): void {
-        foreach($classes as $class) {
+    public function addMore(array $classes): void
+    {
+        foreach ($classes as $class) {
             $this->add($class);
         }
     }
@@ -49,7 +48,7 @@ class ModelExtender
         $extensionAnnotation = $this->reader->getClassAnnotation($reflectionClass, Extension::class);
 
         if ($extensionAnnotation === null) {
-            throw new ArgumentException(sprintf("Class %s must have the class Annotation %s", $class, Extension::class));
+            throw new ArgumentException(\sprintf("Class %s must have the class Annotation %s", $class, Extension::class));
         }
 
         $modelClass = $extensionAnnotation->getModelClass();
@@ -63,7 +62,7 @@ class ModelExtender
 
         foreach ($reflectionMethods as $method) {
             if ($method->isStatic() === false) {
-                throw new ArgumentException(sprintf("Method %s must be static.", $method->getName()));
+                throw new ArgumentException(\sprintf("Method %s must be static.", $method->getName()));
             }
 
             /** @var ExtensionMethod $extensionMethodAnnotation */

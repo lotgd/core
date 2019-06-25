@@ -31,8 +31,7 @@ class ViewpointSnapshot
         array $actionGroups,
         array $attachments,
         array $data
-    )
-    {
+    ) {
         $this->title = $title;
         $this->description = $description;
         $this->template = $template;

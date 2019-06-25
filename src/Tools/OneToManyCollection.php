@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace LotGD\Core\Tools;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManagerInterface;
 
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\KeyNotFoundException;
@@ -33,8 +34,8 @@ class OneToManyCollection implements Collection
      */
     public function __construct(EntityManagerInterface $entityManager, string $typeClass)
     {
-        if (class_exists($typeClass) === false) {
-            throw new ClassNotFoundException(sprintf("The class %s has not been found.", $typeClass));
+        if (\class_exists($typeClass) === false) {
+            throw new ClassNotFoundException(\sprintf("The class %s has not been found.", $typeClass));
         }
 
         $this->entityManager = $entityManager;
@@ -54,8 +55,8 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @return int
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return int
      */
     public function count(): int
     {
@@ -65,14 +66,14 @@ class OneToManyCollection implements Collection
                 ->from($this->typeClass, "p")
                 ->select("COUNT(p.propertyName)")
                 ->getQuery()
-                ->getSingleScalarResult();
+                ->getSingleScalarResult()
+            ;
         }
 
         if ($this->collection === null) {
             return $this->numberOfRows;
-        } else {
-            return count($this->collection);
         }
+        return \count($this->collection);
     }
 
     /**
@@ -83,14 +84,14 @@ class OneToManyCollection implements Collection
     private function checkElementType($element)
     {
         if ($element instanceof $this->typeClass === false) {
-            throw new WrongTypeException(sprintf('$element needs to be of type %s', $this->typeClass));
+            throw new WrongTypeException(\sprintf('$element needs to be of type %s', $this->typeClass));
         }
     }
 
     /**
      * @param mixed $element
-     * @return true|void
      * @throws WrongTypeException
+     * @return true|void
      */
     public function add($element)
     {
@@ -112,7 +113,8 @@ class OneToManyCollection implements Collection
         $this->entityManager->createQueryBuilder()
             ->delete($this->typeClass, "p")
             ->getQuery()
-            ->execute();
+            ->execute()
+        ;
         $this->collection = [];
     }
 
@@ -128,7 +130,7 @@ class OneToManyCollection implements Collection
             return false;
         }
 
-        return in_array($element, $this->collection);
+        return \in_array($element, $this->collection);
     }
 
     /**
@@ -158,7 +160,7 @@ class OneToManyCollection implements Collection
     public function removeElement($element)
     {
         if ($this->contains($element)) {
-            $key = array_search($element, $this->collection);
+            $key = \array_search($element, $this->collection);
             $this->entityManager->remove($element);
             unset($this->collection[$key]);
         }
@@ -168,7 +170,7 @@ class OneToManyCollection implements Collection
      * @param int|string $key
      * @return bool
      */
-    public function containsKey($key)
+    public function containsKey($key): bool
     {
         return isset($this->collection[$key]);
     }
@@ -176,16 +178,15 @@ class OneToManyCollection implements Collection
     /**
      * Returns the element saved with the given key.
      * @param int|string $key
-     * @return type
      * @throws KeyNotFoundException
+     * @return mixed
      */
     public function get($key)
     {
         if (isset($this->collection[$key])) {
             return $this->collection[$key];
-        } else {
-            throw new KeyNotFoundException(sprintf("The key %s has not been found within the collection", $key));
         }
+        throw new KeyNotFoundException(\sprintf("The key %s has not been found within the collection", $key));
     }
 
     /**
@@ -193,7 +194,7 @@ class OneToManyCollection implements Collection
      */
     public function getKeys(): array
     {
-        return array_keys($this->collection);
+        return \array_keys($this->collection);
     }
 
     /**
@@ -201,7 +202,7 @@ class OneToManyCollection implements Collection
      */
     public function getValues(): array
     {
-        return array_values($this->collection);
+        return \array_values($this->collection);
     }
 
     /**
@@ -231,7 +232,7 @@ class OneToManyCollection implements Collection
      */
     public function first()
     {
-        return array_values($this->collection)[0];
+        return \array_values($this->collection)[0];
     }
 
     /**
@@ -239,7 +240,7 @@ class OneToManyCollection implements Collection
      */
     public function last()
     {
-        return array_values($this->collection)[count($this->collection)];
+        return \array_values($this->collection)[\count($this->collection)];
     }
 
     /**
@@ -247,7 +248,7 @@ class OneToManyCollection implements Collection
      */
     public function key()
     {
-        return key($this->collection);
+        return \key($this->collection);
     }
 
     /**
@@ -255,7 +256,7 @@ class OneToManyCollection implements Collection
      */
     public function next()
     {
-        return next($this->collection);
+        return \next($this->collection);
     }
 
     /**
@@ -263,13 +264,13 @@ class OneToManyCollection implements Collection
      */
     public function current()
     {
-        return current($this->collection);
+        return \current($this->collection);
     }
 
     /**
      * @param \Closure $p
-     * @return bool
      * @throws NotImplementedException
+     * @return bool
      */
     public function exists(\Closure $p): bool
     {
@@ -278,8 +279,8 @@ class OneToManyCollection implements Collection
 
     /**
      * @param \Closure $p
-     * @return Collection|void
      * @throws NotImplementedException
+     * @return Collection|void
      */
     public function filter(\Closure $p)
     {
@@ -288,8 +289,8 @@ class OneToManyCollection implements Collection
 
     /**
      * @param \Closure $p
-     * @return bool|void
      * @throws NotImplementedException
+     * @return bool|void
      */
     public function forAll(\Closure $p)
     {
@@ -298,8 +299,8 @@ class OneToManyCollection implements Collection
 
     /**
      * @param \Closure $p
-     * @return Collection|void
      * @throws NotImplementedException
+     * @return Collection|void
      */
     public function map(\Closure $p)
     {
@@ -308,8 +309,8 @@ class OneToManyCollection implements Collection
 
     /**
      * @param \Closure $p
-     * @return Collection[]|void
      * @throws NotImplementedException
+     * @return Collection[]|void
      */
     public function partition(\Closure $p)
     {
@@ -318,20 +319,20 @@ class OneToManyCollection implements Collection
 
     /**
      * @param mixed $element
-     * @return bool|false|int|string
      * @throws WrongTypeException
+     * @return bool|false|int|string
      */
     public function indexOf($element)
     {
         $this->checkElementType($element);
-        return array_search($element, $this->collection);
+        return \array_search($element, $this->collection);
     }
 
     /**
      * @param int $offset
      * @param null $length
-     * @return array|void
      * @throws NotImplementedException
+     * @return array|void
      */
     public function slice($offset, $length = null)
     {
@@ -342,15 +343,15 @@ class OneToManyCollection implements Collection
      * Gets a Iterator over this collection.
      * @return \ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->collection);
     }
 
     /**
      * @param mixed $key
-     * @return mixed
      * @throws KeyNotFoundException
+     * @return mixed
      */
     public function offsetGet($key)
     {
@@ -363,7 +364,7 @@ class OneToManyCollection implements Collection
      */
     public function offsetSet($key, $element)
     {
-         $this->set($key, $element);
+        $this->set($key, $element);
     }
 
     /**
@@ -378,7 +379,7 @@ class OneToManyCollection implements Collection
      * @param mixed $key
      * @return bool
      */
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return isset($this->collection[$key]);
     }

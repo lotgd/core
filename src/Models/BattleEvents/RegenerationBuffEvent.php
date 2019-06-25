@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models\BattleEvents;
 
-use LotGD\Core\Exceptions\BattleEventException;
 use LotGD\Core\Game;
 use LotGD\Core\Models\FighterInterface;
 
@@ -48,16 +47,16 @@ class RegenerationBuffEvent extends BattleEvent
         parent::decorate($game);
 
         if ($this->regeneration === 0) {
-            return str_replace(
+            return \str_replace(
                 "{target}",
                 $target->getDisplayName(),
                 $this->noEffectMessage
             );
-        } else {
-            return str_replace(
+        }
+        return \str_replace(
                 [
                     "{target}",
-                    "{amount}"
+                    "{amount}",
                 ],
                 [
                     $target->getDisplayName(),
@@ -65,7 +64,6 @@ class RegenerationBuffEvent extends BattleEvent
                 ],
                 $this->effectMessage
             );
-        }
     }
 
     /**
@@ -89,8 +87,8 @@ class RegenerationBuffEvent extends BattleEvent
             // Damaging
             if ($healthLeft === 0) {
                 $this->regeneration = 0;
-            } elseif ($healthLeft < -1*$this->regeneration) {
-                $this->regeneration = - $healthLeft;
+            } elseif ($healthLeft < -1 * $this->regeneration) {
+                $this->regeneration = -$healthLeft;
             }
         }
 

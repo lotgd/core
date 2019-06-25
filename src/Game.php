@@ -1,21 +1,23 @@
 <?php
-declare (strict_types=1);
+declare(strict_types=1);
 
 namespace LotGD\Core;
 
 use DateTime;
-use Doctrine\Common\Util\Debug;
 use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Events\NavigateToSceneData;
 use LotGD\Core\Events\NewViewpointData;
-use Monolog\Logger;
+use LotGD\Core\Exceptions\ActionNotFoundException;
 
-use LotGD\Core\Models\{
-    Character, SceneConnectable, Viewpoint, Scene, SceneConnection
-};
-use LotGD\Core\Exceptions\ {
-    ActionNotFoundException, CharacterNotFoundException, InvalidConfigurationException, SceneNotFoundException
-};
+use LotGD\Core\Exceptions\CharacterNotFoundException;
+use LotGD\Core\Exceptions\InvalidConfigurationException;
+use LotGD\Core\Exceptions\SceneNotFoundException;
+use LotGD\Core\Models\Character;
+use LotGD\Core\Models\Scene;
+use LotGD\Core\Models\SceneConnectable;
+use LotGD\Core\Models\SceneConnection;
+use LotGD\Core\Models\Viewpoint;
+use Monolog\Logger;
 
 /**
  * The main game class.
@@ -33,7 +35,6 @@ class Game
     private $diceBag;
     private $cwd;
     private $timeKeeper;
-
 
     /**
      * Construct a game. You probably want to use Bootstrap to do this.
@@ -188,7 +189,7 @@ class Game
     }
 
     /**
-     * Returns the Message manager
+     * Returns the Message manager.
      * @return MessageManager
      */
     public function getMessageManager(): MessageManager
@@ -197,7 +198,7 @@ class Game
     }
 
     /**
-     * Sets the Message Manager
+     * Sets the Message Manager.
      * @param MessageManager $messageManager
      */
     public function setMessageManager(MessageManager $messageManager): void
@@ -207,8 +208,8 @@ class Game
 
     /**
      * Returns the currently configured user character.
-     * @return Character
      * @throws CharacterNotFoundException
+     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -229,8 +230,8 @@ class Game
 
     /**
      * Return the viewpoint for the current user.
-     * @return Viewpoint
      * @throws InvalidConfigurationException
+     * @return Viewpoint
      */
     public function getViewpoint(): Viewpoint
     {
@@ -241,7 +242,7 @@ class Game
             // scene.
             $contextData = NewViewpointData::create([
                 'character' => $this->getCharacter(),
-                'scene' => null
+                'scene' => null,
             ]);
 
             $contextData = $this->getEventManager()->publish('h/lotgd/core/default-scene', $contextData);
@@ -292,7 +293,7 @@ class Game
 
             // Iterates through all connections and adds an action to the connected scene to the action group. If the connection
             // belongs to a new connection Group, it creates a new ActionGroup.
-            $scene->getConnections()->map(function(SceneConnection $connection) use ($scene, &$actionGroups) {
+            $scene->getConnections()->map(function (SceneConnection $connection) use ($scene, &$actionGroups) {
                 if ($connection->getOutgoingScene() === $scene) {
                     // current scene is outgoing, use incoming.
                     $connectedScene = $connection->getIncomingScene();
@@ -328,14 +329,14 @@ class Game
             });
 
             // Logging
-            $counts = implode(", ", array_map(function($k, $v) {
-                return $k .count($v);
-            }, array_keys($actionGroups), array_values($actionGroups)));
+            $counts = \implode(", ", \array_map(function ($k, $v) {
+                return $k .\count($v);
+            }, \array_keys($actionGroups), \array_values($actionGroups)));
             $this->getLogger()->addDebug("Total actions: {$counts}");
 
             $actionGroups[ActionGroup::HiddenGroup] = new ActionGroup(ActionGroup::HiddenGroup, '', 100);
 
-            $viewpoint->setActionGroups(array_values($actionGroups));
+            $viewpoint->setActionGroups(\array_values($actionGroups));
 
             // Let and installed listeners (ie modules) make modifications to the
             // new viewpoint, including the ability to redirect the user to
@@ -345,7 +346,7 @@ class Game
                 'viewpoint' => $viewpoint,
                 'scene' => $scene,
                 'parameters' => $parameters,
-                'redirect' => null
+                'redirect' => null,
             ]);
 
             $hook = 'h/lotgd/core/navigate-to/' . $scene->getTemplate();
@@ -356,7 +357,7 @@ class Game
                 $id = $scene->getId();
                 $this->getLogger()->debug("Redirecting to sceneId={$id}");
             }
-        } while($scene !== null);
+        } while ($scene !== null);
     }
 
     /**
@@ -382,14 +383,14 @@ class Game
 
         $sceneId = $action->getDestinationSceneId();
         $scene = $this->getEntityManager()->getRepository(Scene::class)->find([
-            'id' => $sceneId
+            'id' => $sceneId,
         ]);
         if ($scene == null) {
             throw new SceneNotFoundException("Cannot find sceneId={$sceneId} specified by actionId={$actionId}.");
         }
 
         // action parameters overwrite other parameters since the former cannot be changed by the user
-        $parameters = array_merge($parameters, $actionParameters);
+        $parameters = \array_merge($parameters, $actionParameters);
 
         $this->navigateToScene($scene, $parameters);
 

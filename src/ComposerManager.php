@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use Composer\Composer;
+use Composer\Factory;
+use Composer\IO\NullIO;
+use Composer\Package\CompletePackageInterface;
+use Composer\Package\PackageInterface;
 use Exception;
-use Composer\{
-    Composer, Factory, IO\NullIO, Package\CompletePackageInterface, Package\PackageInterface
-};
 
-use LotGD\Core\{
-    Exceptions\InvalidConfigurationException,
-    Exceptions\LibraryDoesNotExistException
-};
+use LotGD\Core\Exceptions\InvalidConfigurationException;
+use LotGD\Core\Exceptions\LibraryDoesNotExistException;
 
 /**
  * Helps perform tasks with the composer configuration.
@@ -39,8 +39,8 @@ class ComposerManager
     {
         if ($this->composer === null) {
             // Verify location of composer.json.
-            $composerConfigPath = $this->cwd . DIRECTORY_SEPARATOR . "composer.json";
-            if (!file_exists($composerConfigPath)) {
+            $composerConfigPath = $this->cwd . \DIRECTORY_SEPARATOR . "composer.json";
+            if (!\file_exists($composerConfigPath)) {
                 throw new InvalidConfigurationException("composer.json cannot be found at {$composerConfigPath}.");
             }
 
@@ -54,8 +54,8 @@ class ComposerManager
     /**
      * Return the Composer package for the corresponding library, in vendor/module format.
      * @param string $library
-     * @return CompletePackageInterface Package corresponding to this library.
      * @throws LibraryDoesNotExistException
+     * @return CompletePackageInterface Package corresponding to this library.
      */
     public function getPackageForLibrary(string $library): CompletePackageInterface
     {
@@ -75,7 +75,7 @@ class ComposerManager
      */
     public function getPackages(): array
     {
-        return array_merge(
+        return \array_merge(
             [$this->getComposer()->getPackage()],
             $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages()
         );
@@ -87,11 +87,11 @@ class ComposerManager
      */
     public function getModulePackages(): array
     {
-        $result = array();
+        $result = [];
         $packages = $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages();
         foreach ($packages as $p) {
             if ($p->getType() === 'lotgd-module') {
-                array_push($result, $p);
+                \array_push($result, $p);
             }
         }
 
@@ -104,7 +104,7 @@ class ComposerManager
      * @return string|null Path representing $namespace or null if $namespace
      * cannot be found or if the path does not exist.
      */
-    public function translateNamespaceToPath(string $namespace)
+    public function translateNamespaceToPath(string $namespace): ?string
     {
         // Find the directory for this namespace by using the autoloader's
         // classmap.
@@ -114,32 +114,32 @@ class ComposerManager
         // Standardize the namespace to remove any leading \ and add a trailing \
         $n = $namespace;
         if ('\\' == $n[0]) {
-            $n = substr($n, 1);
+            $n = \substr($n, 1);
         }
-        if (strlen($n) > 0 && '\\' != $n[strlen($n) - 1]) {
+        if (\strlen($n) > 0 && '\\' != $n[\strlen($n) - 1]) {
             $n .= '\\';
         }
 
-        $split = explode('\\', $n);
-        $suffix = array_splice($split, -1, 1); // starts with ['']
+        $split = \explode('\\', $n);
+        $suffix = \array_splice($split, -1, 1); // starts with ['']
         $path = null;
         while (!empty($split)) {
-            $key = implode('\\', $split) . '\\';
-            $dir = implode(DIRECTORY_SEPARATOR, $suffix);
+            $key = \implode('\\', $split) . '\\';
+            $dir = \implode(\DIRECTORY_SEPARATOR, $suffix);
             // Prefix to directory mappings are arrays in Composer's
             // ClassLoader object. Not sure why. This might break in
             // some unforseen case.
-            if (isset($prefixes[$key]) && is_dir($prefixes[$key][0] .  DIRECTORY_SEPARATOR . $dir)) {
-                $path = $prefixes[$key][0] .  DIRECTORY_SEPARATOR . $dir;
+            if (isset($prefixes[$key]) && \is_dir($prefixes[$key][0] .  \DIRECTORY_SEPARATOR . $dir)) {
+                $path = $prefixes[$key][0] .  \DIRECTORY_SEPARATOR . $dir;
                 break;
             }
-            $suffix = array_merge($suffix, array_splice($split, -1, 1));
+            $suffix = \array_merge($suffix, \array_splice($split, -1, 1));
         }
 
         if ($path == null) {
             return null;
         }
-        $path = realpath($path);
+        $path = \realpath($path);
         if ($path == false) {
             return null;
         }
@@ -156,13 +156,13 @@ class ComposerManager
         // Dance to find the autoloader.
         // TOOD: change this to open up the Composer config and use $c['config']['vendor-dir'] instead of "vendor"
         $order = [
-            implode(DIRECTORY_SEPARATOR, [$this->cwd, "vendor", "autoload.php"]),
-            implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "vendor", "autoload.php"]),
-            implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "autoload.php"]),
+            \implode(\DIRECTORY_SEPARATOR, [$this->cwd, "vendor", "autoload.php"]),
+            \implode(\DIRECTORY_SEPARATOR, [__DIR__, "..", "vendor", "autoload.php"]),
+            \implode(\DIRECTORY_SEPARATOR, [__DIR__, "..", "autoload.php"]),
         ];
 
         foreach ($order as $path) {
-            if (file_exists($path)) {
+            if (\file_exists($path)) {
                 return $path;
             }
         }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Tools\Model;
 
 /**
- * Provides method and doctrine annotation for a property submodel
+ * Provides method and doctrine annotation for a property submodel.
  */
 trait Properties
 {
@@ -14,7 +14,7 @@ trait Properties
     private $propertyValue = null;
     
     /**
-     * Returns the name of the property
+     * Returns the name of the property.
      * @return string
      */
     public function getName(): string
@@ -23,7 +23,7 @@ trait Properties
     }
     
     /**
-     * Sets the name of the property
+     * Sets the name of the property.
      * @param string $name
      * @throws ArgumentEmptyException If parameter $name is empty
      */
@@ -37,20 +37,20 @@ trait Properties
     }
     
     /**
-     * Returns the stored property
+     * Returns the stored property.
      * @return mixed
      */
     public function getValue()
     {
-        return unserialize($this->propertyValue);
+        return \unserialize($this->propertyValue);
     }
     
     /**
-     * Sets the stored property
+     * Sets the stored property.
      * @param mixed $value
      */
     public function setValue($value)
     {
-        $this->propertyValue = serialize($value);
+        $this->propertyValue = \serialize($value);
     }
 }

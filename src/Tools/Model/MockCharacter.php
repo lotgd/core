@@ -1,13 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace LotGD\Core\Tools\Model;
 
-use LotGD\Core\{
-    BuffList,
-    Game
-};
+use LotGD\Core\BuffList;
 use LotGD\Core\Exceptions\IsNullException;
 use LotGD\Core\Models\Viewpoint;
 use Ramsey\Uuid\UuidInterface;
@@ -28,8 +25,8 @@ trait MockCharacter
     }
 
     /**
-     * @return UuidInterface
      * @throws IsNullException
+     * @return UuidInterface
      */
     public function getId(): UuidInterface
     {
@@ -37,8 +34,8 @@ trait MockCharacter
     }
 
     /**
-     * @return string
      * @throws IsNullException
+     * @return string
      */
     public function getName(): string
     {
@@ -46,8 +43,8 @@ trait MockCharacter
     }
 
     /**
-     * @return string
      * @throws IsNullException
+     * @return string
      */
     public function getDisplayName(): string
     {
@@ -55,8 +52,8 @@ trait MockCharacter
     }
 
     /**
-     * @return int
      * @throws IsNullException
+     * @return int
      */
     public function getHealth(): int
     {
@@ -92,8 +89,8 @@ trait MockCharacter
     }
 
     /**
-     * @return int
      * @throws IsNullException
+     * @return int
      */
     public function getMaxHealth(): int
     {
@@ -101,8 +98,8 @@ trait MockCharacter
     }
 
     /**
-     * @return int
      * @throws IsNullException
+     * @return int
      */
     public function getLevel(): int
     {
@@ -110,8 +107,8 @@ trait MockCharacter
     }
 
     /**
-     * @return bool
      * @throws IsNullException
+     * @return bool
      */
     public function isAlive(): bool
     {
@@ -120,8 +117,8 @@ trait MockCharacter
 
     /**
      * @param bool $ignoreBuffs
-     * @return int
      * @throws IsNullException
+     * @return int
      */
     public function getAttack(bool $ignoreBuffs = false): int
     {
@@ -130,8 +127,8 @@ trait MockCharacter
 
     /**
      * @param bool $ignoreBuffs
-     * @return int
      * @throws IsNullException
+     * @return int
      */
     public function getDefense(bool $ignoreBuffs = false): int
     {
@@ -139,8 +136,8 @@ trait MockCharacter
     }
 
     /**
-     * @return Viewpoint
      * @throws IsNullException
+     * @return Viewpoint
      */
     public function getViewpoint(): Viewpoint
     {
@@ -150,7 +147,6 @@ trait MockCharacter
     /**
      * @param string $name
      * @param null $default
-     * @return null
      */
     public function getProperty(string $name, $default = null)
     {
@@ -158,7 +154,7 @@ trait MockCharacter
     }
 
     /**
-     * Returns an empty bufflist
+     * Returns an empty bufflist.
      * @return BuffList
      */
     public function getBuffs(): BuffList

@@ -29,8 +29,8 @@ class BattleEvent
     /**
      * Returns a string describing the event.
      * @param \LotGD\Core\Models\BattleEvents\Game $game
-     * @return string
      * @throws BattleEventException
+     * @return string
      */
     public function decorate(Game $game): string
     {

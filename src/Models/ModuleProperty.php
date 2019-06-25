@@ -23,7 +23,7 @@ class ModuleProperty
     private $owner;
 
     /**
-     * Returns the owner
+     * Returns the owner.
      * @return \LotGD\Core\Models\Module
      */
     public function getOwner(): Module
@@ -32,7 +32,7 @@ class ModuleProperty
     }
 
     /**
-     * Sets the owner
+     * Sets the owner.
      * @param \LotGD\Core\Models\Module $owner
      */
     public function setOwner(Module $owner)

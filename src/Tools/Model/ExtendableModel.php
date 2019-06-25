@@ -20,7 +20,7 @@ trait ExtendableModel
         $callback = ModelExtender::get(self::class, $method);
 
         if ($callback) {
-            return call_user_func_array($callback, array_merge([$this], $arguments));
+            return \call_user_func_array($callback, \array_merge([$this], $arguments));
         }
     }
 }

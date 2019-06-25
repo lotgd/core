@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-
 namespace LotGD\Core\Console\Command;
-
 
 use LotGD\Core\Models\Character;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -14,7 +12,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Resets the viewpoint of a given character.
- * @package LotGD\Core\Console\Command
  */
 class CharacterResetViewpointCommand extends BaseCommand
 {
@@ -27,9 +24,10 @@ class CharacterResetViewpointCommand extends BaseCommand
             ->setDescription('Resets the viewpoint of a given character.')
             ->setDefinition(
                 new InputDefinition([
-                    new InputOption('id', null, InputOption::VALUE_REQUIRED)
+                    new InputOption('id', null, InputOption::VALUE_REQUIRED),
                 ])
-            );
+            )
+        ;
     }
 
     /**

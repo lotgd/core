@@ -17,7 +17,8 @@ class ConsoleCommand extends BaseCommand
     protected function configure()
     {
         $this->setName('console')
-             ->setDescription('Start a shell to interact with the game');
+            ->setDescription('Start a shell to interact with the game')
+        ;
     }
 
     /**
@@ -25,18 +26,18 @@ class ConsoleCommand extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        print("Daenerys console, the dragon prompt. lotgd/core " . \LotGD\Core\Game::getVersion() . ".\n");
-        print("Enter some PHP, but be careful, this is live and attached to your currently configured setup:\n\n");
-        print($this->game->getConfiguration());
+        print "Daenerys console, the dragon prompt. lotgd/core " . \LotGD\Core\Game::getVersion() . ".\n";
+        print "Enter some PHP, but be careful, this is live and attached to your currently configured setup:\n\n";
+        print $this->game->getConfiguration();
 
-        print("\n");
-        print("Try things like `\$g::getVersion()`. To quit, ^D or `exit();`.\n");
-        print("\n");
+        print "\n";
+        print "Try things like `\$g::getVersion()`. To quit, ^D or `exit();`.\n";
+        print "\n";
 
         $boris = new \Boris\Boris('🐲 > ');
-        $boris->setLocal(array(
-            'g' => $this->game
-        ));
+        $boris->setLocal([
+            'g' => $this->game,
+        ]);
         $boris->start();
     }
 }

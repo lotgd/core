@@ -10,43 +10,42 @@ use LotGD\Core\Models\SystemCharacter;
 
 /**
  * Manages the message system overall
- * Class MessageManager
- * @package LotGD\Core
+ * Class MessageManager.
  */
 class MessageManager
 {
     /**
-     * Sends a message to a MessageThread
+     * Sends a message to a MessageThread.
      * @param \LotGD\Core\Models\Character $from
      * @param string $message
      * @param \LotGD\Core\Models\MessageThread $thread
      * @param bool $systemMessage
-     * @return \LotGD\Core\Models\Message
      * @throws Exceptions\CoreException
+     * @return \LotGD\Core\Models\Message
      */
     public function send(
         Character $from,
         string $message,
         MessageThread $thread,
         bool $systemMessage = false
-    ) {
+    ): Message {
         $message = new Message($from, $message, $thread, $systemMessage);
         $thread->addMessage($message);
         return $message;
     }
 
     /**
-     * Sends a system message to a MessageThread
+     * Sends a system message to a MessageThread.
      * @param string $message
      * @param \LotGD\Core\Models\MessageThread $thread
-     * @return \LotGD\Core\Models\Message
      * @throws Exceptions\ArgumentException
      * @throws Exceptions\CoreException
+     * @return \LotGD\Core\Models\Message
      */
     public function sendSystemMessage(
         string $message,
         MessageThread $thread
-    ) {
+    ): Message {
         $message = new Message(SystemCharacter::getInstance(), $message, $thread, true);
         $thread->addMessage($message);
         return $message;

@@ -9,7 +9,6 @@ use LotGD\Core\Exceptions\ArgumentException;
  * EventContextData to provide a basic structure for managing contextual data of an event.
  *
  * This class must be immutable and returns always a new instance of itself for any change.
- * @package LotGD\Core\Events
  * @immutable
  */
 class EventContextData
@@ -41,31 +40,41 @@ class EventContextData
     {
         $configuration = static::$argumentConfig;
         $types = [
-            "mixed" => function ($x) {return true;},
-            "int" => function ($x) {return is_int($x);},
-            "float" => function ($x) {return is_float($x);},
-            "numeric" => function($x) {return is_numeric($x);},
-            "string" => function($x) {return is_string($x);},
+            "mixed" => function ($x) {
+                return true;
+            },
+            "int" => function ($x) {
+                return \is_int($x);
+            },
+            "float" => function ($x) {
+                return \is_float($x);
+            },
+            "numeric" => function ($x) {
+                return \is_numeric($x);
+            },
+            "string" => function ($x) {
+                return \is_string($x);
+            },
         ];
 
-        $keys = array_keys($data);
+        $keys = \array_keys($data);
         foreach ($keys as $key) {
             if (!isset($configuration[$key])) {
-                throw new ArgumentException(sprintf("%s does not accept a field called %s", static::class, $key));
+                throw new ArgumentException(\sprintf("%s does not accept a field called %s", static::class, $key));
             }
         }
         foreach ($configuration as $key => $config) {
             if ($config["required"] === true and !isset($data[$key])) {
-                throw new ArgumentException(sprintf("%s must have a field called %s.", static::class, $key));
+                throw new ArgumentException(\sprintf("%s must have a field called %s.", static::class, $key));
             }
 
             if (isset($types[$config["type"]])) {
                 if ($types[$config["type"]]($data[$key]) === false) {
-                    throw new ArgumentException(sprintf("The field %s of %s must be of type %s.", $key, static::class, $config["type"]));
+                    throw new ArgumentException(\sprintf("The field %s of %s must be of type %s.", $key, static::class, $config["type"]));
                 }
             } else {
                 if (!$data[$key] instanceof $config["type"]) {
-                    throw new ArgumentException(sprintf("The field %s of %s must be of type %s", $key, static::class, $config["type"]));
+                    throw new ArgumentException(\sprintf("The field %s of %s must be of type %s", $key, static::class, $config["type"]));
                 }
             }
         }
@@ -88,7 +97,7 @@ class EventContextData
      */
     public function has(string $field): bool
     {
-        return array_key_exists($field, $this->data);
+        return \array_key_exists($field, $this->data);
     }
 
     /**
@@ -100,13 +109,12 @@ class EventContextData
     {
         if ($this->has($field)) {
             return $this->data[$field];
-        } else {
-            $this->throwException($field);
         }
+        $this->throwException($field);
     }
 
     /**
-     * Sets a field to a new value and returns a new data container
+     * Sets a field to a new value and returns a new data container.
      * @param string $field
      * @param $value
      * @return EventContextData
@@ -118,13 +126,12 @@ class EventContextData
             $data[$field] = $value;
 
             return new static($data);
-        } else {
-            $this->throwException($field);
         }
+        $this->throwException($field);
     }
 
     /**
-     * Sets multiple fields at once
+     * Sets multiple fields at once.
      * @param array $data array of $field=>$value pairs
      * @return EventContextData
      */
@@ -144,12 +151,12 @@ class EventContextData
     }
 
     /**
-     * Returns a list of fields in this context
+     * Returns a list of fields in this context.
      * @return array
      */
     private function getListOfFields(): array
     {
-        return array_keys($this->data);
+        return \array_keys($this->data);
     }
 
     /**
@@ -158,8 +165,8 @@ class EventContextData
      */
     private function getFormattedListOfFields(): string
     {
-        return substr(
-            implode(", ", $this->getListOfFields()),
+        return \substr(
+            \implode(", ", $this->getListOfFields()),
             0,
             -2
         );

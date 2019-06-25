@@ -1,17 +1,14 @@
 <?php
 declare(strict_types=1);
 
-
 namespace LotGD\Core\Models;
-
 
 use LotGD\Core\Exceptions\CharacterStatExistsException;
 use LotGD\Core\Exceptions\CharacterStatNotFoundException;
 use LotGD\Core\Models\CharacterStats\CharacterStatInterface;
 
 /**
- * Class CharacterStatGroup
- * @package LotGD\Core\Models
+ * Class CharacterStatGroup.
  */
 class CharacterStatGroup
 {
@@ -73,8 +70,8 @@ class CharacterStatGroup
 
     /**
      * @param string $id
-     * @return CharacterStatInterface
      * @throws CharacterStatNotFoundException
+     * @return CharacterStatInterface
      */
     public function getCharacterStat(string $id): CharacterStatInterface
     {
@@ -99,13 +96,13 @@ class CharacterStatGroup
     }
 
     /**
-     * @return \Generator|CharacterStatInterface[]
+     * @return CharacterStatInterface[]|\Generator
      */
     public function iterate(): \Generator
     {
         // First, sort stat set by weight if not sorted
         if (!$this->sorted) {
-            uasort($this->stats, function (CharacterStatInterface $a, CharacterStatInterface $b) {
+            \uasort($this->stats, function (CharacterStatInterface $a, CharacterStatInterface $b) {
                 return $a->getWeight() <=> $b->getWeight();
             });
             $this->sorted = true;

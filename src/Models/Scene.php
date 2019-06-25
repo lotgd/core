@@ -13,7 +13,6 @@ use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\SceneBasics;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * A scene is a location within the game, such as the Village or the Tavern. Designed
@@ -28,7 +27,7 @@ class Scene implements CreateableInterface, SceneConnectable
     use Deletor;
     use SceneBasics;
 
-    /** @Id @Column(type="string", length=36, unique=True, name="id", options={"fixed" = true}) */
+    /** @Id @Column(type="string", length=36, unique=True, name="id", options={"fixed"= true}) */
     protected $id;
 
     /**
@@ -52,7 +51,7 @@ class Scene implements CreateableInterface, SceneConnectable
     private static $fillable = [
         "title",
         "description",
-        "template"
+        "template",
     ];
 
     /* @var ?ArrayCollection */
@@ -86,12 +85,11 @@ class Scene implements CreateableInterface, SceneConnectable
      */
     private function filterConnectionGroupCollectionByName(string $name): Collection
     {
-        return $this->connectionGroups->filter(function(SceneConnectionGroup $group) use ($name) {
+        return $this->connectionGroups->filter(function (SceneConnectionGroup $group) use ($name) {
             if ($group->getName() === $name) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         });
     }
 
@@ -102,7 +100,7 @@ class Scene implements CreateableInterface, SceneConnectable
      */
     public function hasConnectionGroup(string $name): bool
     {
-        return count($this->filterConnectionGroupCollectionByName($name)) === 1 ? true : false;
+        return \count($this->filterConnectionGroupCollectionByName($name)) === 1 ? true : false;
     }
 
     /**
@@ -204,15 +202,14 @@ class Scene implements CreateableInterface, SceneConnectable
      * @param \LotGD\Core\Models\Scene $scene
      * @return bool True if yes.
      */
-    public function isConnectedTo(Scene $scene): bool
+    public function isConnectedTo(self $scene): bool
     {
         $this->loadConnectedScenes();
 
         if ($this->connectedScenes->contains($scene)) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -222,7 +219,7 @@ class Scene implements CreateableInterface, SceneConnectable
     public function getConnections(): Collection
     {
         return new ArrayCollection(
-            array_merge(
+            \array_merge(
                 $this->outgoingConnections->toArray(),
                 $this->incomingConnections->toArray()
             )

@@ -8,5 +8,4 @@ namespace LotGD\Core\Models;
  */
 interface PermissionAssociationInterface
 {
-
 }

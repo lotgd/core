@@ -19,7 +19,7 @@ abstract class Attachment
      */
     public function __construct(string $type)
     {
-        $this->id = bin2hex(random_bytes(8));
+        $this->id = \bin2hex(\random_bytes(8));
         $this->type = $type;
     }
 

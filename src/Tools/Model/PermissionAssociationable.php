@@ -5,7 +5,6 @@ namespace LotGD\Core\Tools\Model;
 
 use LotGD\Core\Models\Actor;
 use LotGD\Core\Models\Permission;
-use LotGD\Core\Models\PermissionableInterface;
 
 /**
  * Tools to work with a permission type field.
@@ -26,7 +25,8 @@ trait PermissionAssociationable
      * @param Permission $permission
      * @param int $state
      */
-    public function __construct(Actor $owner, Permission $permission, int $state) {
+    public function __construct(Actor $owner, Permission $permission, int $state)
+    {
         $this->owner = $owner;
         $this->permission = $permission;
         $this->permissionState = $state;

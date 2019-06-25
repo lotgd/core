@@ -3,19 +3,16 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
-use Doctrine\ORM\EntityManagerInterface;
-
 use LotGD\Core\Events\EventContext;
-use LotGD\Core\Models\EventSubscription;
-use LotGD\Core\EventHandler;
+use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\SubscriptionNotFoundException;
 use LotGD\Core\Exceptions\WrongTypeException;
-use LotGD\Core\Events\EventContextData;
+use LotGD\Core\Models\EventSubscription;
 
 /**
  * Manages a simple publish/subscribe system based on regular expressions
- * matching event names and running a fixed
+ * matching event names and running a fixed.
  */
 class EventManager
 {
@@ -50,7 +47,7 @@ class EventManager
 
         $subscriptions = $this->getSubscriptions();
         foreach ($subscriptions as $s) {
-            if (preg_match($s->getPattern(), $event)) {
+            if (\preg_match($s->getPattern(), $event)) {
                 $class = $s->getClass();
                 $this->g->getLogger()->addDebug("  Handling with {$class}.");
 
@@ -102,14 +99,14 @@ class EventManager
         }
 
         // Validate the regular expression.
-        if (@preg_match($pattern, '') === false) {
+        if (@\preg_match($pattern, '') === false) {
             throw new WrongTypeException("Invalid regular expression: {$pattern}");
         }
 
         $e = EventSubscription::create([
             'pattern' => $pattern,
             'class' => $class,
-            'library' => $library
+            'library' => $library,
         ]);
 
         $this->g->getEntityManager()->persist($e);
@@ -126,11 +123,11 @@ class EventManager
      */
     public function unsubscribe(string $pattern, string $class, string $library)
     {
-        $e = $this->g->getEntityManager()->getRepository(EventSubscription::class)->find(array(
+        $e = $this->g->getEntityManager()->getRepository(EventSubscription::class)->find([
             'pattern' => $pattern,
             'class' => $class,
-            'library' => $library
-        ));
+            'library' => $library,
+        ]);
         if (!$e) {
             throw new SubscriptionNotFoundException("Subscription not found with pattern={$pattern} class={$class} library={$library}.");
         }

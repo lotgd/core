@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace LotGD\Core\Models\Repositories;
 
-use Doctrine\Common\Util\Debug;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\QueryBuilder;
 
 use LotGD\Core\Models\MessageThread;
 
 /**
- * Repository for MessageThreads
+ * Repository for MessageThreads.
  */
 class MessageThreadRepository extends EntityRepository
 {
@@ -25,7 +23,7 @@ class MessageThreadRepository extends EntityRepository
     public static function createThreadKey(array $listOfCharacters, string $messageSchema): string
     {
         // ToDo: Replace array with CharacterCollection
-        usort(
+        \usort(
             $listOfCharacters,
             function ($a, $b) {
                 return $a->getId() <=> $b->getId();
@@ -37,11 +35,11 @@ class MessageThreadRepository extends EntityRepository
             $threadParticipants .= $character->getId() . ".";
         }
         
-        return $messageSchema . "://" . md5($threadParticipants);
+        return $messageSchema . "://" . \md5($threadParticipants);
     }
     
     /**
-     * Finds a messageThread
+     * Finds a messageThread.
      * @param array $listOfCharacters
      * @return MessageThread
      */
@@ -56,7 +54,8 @@ class MessageThreadRepository extends EntityRepository
                 ->where("e.threadKey = :threadKey")
                 ->setParameter("threadKey", $threadKey)
                 ->getQuery()
-                ->getSingleResult();
+                ->getSingleResult()
+            ;
             
             return $thread;
         } catch (NoResultException $e) {
@@ -83,7 +82,8 @@ class MessageThreadRepository extends EntityRepository
                 ->where("e.threadKey = :threadKey")
                 ->setParameter("threadKey", $threadKey)
                 ->getQuery()
-                ->getSingleResult();
+                ->getSingleResult()
+            ;
             
             return $thread;
         } catch (NoResultException $e) {

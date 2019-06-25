@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace LotGD\Core\Models\Repositories;
 
@@ -44,14 +44,18 @@ class CharacterRepository extends EntityRepository
 
     /**
      * Find a character by ID, excluding soft deleted ones.
+     * @param mixed $id
+     * @param mixed|null $lockMode
+     * @param mixed|null $lockVersion
      */
-    public function find($id, $lockMode=null, $lockVersion=null)
+    public function find($id, $lockMode = null, $lockVersion = null)
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select("c")
             ->from(Character::class, "c")
             ->where($queryBuilder->expr()->eq("c.id", ":id"))
-            ->setParameter("id", $id);
+            ->setParameter("id", $id)
+        ;
 
         $this->modifyQuery($queryBuilder, self::SKIP_SOFTDELETED);
 
@@ -65,15 +69,17 @@ class CharacterRepository extends EntityRepository
     /**
      * Finds a character id ID, including soft deleted ones.
      * @param $id
-     * @return mixed|null
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return mixed|null
      */
-    public function findWithSoftDeleted($id) {
+    public function findWithSoftDeleted($id)
+    {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select("c")
             ->from(Character::class, "c")
             ->where($queryBuilder->expr()->eq("c.id", ":id"))
-            ->setParameter("id", $id);
+            ->setParameter("id", $id)
+        ;
 
         $this->modifyQuery($queryBuilder, self::INCLUDE_SOFTDELETED);
 
@@ -91,7 +97,8 @@ class CharacterRepository extends EntityRepository
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder->select("c")
-            ->from(Character::class, "c");
+            ->from(Character::class, "c")
+        ;
 
         $this->modifyQuery($queryBuilder, $deletes);
 

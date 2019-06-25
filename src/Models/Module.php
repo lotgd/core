@@ -4,11 +4,10 @@ declare(strict_types=1);
 namespace LotGD\Core\Models;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
-use Doctrine\Common\Collections\ArrayCollection;
 
-use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\PropertyManager;

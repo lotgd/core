@@ -5,12 +5,11 @@ namespace LotGD\Core\Models;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use LotGD\Core\Models\GameConfigurationElement;
-use LotGD\Core\Tools\OneToManyCollection;
 use LotGD\Core\Tools\Model\PropertyManager;
+use LotGD\Core\Tools\OneToManyCollection;
 
 /**
- * Provides an interface to access properties
+ * Provides an interface to access properties.
  */
 class GameConfiguration
 {
@@ -19,8 +18,6 @@ class GameConfiguration
     /** @var ArrayCollection */
     private $properties;
 
-
-    
     /**
      * Constructor.
      * @param EntityManagerInterface $entityManager
@@ -42,7 +39,7 @@ class GameConfiguration
     }
     
     /**
-     * Sets and overwrites a configuration value saved by the name
+     * Sets and overwrites a configuration value saved by the name.
      * @param string $configurationName
      * @param mixed $configurationValue
      */

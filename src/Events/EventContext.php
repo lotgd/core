@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Events;
 
-
 /**
- * Class EventContext
- * @package LotGD\Core
+ * Class EventContext.
  * @immutable
  */
 class EventContext
@@ -69,7 +67,7 @@ class EventContext
     }
 
     /**
-     * Returns a data field
+     * Returns a data field.
      * @param $field
      * @return mixed
      */
@@ -79,7 +77,7 @@ class EventContext
     }
 
     /**
-     * Sets a data field
+     * Sets a data field.
      * @param $field
      * @param $value
      */

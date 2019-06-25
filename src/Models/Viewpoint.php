@@ -52,11 +52,11 @@ class Viewpoint implements CreateableInterface
 
     /** @var array */
     private static $fillable = [
-        "owner"
+        "owner",
     ];
 
     /**
-     * Returns the owner
+     * Returns the owner.
      * @return \LotGD\Core\Models\Character
      */
     public function getOwner(): Character
@@ -65,7 +65,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Sets the owner
+     * Sets the owner.
      * @param \LotGD\Core\Models\Character $owner
      */
     public function setOwner(Character $owner)
@@ -84,7 +84,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Clears the description
+     * Clears the description.
      */
     public function clearDescription(): void
     {
@@ -93,7 +93,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Returns the current description as a string
+     * Returns the current description as a string.
      * @return string
      */
     public function getDescription(): string
@@ -102,7 +102,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Adds a paragraph to the existing description
+     * Adds a paragraph to the existing description.
      * @param string $paragraph
      */
     public function addDescriptionParagraph(string $paragraph)
@@ -174,9 +174,9 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Returns the template scene used to create this viewpoint.
-     * @return Scene
+     * @return Scene|null
      */
-    public function getScene()
+    public function getScene(): ?Scene
     {
         return $this->scene;
     }
@@ -200,9 +200,9 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Adds a new action group to a viewpoint
+     * Adds a new action group to a viewpoint.
      * @param ActionGroup $group The new group to add.
-     * @param null|string $after Optional group id that comes before.
+     * @param string|null $after Optional group id that comes before.
      * @throws ArgumentException
      */
     public function addActionGroup(ActionGroup $group, ?string $after = null): void
@@ -282,7 +282,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Returns all data
+     * Returns all data.
      * @return array
      */
     public function getData(): array
@@ -291,7 +291,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Sets all data
+     * Sets all data.
      * @param array $data
      */
     public function setData(array $data)
@@ -300,7 +300,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Returns a single data field
+     * Returns a single data field.
      * @param string $fieldname Fieldname
      * @param mixed $default Default value
      * @return mixed
@@ -311,7 +311,7 @@ class Viewpoint implements CreateableInterface
     }
 
     /**
-     * Sets a single data field
+     * Sets a single data field.
      * @param string $fieldname
      * @param mixed $value
      */
@@ -351,7 +351,7 @@ class Viewpoint implements CreateableInterface
                     unset($actions[$key]);
                 }
             }
-            $actions = array_values($actions);
+            $actions = \array_values($actions);
             $group->setActions($actions);
         }
     }

@@ -35,7 +35,7 @@ class DamageReflectionEvent extends BattleEvent
     }
 
     /**
-     * Returns the damage
+     * Returns the damage.
      * @return int
      */
     public function getDamage(): int
@@ -66,10 +66,10 @@ class DamageReflectionEvent extends BattleEvent
     {
         parent::decorate($game);
 
-        return str_replace(
+        return \str_replace(
             [
                 "{target}",
-                "{damage}"
+                "{damage}",
             ],
             [
                 $this->target->getDisplayName(),

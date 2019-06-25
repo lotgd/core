@@ -8,5 +8,4 @@ namespace LotGD\Core\Exceptions;
  */
 class EntityDoesNotExistException extends EntityException
 {
-
 }

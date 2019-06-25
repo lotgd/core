@@ -3,18 +3,16 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
-
 use Doctrine\ORM\EntityManagerInterface;
-use Monolog\Logger;
-
 use LotGD\Core\Exceptions\BuilderException;
+
+use Monolog\Logger;
 
 /**
  * The GameBuilder class is used to build a Game object with all dependencies that are needed.
  *
  * You must provide $cwd, $configuration, $entityManager and a logger instance using the with* methods.
  * You can provide additional class *names* for additional dependency injections using the use* methods.
- * @package LotGD\Core
  */
 class GameBuilder
 {
@@ -31,8 +29,8 @@ class GameBuilder
 
     /**
      * Creates the game instance with the prepared parameters.
-     * @return Game
      * @throws BuilderException if at least one of cwd, configuration, entityManager or logger as not been set.
+     * @return Game
      */
     public function create(): Game
     {
@@ -63,13 +61,13 @@ class GameBuilder
         $diceBag = $this->diceBagClass ?? DiceBag::class;
         $game->setDiceBag(new $diceBag());
 
-        $messageManager=$this->messageManagerClass ?? MessageManager::class;
+        $messageManager = $this->messageManagerClass ?? MessageManager::class;
         $game->setMessageManager(new $messageManager());
         return $game;
     }
 
     /**
-     * Adds current working directory argument
+     * Adds current working directory argument.
      * @param string $cwd
      * @return self
      */
@@ -80,7 +78,7 @@ class GameBuilder
     }
 
     /**
-     * Configuration
+     * Configuration.
      * @param Configuration $conf
      * @return self
      */
@@ -113,13 +111,13 @@ class GameBuilder
     }
 
     /**
-     * Sets the fqcn for the message manager to be used
+     * Sets the fqcn for the message manager to be used.
      * @param string $messageManagerFqcn
      * @return self
      */
     public function withMessageManager(string $messageManagerFqcn): self
     {
-        $this->messageManagerClass=$messageManagerFqcn;
+        $this->messageManagerClass = $messageManagerFqcn;
         return $this;
     }
 

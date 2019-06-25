@@ -7,8 +7,6 @@ use Generator;
 
 use LotGD\Core\Exceptions\PermissionAlreadyExistsException;
 use LotGD\Core\Exceptions\PermissionDoesNotExistException;
-use LotGD\Core\Models\Permission;
-use LotGD\Core\Models\PermissionAssociationInterface;
 
 /**
  * This abtract class provides functionality for user entities that crates might
@@ -38,7 +36,7 @@ abstract class Actor
      */
     protected function loadPermissions()
     {
-        if (class_exists($this->getPermissionAssociationClass()) === false) {
+        if (\class_exists($this->getPermissionAssociationClass()) === false) {
             throw new PermissionAssociationEntityMissingException(
                 "The method getPermissionAssociationClass does not return a valid class name."
             );
@@ -104,13 +102,12 @@ abstract class Actor
         if ($this->hasPermissionSet($permission->getId())) {
             $permissionId = $permission->getId();
             throw new PermissionAlreadyExistsException("The permission with the id {$permissionId} has already been set on this actor.");
-        } else {
-            $associationEntity = $this->getPermissionAssociationClass();
-
-            $permissionAssoc = new $associationEntity($this, $permission, $state);
-            $this->permissions->add($permissionAssoc);
-            $this->permissionIdToAssociation[$permissionAssoc->getId()] = $permissionAssoc;
         }
+        $associationEntity = $this->getPermissionAssociationClass();
+
+        $permissionAssoc = new $associationEntity($this, $permission, $state);
+        $this->permissions->add($permissionAssoc);
+        $this->permissionIdToAssociation[$permissionAssoc->getId()] = $permissionAssoc;
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core;
 
 use DateTime;
-use LotGD\Core\Exceptions\ArgumentException;
 
 /**
  * Configurable way to convert back and forth between real time and game time.
@@ -38,11 +37,11 @@ class TimeKeeper
         int $gameOffsetSeconds,
         int $gameDaysPerDay
     ) {
-        $gameEpochCopy = clone($gameEpoch);
+        $gameEpochCopy = clone $gameEpoch;
 
         if ($gameOffsetSeconds < 0) {
             $this->adjustedEpoch = $gameEpochCopy->sub(
-                $this->interval(0, 0, 0, 0, $gameOffsetSeconds*-1)
+                $this->interval(0, 0, 0, 0, $gameOffsetSeconds * -1)
             );
         } else {
             $this->adjustedEpoch = $gameEpochCopy->add(
@@ -52,7 +51,7 @@ class TimeKeeper
         
         $this->theBeginning = new DateTime("0000-01-01 UTC");
 
-        $this->secondsPerGameDay = (float) $this->secondsPerDay / $gameDaysPerDay;
+        $this->secondsPerGameDay = (float)$this->secondsPerDay / $gameDaysPerDay;
         $this->secondsPerGameYear = $this->secondsPerGameDay * 365;
         $this->secondsPerGameHour = $this->secondsPerGameDay / 24;
         $this->secondsPerGameMinute = $this->secondsPerGameHour / 60;
@@ -95,7 +94,8 @@ class TimeKeeper
      * @param DateTime $time Game time to convert.
      * @return DateTime Real time corresponding to game time $time.
      */
-    public function convertFromGameTime(DateTime $time): DateTime {
+    public function convertFromGameTime(DateTime $time): DateTime
+    {
         // Game dates are in the distant past, better not use getTimestamp().
         $i = $this->theBeginning->diff($time);
 
@@ -105,8 +105,8 @@ class TimeKeeper
         $seconds += $i->i * $this->secondsPerGameMinute;
         $seconds += $i->s * $this->secondsPerGameSecond;
 
-        $ret = clone($this->adjustedEpoch);
-        return $ret->add($this->interval(0, 0, 0, 0, (int) $seconds));
+        $ret = clone $this->adjustedEpoch;
+        return $ret->add($this->interval(0, 0, 0, 0, (int)$seconds));
     }
 
     /**
@@ -114,28 +114,29 @@ class TimeKeeper
      * @param DateTime $time Real time to convert.
      * @return DateTime Game time corresponding to real time $time.
      */
-    public function convertToGameTime(DateTime $time): DateTime {
+    public function convertToGameTime(DateTime $time): DateTime
+    {
         $timeUnix = $time->getTimestamp();
         $epochUnix = $this->adjustedEpoch->getTimestamp();
 
         $interval = $timeUnix - $epochUnix;
 
-        $years = (int) ($interval / $this->secondsPerGameYear);
+        $years = (int)($interval / $this->secondsPerGameYear);
         $interval -= $years * $this->secondsPerGameYear;
 
-        $days = (int) ($interval / $this->secondsPerGameDay);
+        $days = (int)($interval / $this->secondsPerGameDay);
         $interval -= $days * $this->secondsPerGameDay;
 
-        $hours = (int) ($interval / $this->secondsPerGameHour);
+        $hours = (int)($interval / $this->secondsPerGameHour);
         $interval -= $hours * $this->secondsPerGameHour;
 
-        $minutes = (int) ($interval / $this->secondsPerGameMinute);
+        $minutes = (int)($interval / $this->secondsPerGameMinute);
         $interval -= $minutes * $this->secondsPerGameMinute;
 
-        $seconds = (int) ($interval / $this->secondsPerGameSecond);
+        $seconds = (int)($interval / $this->secondsPerGameSecond);
         $interval -= $seconds * $this->secondsPerGameSecond;
 
-        $ret = clone($this->theBeginning);
+        $ret = clone $this->theBeginning;
         return $ret->add(
             $this->interval($years, $days, $hours, $minutes, $seconds)
         );
@@ -148,8 +149,8 @@ class TimeKeeper
      * @param int $hours
      * @param int $minutes
      * @param int $seconds
-     * @return \DateInterval
      * @throws \Exception
+     * @return \DateInterval
      */
     private function interval(
         int $years,

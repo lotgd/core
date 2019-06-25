@@ -3,19 +3,16 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console;
 
-use Symfony\Component\Console\Application;
-
 use LotGD\Core\Bootstrap;
-use LotGD\Core\Game;
-use LotGD\Core\Console\Command\{
-    CharacterListCommand,
-    CharacterResetViewpointCommand,
-    DatabaseInitCommand,
-    DatabaseSchemaUpdateCommand,
-    ModuleValidateCommand,
-    ModuleRegisterCommand,
-    ConsoleCommand
-};
+
+use LotGD\Core\Console\Command\CharacterListCommand;
+use LotGD\Core\Console\Command\CharacterResetViewpointCommand;
+use LotGD\Core\Console\Command\ConsoleCommand;
+use LotGD\Core\Console\Command\DatabaseInitCommand;
+use LotGD\Core\Console\Command\DatabaseSchemaUpdateCommand;
+use LotGD\Core\Console\Command\ModuleRegisterCommand;
+use LotGD\Core\Console\Command\ModuleValidateCommand;
+use Symfony\Component\Console\Application;
 
 /**
  * Main execution class for the daenerys tool.
@@ -61,7 +58,7 @@ class Main
     {
         // Bootstrap application
         $this->bootstrap = new Bootstrap();
-        $this->game = $this->bootstrap->getGame(getcwd());
+        $this->game = $this->bootstrap->getGame(\getcwd());
 
         // Add commands
         $this->addCommands();

@@ -13,7 +13,7 @@ use LotGD\Core\Exceptions\CoreException;
 use LotGD\Core\Tools\Model\Saveable;
 
 /**
- * A Thread of messages
+ * A Thread of messages.
  *
  * @Entity(repositoryClass="LotGD\Core\Models\Repositories\MessageThreadRepository")
  * @Table(name="message_threads")
@@ -26,7 +26,7 @@ class MessageThread implements SaveableInterface
     private $id;
     /** @Column(type="string", length=255, unique=true) */
     private $threadKey;
-    /** @Column(type="boolean", options={"default"=false}) */
+    /** @Column(type="boolean", options={"default"= false}) */
     private $readonly = false;
     /** @ManyToMany(targetEntity="Character", cascade={"persist"}, mappedBy="messageThreads")  */
     private $participants;
@@ -53,7 +53,7 @@ class MessageThread implements SaveableInterface
     }
     
     /**
-     * Returns the primary id of this message
+     * Returns the primary id of this message.
      * @return int
      */
     public function getId(): int
@@ -62,7 +62,7 @@ class MessageThread implements SaveableInterface
     }
     
     /**
-     * Returns a list of messages inside this thread
+     * Returns a list of messages inside this thread.
      * @return Collection
      */
     public function getMessages(): Collection
@@ -79,13 +79,12 @@ class MessageThread implements SaveableInterface
     {
         if ($this->isReadonly() && $message->getApparantAuthor() instanceof SystemCharacter === false) {
             throw new CoreException("Cannot write a normal message to a readonly thread");
-        } else {
-            $this->messages->add($message);
         }
+        $this->messages->add($message);
     }
     
     /**
-     * Get a collection of participants in this thread
+     * Get a collection of participants in this thread.
      * @return Collection
      */
     public function getParticipants(): Collection
@@ -94,7 +93,7 @@ class MessageThread implements SaveableInterface
     }
     
     /**
-     * Returns true if the thread is "readonly"
+     * Returns true if the thread is "readonly".
      * @return bool
      */
     public function isReadonly(): bool

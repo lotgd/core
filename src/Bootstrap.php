@@ -4,28 +4,20 @@ declare(strict_types=1);
 namespace LotGD\Core;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\EventManager as DoctrineEventManager;
-use Doctrine\Common\Util\Debug;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events as DoctrineEvents;
-use Doctrine\ORM\ {
-    EntityManager,
-    EntityManagerInterface,
-    Mapping\AnsiQuoteStrategy,
-    Tools\Setup,
-    Tools\SchemaTool
-};
-use Monolog\ {
-    Logger,
-    Handler\RotatingFileHandler
-};
+use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\Setup;
+use LotGD\Core\Doctrine\EntityPostLoadEventListener;
+use LotGD\Core\Exceptions\InvalidConfigurationException;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Logger;
+
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application;
-
-use LotGD\Core\{
-    ComposerManager, BootstrapInterface, Doctrine\EntityPostLoadEventListener, Exceptions\InvalidConfigurationException
-};
 
 /**
  * The entry point for constructing a properly configured LotGD Game object.
@@ -34,7 +26,7 @@ class Bootstrap
 {
     private $logger;
     private $game;
-    /** @var  LibraryConfigurationManager */
+    /** @var LibraryConfigurationManager */
     private $libraryConfigurationManager;
     private $annotationDirectories = [];
 
@@ -46,12 +38,12 @@ class Bootstrap
     public static function createGame(string $cwd = null): Game
     {
         $game = new self();
-        $cwd = $cwd ?? getcwd();
+        $cwd = $cwd ?? \getcwd();
         return $game->getGame($cwd);
     }
 
     /**
-     * Starts the game kernel with the most important classes and returns the object
+     * Starts the game kernel with the most important classes and returns the object.
      * @param string $cwd
      * @return Game
      */
@@ -65,7 +57,7 @@ class Bootstrap
         $composer = $this->createComposerManager($cwd);
         $this->libraryConfigurationManager = $this->createLibraryConfigurationManager($composer, $cwd);
 
-        list($dsn, $user, $password) = $config->getDatabaseConnectionDetails($cwd);
+        [$dsn, $user, $password] = $config->getDatabaseConnectionDetails($cwd);
         $pdo = $this->connectToDatabase($dsn, $user, $password);
         $entityManager = $this->createEntityManager($pdo, $config);
 
@@ -74,7 +66,8 @@ class Bootstrap
             ->withLogger($this->logger)
             ->withEntityManager($entityManager)
             ->withCwd($cwd)
-            ->create();
+            ->create()
+        ;
 
         // Add Event listener to entity manager
         $dem = $entityManager->getEventManager();
@@ -87,7 +80,7 @@ class Bootstrap
     }
 
     /**
-     * Creates a library configuration manager
+     * Creates a library configuration manager.
      * @param ComposerManager $composerManager
      * @param string $cwd
      * @return LibraryConfigurationManager
@@ -100,7 +93,7 @@ class Bootstrap
     }
 
     /**
-     * Connects to a database using pdo
+     * Connects to a database using pdo.
      * @param string $dsn
      * @param string $user
      * @param string $password
@@ -112,7 +105,7 @@ class Bootstrap
     }
 
     /**
-     * Creates and returns an instance of ComposerManager
+     * Creates and returns an instance of ComposerManager.
      * @param string $cwd
      * @return ComposerManager
      */
@@ -125,16 +118,16 @@ class Bootstrap
     /**
      * Returns a configuration object reading from the file located at the path stored in $cwd/config/lotgd.yml.
      * @param string $cwd
-     * @return Configuration
      * @throws InvalidConfigurationException
+     * @return Configuration
      */
     protected function createConfiguration(string $cwd): Configuration
     {
         if (empty($configFilePath)) {
-            $configFilePath = implode(DIRECTORY_SEPARATOR, [$cwd, "config", "lotgd.yml"]);
+            $configFilePath = \implode(\DIRECTORY_SEPARATOR, [$cwd, "config", "lotgd.yml"]);
         }
 
-        if ($configFilePath === false || strlen($configFilePath) == 0 || is_file($configFilePath) === false) {
+        if ($configFilePath === false || \strlen($configFilePath) == 0 || \is_file($configFilePath) === false) {
             throw new InvalidConfigurationException("Invalid or missing configuration file: {$configFilePath}.");
         }
 
@@ -143,7 +136,7 @@ class Bootstrap
     }
 
     /**
-     * Returns a logger instance
+     * Returns a logger instance.
      * @param Configuration $config
      * @param string $name
      * @return LoggerInterface
@@ -152,13 +145,13 @@ class Bootstrap
     {
         $logger = new Logger($name);
         // Add lotgd as the prefix for the log filenames.
-        $logger->pushHandler(new RotatingFileHandler($config->getLogPath() . DIRECTORY_SEPARATOR . $name, 14));
+        $logger->pushHandler(new RotatingFileHandler($config->getLogPath() . \DIRECTORY_SEPARATOR . $name, 14));
 
         return $logger;
     }
 
     /**
-     * Creates the EntityManager using the pdo connection given in it's argument
+     * Creates the EntityManager using the pdo connection given in it's argument.
      * @param \PDO $pdo
      * @param Configuration
      * @return EntityManagerInterface
@@ -178,7 +171,8 @@ class Bootstrap
         // Register uuid type
         try {
             Type::addType('uuid', 'Ramsey\Uuid\Doctrine\UuidType');
-        } catch (DBALException $e) {}
+        } catch (DBALException $e) {
+        }
 
         // Create Schema and update database if needed
         if ($config->getDatabaseAutoSchemaUpdate()) {
@@ -197,12 +191,12 @@ class Bootstrap
     protected function generateAnnotationDirectories(): array
     {
         // Read db annotations from our own model files.
-        $directories = [__DIR__ . DIRECTORY_SEPARATOR . 'Models'];
+        $directories = [__DIR__ . \DIRECTORY_SEPARATOR . 'Models'];
 
         // Get additional annotation directories from library configs.
         $libraryDirectories = $this->libraryConfigurationManager->getEntityDirectories();
 
-        return array_merge($directories, $libraryDirectories);
+        return \array_merge($directories, $libraryDirectories);
     }
 
     /**
