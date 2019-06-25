@@ -32,7 +32,7 @@ class BuffList
     protected $buffs;
     protected $buffsBySlot;
     protected $activeBuffs = [];
-    /** @var Doctrine\Common\Collections\ArrayCollection */
+    /** @var ArrayCollection */
     protected $usedBuffs;
 
     /** @var boolean True of the modifiers have already been calculated */
@@ -136,6 +136,7 @@ class BuffList
 
     /**
      * Returns whether any buffs are in use.
+     * @return bool
      */
     public function hasBuffsInUse(): bool
     {
@@ -391,7 +392,7 @@ class BuffList
     /**
      * Processes buffs that do direct damage or regeneration
      * @param int $activation
-     * @param \LotGD\Core\Game $game
+     * @param Game $game
      * @param FighterInterface $goodguy
      * @param FighterInterface $badguy
      * @return Collection
@@ -493,7 +494,7 @@ class BuffList
      * Processes buffs that are dependant on the damage done in one round
      * @param int $activation
      * @param int $damage Positive damage is applied to the badguy, negative damage is applied to the goodguy
-     * @param \LotGD\Core\Game $game
+     * @param Game $game
      * @param FighterInterface $goodguy
      * @param FighterInterface $badguy
      * @return Collection

@@ -20,6 +20,12 @@ trait PermissionAssociationable
     /** @Column(type="integer") */
     protected $permissionState;
 
+    /**
+     * PermissionAssociationable constructor.
+     * @param Actor $owner
+     * @param Permission $permission
+     * @param int $state
+     */
     public function __construct(Actor $owner, Permission $permission, int $state) {
         $this->owner = $owner;
         $this->permission = $permission;

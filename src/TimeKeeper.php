@@ -64,7 +64,7 @@ class TimeKeeper
     /**
      * Returns whether a user who is interating with the game now and last
      * interacted at $lastInteractionTime should experience a New Day event.
-     * @param DateTime|null $lastInteractionTime
+     * @param DateTime $lastInteractionTime
      * @return bool
      */
     public function isNewDay(?DateTime $lastInteractionTime): bool
@@ -143,6 +143,13 @@ class TimeKeeper
 
     /**
      * Convenience method to generate a DateInterval from an exploded date.
+     * @param int $years
+     * @param int $days
+     * @param int $hours
+     * @param int $minutes
+     * @param int $seconds
+     * @return \DateInterval
+     * @throws \Exception
      */
     private function interval(
         int $years,

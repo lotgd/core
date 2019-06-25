@@ -150,7 +150,7 @@ class ModuleManager
 
     /**
      * Returns the list of currently registered modules.
-     * @return array<Module> Array of modules.
+     * @return ModuleModel[] Array of modules.
      */
     public function getModules(): array
     {
@@ -160,7 +160,7 @@ class ModuleManager
     /**
      * Returns the module with the specified library name, in vendor/module format.
      * @param string $library
-     * @return Module
+     * @return ModuleModel|null
      */
     public function getModule(string $library): ?ModuleModel
     {

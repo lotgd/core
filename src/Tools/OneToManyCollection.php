@@ -46,7 +46,7 @@ class OneToManyCollection implements Collection
 
     /**
      * Returns the class this collection consists of.
-     * @return string
+     * @return ClassMetadata
      */
     public function getTypeClass(): ClassMetadata
     {
@@ -54,7 +54,8 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @return int
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function count(): int
     {
@@ -87,7 +88,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $element
+     * @return true|void
+     * @throws WrongTypeException
      */
     public function add($element)
     {
@@ -102,7 +105,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * Clears the collection.
      */
     public function clear()
     {
@@ -114,7 +117,8 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $element
+     * @return bool
      */
     public function contains($element): bool
     {
@@ -128,7 +132,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @return bool
      */
     public function isEmpty(): bool
     {
@@ -136,7 +140,8 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param int|string $key
+     * @return mixed|void
      */
     public function remove($key)
     {
@@ -147,7 +152,8 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $element
+     * @return bool|void
      */
     public function removeElement($element)
     {
@@ -159,7 +165,8 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param int|string $key
+     * @return bool
      */
     public function containsKey($key)
     {
@@ -182,7 +189,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @return array
      */
     public function getKeys(): array
     {
@@ -190,7 +197,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @return array
      */
     public function getValues(): array
     {
@@ -198,7 +205,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param int|string $key
+     * @param mixed $value
+     * @throws WrongTypeException
      */
     public function set($key, $value)
     {
@@ -210,7 +219,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @return array
      */
     public function toArray(): array
     {
@@ -218,23 +227,23 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @return mixed
      */
     public function first()
     {
-        return first($this->collection);
+        return array_values($this->collection)[0];
     }
 
     /**
-     * @inheritDoc
+     * @return mixed
      */
     public function last()
     {
-        return last($this->collection);
+        return array_values($this->collection)[count($this->collection)];
     }
 
     /**
-     * @inheritDoc
+     * @return int|string|null
      */
     public function key()
     {
@@ -242,7 +251,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @return mixed|object
      */
     public function next()
     {
@@ -250,7 +259,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @return mixed|object
      */
     public function current()
     {
@@ -258,7 +267,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param \Closure $p
+     * @return bool
+     * @throws NotImplementedException
      */
     public function exists(\Closure $p): bool
     {
@@ -266,7 +277,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param \Closure $p
+     * @return Collection|void
+     * @throws NotImplementedException
      */
     public function filter(\Closure $p)
     {
@@ -274,7 +287,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param \Closure $p
+     * @return bool|void
+     * @throws NotImplementedException
      */
     public function forAll(\Closure $p)
     {
@@ -282,7 +297,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param \Closure $p
+     * @return Collection|void
+     * @throws NotImplementedException
      */
     public function map(\Closure $p)
     {
@@ -290,7 +307,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param \Closure $p
+     * @return Collection[]|void
+     * @throws NotImplementedException
      */
     public function partition(\Closure $p)
     {
@@ -298,7 +317,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $element
+     * @return bool|false|int|string
+     * @throws WrongTypeException
      */
     public function indexOf($element)
     {
@@ -307,7 +328,10 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param int $offset
+     * @param null $length
+     * @return array|void
+     * @throws NotImplementedException
      */
     public function slice($offset, $length = null)
     {
@@ -324,7 +348,9 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $key
+     * @return mixed
+     * @throws KeyNotFoundException
      */
     public function offsetGet($key)
     {
@@ -332,7 +358,8 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $key
+     * @param mixed $element
      */
     public function offsetSet($key, $element)
     {
@@ -340,7 +367,7 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $key
      */
     public function offsetUnset($key)
     {
@@ -348,7 +375,8 @@ class OneToManyCollection implements Collection
     }
 
     /**
-     * @inheritDoc
+     * @param mixed $key
+     * @return bool
      */
     public function offsetExists($key)
     {

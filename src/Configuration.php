@@ -213,6 +213,7 @@ class Configuration
     /**
      * Generate a textual representation of the configuration, for debugging
      * purposes.
+     * @return string
      */
     public function __toString(): string
     {

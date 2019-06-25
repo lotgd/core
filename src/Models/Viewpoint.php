@@ -202,7 +202,7 @@ class Viewpoint implements CreateableInterface
     /**
      * Adds a new action group to a viewpoint
      * @param ActionGroup $group The new group to add.
-     * @param null|string $after, optional group id that comes before.
+     * @param null|string $after Optional group id that comes before.
      * @throws ArgumentException
      */
     public function addActionGroup(ActionGroup $group, ?string $after = null): void
@@ -228,7 +228,7 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Returns an action group by id or fails.
-     * @param $actionGroupId
+     * @param string $actionGroupId
      * @return ActionGroup|null
      */
     public function findActionGroupById(string $actionGroupId): ?ActionGroup
@@ -302,7 +302,7 @@ class Viewpoint implements CreateableInterface
     /**
      * Returns a single data field
      * @param string $fieldname Fieldname
-     * @param mixed $default default value
+     * @param mixed $default Default value
      * @return mixed
      */
     public function getDataField(string $fieldname, $default = null)
@@ -313,6 +313,7 @@ class Viewpoint implements CreateableInterface
     /**
      * Sets a single data field
      * @param string $fieldname
+     * @param mixed $value
      */
     public function setDataField(string $fieldname, $value)
     {

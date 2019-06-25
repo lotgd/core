@@ -53,7 +53,7 @@ class Battle
     
     /**
      * Takes a game object and two participants (Player and Monster) to fight a battle.
-     * @param \LotGD\Core\Game $game
+     * @param Game $game
      * @param FighterInterface $player
      * @param FighterInterface $monster
      */
@@ -83,7 +83,7 @@ class Battle
      * @param Game $game
      * @param FighterInterface $player
      * @param string $serialized
-     * @return Battle
+     * @return self
      */
     public static function unserialize(Game $game, FighterInterface $player, string $serialized): self
     {
@@ -241,7 +241,7 @@ class Battle
      * Fights the number of rounds given by the parameter $n and returns the number
      * of actual rounds fought.
      * @param int $n
-     * @param bool $firstDamageRound Which damage rounds are calculated. Cannot be 0.
+     * @param int $firstDamageRound Which damage rounds are calculated. Cannot be 0.
      * @return int Number of fights fought.
      * @throws ArgumentException if firstDamageRound is 0.
      * @throws BattleIsOverException
@@ -333,6 +333,7 @@ class Battle
      * Runs one turn.
      * @param FighterInterface $attacker
      * @param FighterInterface $defender
+     * @return ArrayCollection
      */
     protected function turn(FighterInterface $attacker, FighterInterface $defender): ArrayCollection
     {

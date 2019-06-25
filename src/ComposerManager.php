@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use Exception;
 use Composer\{
     Composer, Factory, IO\NullIO, Package\CompletePackageInterface, Package\PackageInterface
 };
-use Monolog\Logger;
 
 use LotGD\Core\{
     Exceptions\InvalidConfigurationException,
@@ -53,7 +53,8 @@ class ComposerManager
 
     /**
      * Return the Composer package for the corresponding library, in vendor/module format.
-     * @return PackageInterface Package corresponding to this library.
+     * @param string $library
+     * @return CompletePackageInterface Package corresponding to this library.
      * @throws LibraryDoesNotExistException
      */
     public function getPackageForLibrary(string $library): CompletePackageInterface
@@ -148,6 +149,7 @@ class ComposerManager
     /**
      * Returns a path (could be relative) to the proper autoload.php file in
      * the current setup.
+     * @return string
      */
     public function findAutoloader(): string
     {

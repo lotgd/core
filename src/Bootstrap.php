@@ -7,6 +7,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\EventManager as DoctrineEventManager;
 use Doctrine\Common\Util\Debug;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Events as DoctrineEvents;
 use Doctrine\ORM\ {
     EntityManager,
@@ -39,7 +40,7 @@ class Bootstrap
 
     /**
      * Create a new Game object, with all the necessary configuration.
-     * @param string $cwd
+     * @param string|null $cwd
      * @return Game The newly created Game object.
      */
     public static function createGame(string $cwd = null): Game
@@ -89,7 +90,7 @@ class Bootstrap
      * Creates a library configuration manager
      * @param ComposerManager $composerManager
      * @param string $cwd
-     * @return \LotGD\Core\LibraryConfigurationManager
+     * @return LibraryConfigurationManager
      */
     protected function createLibraryConfigurationManager(
         ComposerManager $composerManager,
@@ -100,7 +101,9 @@ class Bootstrap
 
     /**
      * Connects to a database using pdo
-     * @param \LotGD\Core\Configuration $config
+     * @param string $dsn
+     * @param string $user
+     * @param string $password
      * @return \PDO
      */
     protected function connectToDatabase(string $dsn, string $user, string $password): \PDO
@@ -122,7 +125,7 @@ class Bootstrap
     /**
      * Returns a configuration object reading from the file located at the path stored in $cwd/config/lotgd.yml.
      * @param string $cwd
-     * @return \LotGD\Core\Configuration
+     * @return Configuration
      * @throws InvalidConfigurationException
      */
     protected function createConfiguration(string $cwd): Configuration
@@ -157,6 +160,7 @@ class Bootstrap
     /**
      * Creates the EntityManager using the pdo connection given in it's argument
      * @param \PDO $pdo
+     * @param Configuration
      * @return EntityManagerInterface
      */
     protected function createEntityManager(\PDO $pdo, Configuration $config): EntityManagerInterface
@@ -173,7 +177,7 @@ class Bootstrap
 
         // Register uuid type
         try {
-            \Doctrine\DBAL\Types\Type::addType('uuid', 'Ramsey\Uuid\Doctrine\UuidType');
+            Type::addType('uuid', 'Ramsey\Uuid\Doctrine\UuidType');
         } catch (DBALException $e) {}
 
         // Create Schema and update database if needed

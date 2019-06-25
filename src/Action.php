@@ -49,7 +49,7 @@ class Action
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getTitle(): ?string
     {
@@ -77,6 +77,7 @@ class Action
     /**
      * Sets all parameters for this action
      * @param array $parameters
+     * @return void
      */
     public function setParameters(array $parameters): void
     {

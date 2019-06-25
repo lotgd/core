@@ -8,16 +8,21 @@ use LotGD\Core\Game;
 
 /**
  * Helper trait to implement public setGame from GameAwareInterface and private getGame for internal use.
- * @package LotGD\Core\Tools\Model
  */
 trait GameAware
 {
     private $game;
 
+    /**
+     * @param Game $game
+     */
     public function setGame(Game $game) {
         $this->game = $game;
     }
 
+    /**
+     * @return Game
+     */
     public function getGame(): Game {
         return $this->game;
     }

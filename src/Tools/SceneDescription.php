@@ -6,7 +6,6 @@ namespace LotGD\Core\Tools;
 /**
  * Abstracts a scene description and provides tools to modify the text more easily.
  * Class SceneDescription
- * @package LotGD\Core\Tools
  */
 class SceneDescription
 {
@@ -42,6 +41,7 @@ class SceneDescription
     /**
      * Adds a paragraph to the description. If the paragraph contains \n\n, it gets broken into multiple paragraphs first.
      * @param string $paragraph
+     * @return void
      */
     public function addParagraph(string $paragraph): void
     {

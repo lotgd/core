@@ -100,7 +100,9 @@ class SceneConnectionGroup implements SceneConnectable
     }
 
     /**
-     * @inheritDoc
+     * @param SceneConnectable $connectable
+     * @param int|null $directionality
+     * @return SceneConnection
      */
     public function connect(SceneConnectable $connectable, int $directionality = null): SceneConnection
     {

@@ -5,7 +5,6 @@ namespace LotGD\Core\Models;
 
 /**
  * Represents a complete set of viewpoint data used to restore a saved viewpoint.
- * @package LotGD\Core\Models
  */
 class ViewpointSnapshot
 {

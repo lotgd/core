@@ -14,6 +14,7 @@
     ],
     "require": {
         "php": "^7.1.0",
+        "ext-pdo": "*",
         "composer/composer": "*",
         "gedmo/doctrine-extensions": "*",
         "doctrine/orm": "^2.5",
@@ -33,6 +34,6 @@
     "require-dev": {
         "phpunit/phpunit": "^7.0",
         "phpunit/php-code-coverage": "*",
-        "dancryer/php-docblock-checker": "*"
+        "friendsofphp/php-cs-fixer": "*"
     }
 }

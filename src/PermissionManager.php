@@ -48,7 +48,7 @@ class PermissionManager
 
     /**
      * Construct a permission manager.
-     * @param Game $g The game.
+     * @param Game $game The game.
      */
     public function __construct(Game $game)
     {
@@ -57,7 +57,7 @@ class PermissionManager
 
     /**
      * Checks if an actor has a permission set. No assumption can be made if it's allowed or denied.
-     * @param \LotGD\Core\PermissionableInterface $actor
+     * @param Actor $actor
      * @param string $permissionId
      * @return bool True if the permission has been set, be it allowed or denied.
      */
@@ -74,7 +74,7 @@ class PermissionManager
 
     /**
      * Checks if an actor is allowed a given permission.
-     * @param \LotGD\Core\PermissionableInterface $actor
+     * @param Actor $actor
      * @param string $permissionId
      * @return bool True if the actor has the permission set and it's state is allowed.
      */
@@ -91,7 +91,7 @@ class PermissionManager
 
     /**
      * Checks if an actor is denied a given permission.
-     * @param \LotGD\Core\PermissionableInterface $actor
+     * @param Actor $actor
      * @param string $permissionId
      * @return bool True if the actor has the permission set and it's state is denied.
      */
@@ -126,7 +126,7 @@ class PermissionManager
 
     /**
      * Allows an actor a permission given by the permission id.
-     * @param PermissionableInterface $actor
+     * @param Actor $actor
      * @param string $permissionId
      */
     public function allow(
@@ -152,7 +152,7 @@ class PermissionManager
 
     /**
      * Denies an actor a permission given by the permission id.
-     * @param PermissionableInterface $actor
+     * @param Actor $actor
      * @param string $permissionId
      */
     public function deny(
@@ -178,7 +178,7 @@ class PermissionManager
 
     /**
      * Removes a permission from an actor.
-     * @param PermissionableInterface $actor
+     * @param Actor $actor
      * @param string $permissionId
      */
     public function remove(
