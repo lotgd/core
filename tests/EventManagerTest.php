@@ -32,7 +32,7 @@ class EventManagerTest extends CoreModelTestCase
     /** @var string default data set */
     protected $dataset = "eventManager";
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -16,7 +16,7 @@ class TimeKeeperTests extends TestCase {
     private $gameOffsetSeconds;
     private $gameDaysPerDay;
 
-    public function setUp() {
+    public function setUp(): void {
         $this->gameEpoch = new \DateTime('2015-07-27 00:00:00 PDT');;
         $this->gameOffsetSeconds = 0;
         $this->gameDaysPerDay = 2;

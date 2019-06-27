@@ -30,7 +30,7 @@ class ModuleManagerTest extends CoreModelTestCase
     protected $game;
     protected $mm;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

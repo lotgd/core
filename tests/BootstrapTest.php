@@ -19,7 +19,7 @@ class BootstrapTest extends TestCase
 {
     private $logger;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->logger = new Logger('test');
         $this->logger->pushHandler(new NullHandler());

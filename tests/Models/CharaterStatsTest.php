@@ -39,7 +39,7 @@ class CharaterStatsTest extends CoreModelTestCase
     /** @var string default data set */
     protected $dataset = "character_stats";
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +48,7 @@ class CharaterStatsTest extends CoreModelTestCase
         $this->getEntityManager()->flush();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $game = $this->g;
         $game->getEventManager()->unsubscribe("#h/lotgd/core/characterStats/populate#", TestEventProvider::class, "lotgd/test");
