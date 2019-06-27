@@ -103,7 +103,7 @@ abstract class ModelTestCase extends TestCase
         return self::$em;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->getConnection();
 
@@ -150,7 +150,7 @@ abstract class ModelTestCase extends TestCase
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
 
         /** @var \PDO $pdo */

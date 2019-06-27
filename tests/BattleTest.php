@@ -6,14 +6,14 @@ namespace LotGD\Core\Tests\Models;
 use Doctrine\Common\Collections\Collection;
 
 use Doctrine\Common\Util\Debug;
-use LotGD\Core\{
-    Battle,
+use LotGD\Core\{Battle,
     DiceBag,
+    Exceptions\BattleIsOverException,
+    Exceptions\BattleNotOverException,
     Game,
     Models\Buff,
     Models\Character,
-    Models\Monster
-};
+    Models\Monster};
 use LotGD\Core\Models\BattleEvents\{
     BuffMessageEvent,
     CriticalHitEvent,
@@ -202,9 +202,6 @@ class BattleTest extends CoreModelTestCase
         $this->assertSame($battle->getWinner(), $highLevelMonster);
     }
 
-    /**
-     * @expectedException LotGD\Core\Exceptions\BattleNotOverException
-     */
     public function testBattleNotOverExceptionFromWinner()
     {
         $em = $this->getEntityManager();
@@ -214,12 +211,11 @@ class BattleTest extends CoreModelTestCase
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
 
+        $this->expectException(BattleNotOverException::class);
+
         $battle->getWinner();
     }
 
-    /**
-     * @expectedException LotGD\Core\Exceptions\BattleNotOverException
-     */
     public function testBattleNotOverExceptionFromLoser()
     {
         $em = $this->getEntityManager();
@@ -229,12 +225,13 @@ class BattleTest extends CoreModelTestCase
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
 
+        $this->expectException(BattleNotOverException::class);
+
         $battle->getLoser();
     }
 
     /**
      * Tests if the BattleIsOverException gets thrown.
-     * @expectedException LotGD\Core\Exceptions\BattleIsOverException
      */
     public function testBattleIsOverException()
     {
@@ -244,6 +241,8 @@ class BattleTest extends CoreModelTestCase
         $monster = $em->getRepository(Monster::class)->find("de84c507-9673-44e7-b665-9e43416b9c2f");
 
         $battle = new Battle($this->getMockGame($character), $character, $monster);
+
+        $this->expectException(BattleIsOverException::class);
 
         // Fighting for 99 rounds should be enough for determining a loser - and to
         // throw the exception.
@@ -1358,7 +1357,7 @@ class BattleTest extends CoreModelTestCase
         ]));
 
         $modifier = $player->getBuffs()->getGoodguyAttackModifier();
-        $this->assertEquals(0.15498, $modifier, '', 0.001);
+        $this->assertEqualsWithDelta(0.15498, $modifier, 0.001);
     }
 
     public function testBufflistGoodguyDefenseModifier()
@@ -1387,7 +1386,7 @@ class BattleTest extends CoreModelTestCase
         ]));
 
         $modifier = $player->getBuffs()->getGoodguyDefenseModifier();
-        $this->assertEquals(7.2408, $modifier, '', 0.001);
+        $this->assertEqualsWithDelta(7.2408, $modifier, 0.001);
     }
 
     public function testBufflistGoodguyDamageModifier()
@@ -1416,7 +1415,7 @@ class BattleTest extends CoreModelTestCase
         ]));
 
         $modifier = $player->getBuffs()->getGoodguyDamageModifier();
-        $this->assertEquals(2.5, $modifier, '', 0.001);
+        $this->assertEqualsWithDelta(2.5, $modifier, 0.001);
     }
 
     public function testBufflistBadguyAttackModifier()
@@ -1445,7 +1444,7 @@ class BattleTest extends CoreModelTestCase
         ]));
 
         $modifier = $player->getBuffs()->getBadguyAttackModifier();
-        $this->assertEquals(0.15498, $modifier, '', 0.001);
+        $this->assertEqualsWithDelta(0.15498, $modifier, 0.001);
     }
 
     public function testBufflistBadguyDefenseModifier()
@@ -1474,7 +1473,7 @@ class BattleTest extends CoreModelTestCase
         ]));
 
         $modifier = $player->getBuffs()->getBadguyDefenseModifier();
-        $this->assertEquals(7.2408, $modifier, '', 0.001);
+        $this->assertEqualsWithDelta(7.2408, $modifier, 0.001);
     }
 
     public function testBufflistBadguyDamageModifier()
@@ -1503,7 +1502,7 @@ class BattleTest extends CoreModelTestCase
         ]));
 
         $modifier = $player->getBuffs()->getBadguyDamageModifier();
-        $this->assertEquals(2.5, $modifier, '', 0.001);
+        $this->assertEqualsWithDelta(2.5, $modifier, 0.001);
     }
 
     public function testBuffActivatedAt()

@@ -6,6 +6,7 @@ namespace LotGD\Core\Tests\Models;
 use LotGD\Core\EventHandler;
 use LotGD\Core\EventManager;
 use LotGD\Core\Events\EventContext;
+use LotGD\Core\Exceptions\UnexpectedArrayKeyException;
 use LotGD\Core\Game;
 use LotGD\Core\GameBuilder;
 use LotGD\Core\Models\Character;
@@ -110,21 +111,21 @@ class CharacterModelTest extends CoreModelTestCase
 
     /**
      * Tests character creation with faulty data
-     * @param type $characterData
+     * @param array $characterData
      * @dataProvider invalidCharacters
-     * @expectedException TypeError
      */
     public function testFaultyCreation(array $characterData)
     {
+        $this->expectException(\TypeError::class);
         Character::create($characterData);
     }
 
     /**
      * Tests if invalid array key given during Character::create throws an exception
-     * @expectedException \LotGD\Core\Exceptions\UnexpectedArrayKeyException
      */
     public function testUnknownArrayKey()
     {
+        $this->expectException(UnexpectedArrayKeyException::class);
         Character::create([
             "name" => "Walter",
             "maxHealth" => 15,

@@ -17,7 +17,7 @@ class ConfigurationTest extends TestCase
     private $logger;
     private $configDir;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->configDir = __DIR__ . DIRECTORY_SEPARATOR . join(DIRECTORY_SEPARATOR, ['datasets', 'config']);
 
