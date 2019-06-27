@@ -48,7 +48,7 @@ class MessageModelTest extends CoreModelTestCase
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2]);
         
         // $thread1 should come from the database
-        $this->assertInternalType("int", $thread1->getId());
+        $this->assertIsInt($thread1->getId());
         
         $this->assertSame(3, count($thread1->getMessages()));
         $this->assertSame(2, count($character1->getMessageThreads()));
@@ -98,7 +98,7 @@ class MessageModelTest extends CoreModelTestCase
         $thread1 = $em->getRepository(MessageThread::class)->findOrCreateFor([$character1, $character2, $character3, $character4]);
         
         // $thread1 should come from the database
-        $this->assertInternalType("int", $thread1->getId());
+        $this->assertIsInt($thread1->getId());
         $this->assertSame(3, count($thread1->getMessages()));
         $this->assertSame(2, count($character1->getMessageThreads()));
         $this->assertSame(2, count($character2->getMessageThreads()));

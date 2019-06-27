@@ -83,11 +83,11 @@ class BootstrapTest extends TestCase
         $game->getEntityManager()->persist($user);
         $game->getEntityManager()->flush();
         $id = $user->getId();
-        $this->assertInternalType("int", $id);
+        $this->assertIsInt($id);
         $game->getEntityManager()->clear();
         $user = $game->getEntityManager()->getRepository(UserEntity::class)->find($id);
-        $this->assertInternalType("int", $user->getId());
-        $this->assertInternalType("string", $user->getName());
+        $this->assertIsInt($user->getId());
+        $this->assertIsSTring($user->getName());
         $this->assertSame("Monthy", $user->getName());
     }
 
@@ -146,7 +146,7 @@ class BootstrapTest extends TestCase
         $game->getEntityManager()->persist($user);
         $game->getEntityManager()->flush();
         $id = $user->getId();
-        $this->assertInternalType("int", $id);
+        $this->assertIsInt($id);
         $game->getEntityManager()->clear();
         $user = $game->getEntityManager()->getRepository(UserEntity::class)->find($id);
 
