@@ -16,6 +16,8 @@ use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneConnectable;
 use LotGD\Core\Models\SceneConnection;
 use LotGD\Core\Models\Viewpoint;
+use LotGD\Core\SceneTemplates\BasicSceneTemplate;
+use LotGD\Core\SceneTemplates\SceneTemplateInterface;
 use Monolog\Logger;
 
 /**
@@ -340,7 +342,7 @@ class Game
             $sceneTemplate = $scene->getTemplate();
             $templateClass = $sceneTemplate ? $sceneTemplate->getClass() : BasicSceneTemplate::class;
 
-            if (!is_a($templateClass, SceneTemplateInterface::class, true)) {
+            if (!\is_a($templateClass, SceneTemplateInterface::class, true)) {
                 throw new \Exception("Scene template must implement ".SceneTemplateInterface::class);
             }
 
