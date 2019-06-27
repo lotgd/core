@@ -143,7 +143,7 @@ class Scene implements CreateableInterface, SceneConnectable
 
     /**
      * Removes a connection group from this scene.
-     * @param \LotGD\Core\Models\SceneConnectionGroup $group
+     * @param SceneConnectionGroup $group
      * @throws ArgumentException
      */
     public function dropConnectionGroup(SceneConnectionGroup $group): void
@@ -199,7 +199,7 @@ class Scene implements CreateableInterface, SceneConnectable
 
     /**
      * Checks if the given scene is connected to this entity.
-     * @param \LotGD\Core\Models\Scene $scene
+     * @param self $scene
      * @return bool True if yes.
      */
     public function isConnectedTo(self $scene): bool
@@ -228,7 +228,7 @@ class Scene implements CreateableInterface, SceneConnectable
 
     /**
      * Adds a connection to the outgoing connections.
-     * @param \LotGD\Core\Models\SceneConnection $connection
+     * @param SceneConnection $connection
      */
     public function addOutgoingConnection(SceneConnection $connection): void
     {
@@ -242,7 +242,7 @@ class Scene implements CreateableInterface, SceneConnectable
 
     /**
      * Adds a connection to the incoming connections.
-     * @param \LotGD\Core\Models\SceneConnection $connection
+     * @param SceneConnection $connection
      */
     public function addIncomingConnection(SceneConnection $connection): void
     {
