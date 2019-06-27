@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace LotGD\Core\Tools\Model;
 
 use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 use LotGD\Core\Models\SceneTemplate;
 
 /**
@@ -61,7 +61,7 @@ trait SceneBasics
     }
 
     /**
-     * Sets scene template
+     * Sets scene template.
      * @param SceneTemplate|null $template
      */
     public function setTemplate(?SceneTemplate $template)
@@ -70,7 +70,7 @@ trait SceneBasics
     }
 
     /**
-     * Returns scene template
+     * Returns scene template.
      * @return SceneTemplate|null
      */
     public function getTemplate(): ?SceneTemplate

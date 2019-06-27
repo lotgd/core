@@ -25,6 +25,8 @@ return PhpCsFixer\Config::create()
         'doctrine_annotation_braces' => true,
         'doctrine_annotation_indentation' => true,
         'doctrine_annotation_spaces' => [
+            'after_array_assignments_colon' => false,
+            'after_array_assignments_equals' => false,
             'before_argument_assignments' => false,
             'before_array_assignments_colon' => false,
             'before_array_assignments_equals' => false,

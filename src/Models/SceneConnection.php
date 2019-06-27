@@ -28,7 +28,7 @@ class SceneConnection
     private $incomingScene;
 
     /**
-     * @Column(type="integer", options={"default"= 0})
+     * @Column(type="integer", options={"default"=0})
      */
     private $directionality = 0;
 

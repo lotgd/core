@@ -1,20 +1,18 @@
 <?php
 declare(strict_types=1);
 
-
 namespace LotGD\Core\Models;
 
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\SceneTemplates\SceneTemplateInterface;
 
-
 /**
- * Class SceneTemplates
+ * Class SceneTemplates.
  * @Entity
  * @Table("scene_templates")
  */
@@ -26,7 +24,7 @@ class SceneTemplate
     /** @Column(type="string", length=255, name="module") */
     protected $module;
 
-    /** @Column(type="boolean", options={"default": True}) */
+    /** @Column(type="boolean", options={"default"=True}) */
     protected $userAssignable;
 
     /**
@@ -38,9 +36,9 @@ class SceneTemplate
      */
     public function __construct(string $class, string $module)
     {
-        if (!class_exists($class)) {
+        if (!\class_exists($class)) {
             throw new ClassNotFoundException("The class {$class} cannot be found.");
-        } elseif (is_a($class, SceneTemplateInterface::class) === false) {
+        } elseif (\is_a($class, SceneTemplateInterface::class) === false) {
             throw new ArgumentException("The given {$class} must implement SceneTemplateInterface");
         }
 
@@ -62,6 +60,6 @@ class SceneTemplate
      */
     public function setUserAssignable(bool $flag = true)
     {
-        $this->userAssignable=$flag;
+        $this->userAssignable = $flag;
     }
 }

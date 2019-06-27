@@ -27,7 +27,7 @@ class Scene implements CreateableInterface, SceneConnectable
     use Deletor;
     use SceneBasics;
 
-    /** @Id @Column(type="string", length=36, unique=True, name="id", options={"fixed": true}) */
+    /** @Id @Column(type="string", length=36, unique=True, name="id", options={"fixed"=true}) */
     protected $id;
 
     /**

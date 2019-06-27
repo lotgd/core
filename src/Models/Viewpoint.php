@@ -141,7 +141,7 @@ class Viewpoint implements CreateableInterface
         $snapshot = new ViewpointSnapshot(
             $this->getTitle(),
             $this->getDescription(),
-            get_class($this->getTemplate()),
+            \get_class($this->getTemplate()),
             $this->getActionGroups(),
             $this->getAttachments(),
             $this->getData()
