@@ -24,8 +24,8 @@ class SceneTemplate
     /** @Column(type="string", length=255, name="module") */
     protected $module;
 
-    /** @Column(type="boolean", options={"default"=True}) */
-    protected $userAssignable;
+    /** @Column(type="boolean", options={"default"=true}) */
+    protected $userAssignable = true;
 
     /**
      * SceneTemplates constructor.
