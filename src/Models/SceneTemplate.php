@@ -38,7 +38,7 @@ class SceneTemplate
     {
         if (!\class_exists($class)) {
             throw new ClassNotFoundException("The class {$class} cannot be found.");
-        } elseif (\is_a($class, SceneTemplateInterface::class) === false) {
+        } elseif (\is_a($class, SceneTemplateInterface::class, true) === false) {
             throw new ArgumentException("The given {$class} must implement SceneTemplateInterface");
         }
 
