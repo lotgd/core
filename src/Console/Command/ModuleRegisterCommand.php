@@ -5,8 +5,8 @@ namespace LotGD\Core\Console\Command;
 
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
-
 use LotGD\Core\LibraryConfiguration;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -29,7 +29,7 @@ class ModuleRegisterCommand extends BaseCommand
     /**
      * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $modules = $this->game->getComposerManager()->getModulePackages();
@@ -38,6 +38,8 @@ class ModuleRegisterCommand extends BaseCommand
         foreach ($modules as $p) {
             $this->registerModule($p->getName(), $io, $registered);
         }
+
+        return Command::SUCCESS;
     }
 
     /**

@@ -25,8 +25,10 @@ class DatabaseInitCommand extends BaseCommand
     /**
      * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->game->getEntityManager()->flush();
+
+        return Command::SUCCESS;
     }
 }

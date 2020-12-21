@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Console\Command;
 
 use LotGD\Core\Models\Character;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -33,7 +34,7 @@ class CharacterResetViewpointCommand extends BaseCommand
     /**
      * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $id = $input->getOption("id");
@@ -50,5 +51,7 @@ class CharacterResetViewpointCommand extends BaseCommand
         $character->setViewpoint(null);
 
         $this->game->getEntityManager()->flush();
+
+        return Command::SUCCESS;
     }
 }

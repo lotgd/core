@@ -26,7 +26,7 @@ class DatabaseSchemaUpdateCommand extends BaseCommand
     /**
      * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $entityManager = $this->game->getEntityManager();
         $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
@@ -34,5 +34,7 @@ class DatabaseSchemaUpdateCommand extends BaseCommand
         $schemaTool->updateSchema($metaData);
 
         $entityManager->flush();
+
+        return Command::SUCCESS;
     }
 }

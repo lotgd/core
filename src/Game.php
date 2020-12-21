@@ -24,7 +24,7 @@ use Monolog\Logger;
  */
 class Game
 {
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
     private $eventManager;
     private $composerManager;
     private $moduleManager;

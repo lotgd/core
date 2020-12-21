@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -24,7 +25,7 @@ class ModuleValidateCommand extends BaseCommand
     /**
      * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $results = $this->game->getModuleManager()->validate();
 
@@ -35,6 +36,7 @@ class ModuleValidateCommand extends BaseCommand
             return 1;
         }
         $output->writeln("<info>LotGD modules validated</info>");
-        return 0;
+
+        return Command::SUCCESS;
     }
 }
