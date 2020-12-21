@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 
 use LotGD\Core\Models\GameConfigurationElement;
 use LotGD\Core\Tools\OneToManyCollection;

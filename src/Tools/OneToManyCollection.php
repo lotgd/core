@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Tools;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 
 use LotGD\Core\Exceptions\ClassNotFoundException;
