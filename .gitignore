@@ -228,5 +228,8 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 dbconfig.php
+composer.phar
+clover.xml
+.phpunit.result.cache
 
 .php_cs.cache

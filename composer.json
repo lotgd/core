@@ -13,16 +13,17 @@
         "bin/daenerys"
     ],
     "require": {
-        "php": "^7.1.0",
+        "php": "^8.0.0",
         "ext-pdo": "*",
         "composer/composer": "*",
         "gedmo/doctrine-extensions": "*",
-        "doctrine/orm": "^2.5",
-        "monolog/monolog": "^1.12",
-        "symfony/console": "^3.0|^4.0",
-        "symfony/yaml": "^3.0|^4.0",
-        "d11wtq/boris": "^1.0",
-        "ramsey/uuid-doctrine": "^1.5"
+        "doctrine/orm": "^2.8",
+        "doctrine/common": "^3.0",
+        "monolog/monolog": "*",
+        "symfony/console": "*",
+        "symfony/yaml": "*",
+        "d11wtq/boris": "*",
+        "ramsey/uuid-doctrine": "*"
     },
     "repositories": [
         {
@@ -32,7 +33,7 @@
 
     ],
     "require-dev": {
-        "phpunit/phpunit": "^7.0|^8.0",
+        "phpunit/phpunit": "*",
         "phpunit/php-code-coverage": "*",
         "friendsofphp/php-cs-fixer": "*"
     }
