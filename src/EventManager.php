@@ -43,13 +43,13 @@ class EventManager
         // TODO: Add an in-memory cache here. Will likely only be in the 1000s of
         // patterns, so no need to go to the remote key-value store.
 
-        $this->g->getLogger()->addDebug("Publishing event {$event}.");
+        $this->g->getLogger()->debug("Publishing event {$event}.");
 
         $subscriptions = $this->getSubscriptions();
         foreach ($subscriptions as $s) {
             if (\preg_match($s->getPattern(), $event)) {
                 $class = $s->getClass();
-                $this->g->getLogger()->addDebug("  Handling with {$class}.");
+                $this->g->getLogger()->debug("  Handling with {$class}.");
 
                 $eventContext = new EventContext($event, $s->getPattern(), $contextData);
 
@@ -79,7 +79,7 @@ class EventManager
      */
     public function subscribe(string $pattern, string $class, string $library)
     {
-        $this->g->getLogger()->addDebug("Subscribing event pattern={$pattern} class={$class} library={$library}");
+        $this->g->getLogger()->debug("Subscribing event pattern={$pattern} class={$class} library={$library}");
 
         try {
             // Can we resolve this class?

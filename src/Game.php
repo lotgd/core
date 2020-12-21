@@ -279,14 +279,14 @@ class Game
 
             $id = $scene->getId();
             $referrerId = $referrer ? $referrer->getId() : 'null';
-            $this->getLogger()->addDebug("Navigating to sceneId={$id} from referrer sceneId={$referrerId}");
+            $this->getLogger()->debug("Navigating to sceneId={$id} from referrer sceneId={$referrerId}");
 
             // Copy over the basic structure from the scene database.
             $viewpoint->changeFromScene($scene);
 
             // Generate the default set of actions: the default group with
             // all children.
-            $this->getLogger()->addDebug("Building default action group...");
+            $this->getLogger()->debug("Building default action group...");
             $actionGroups = [
                 ActionGroup::DefaultGroup => new ActionGroup(ActionGroup::DefaultGroup, '', 0),
             ];
@@ -310,7 +310,7 @@ class Game
                     }
                 }
 
-                $this->getLogger()->addDebug("  Adding navigation action for child sceneId={$connectedScene->getId()}");
+                $this->getLogger()->debug("  Adding navigation action for child sceneId={$connectedScene->getId()}");
                 $action = new Action($connectedScene->getId(), $connectedScene->getTitle());
 
                 if ($connectionGroupName === null) {
@@ -332,7 +332,7 @@ class Game
             $counts = \implode(", ", \array_map(function ($k, $v) {
                 return $k .\count($v);
             }, \array_keys($actionGroups), \array_values($actionGroups)));
-            $this->getLogger()->addDebug("Total actions: {$counts}");
+            $this->getLogger()->debug("Total actions: {$counts}");
 
             $actionGroups[ActionGroup::HiddenGroup] = new ActionGroup(ActionGroup::HiddenGroup, '', 100);
 

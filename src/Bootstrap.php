@@ -159,9 +159,9 @@ class Bootstrap
     protected function createEntityManager(\PDO $pdo, Configuration $config): EntityManagerInterface
     {
         $this->annotationDirectories = $this->generateAnnotationDirectories();
-        $this->logger->addDebug("Adding annotation directories:");
+        $this->logger->debug("Adding annotation directories:");
         foreach ($this->annotationDirectories as $d) {
-            $this->logger->addDebug("  {$d}");
+            $this->logger->debug("  {$d}");
         }
         $configuration = Setup::createAnnotationMetadataConfiguration($this->annotationDirectories, true);
 
