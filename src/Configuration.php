@@ -16,15 +16,15 @@ use Symfony\Component\Yaml\Yaml;
  */
 class Configuration
 {
-    private $databaseDSN;
-    private $databaseName;
-    private $databaseUser;
-    private $databasePassword;
-    private $databaseAutoSchemaUpdate;
-    private $logPath;
-    private $gameEpoch;
-    private $gameOffsetSeconds;
-    private $gameDaysPerDay;
+    private string $databaseDSN;
+    private string $databaseName;
+    private string $databaseUser;
+    private string $databasePassword;
+    private bool $databaseAutoSchemaUpdate;
+    private string $logPath;
+    private DateTime $gameEpoch;
+    private int $gameOffsetSeconds;
+    private int $gameDaysPerDay;
 
     /**
      * Create the configuration object, reading from the specified path.
