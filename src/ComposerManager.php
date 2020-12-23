@@ -18,18 +18,14 @@ use LotGD\Core\Exceptions\LibraryDoesNotExistException;
  */
 class ComposerManager
 {
-    private $composer;
-    private $cwd;
+    private ?Composer $composer;
 
     /**
      * Construct a manager with an optional working directory where composer.json
      * lives.
      * @param string $cwd
      */
-    public function __construct(string $cwd)
-    {
-        $this->cwd = $cwd;
-    }
+    public function __construct(private string $cwd) {}
 
     /**
      * Returns a Composer instance to perform underlying operations on. Be careful.
