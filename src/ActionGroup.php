@@ -11,9 +11,6 @@ class ActionGroup implements \Countable
     const DefaultGroup = 'lotgd/core/default';
     const HiddenGroup = 'lotgd/core/hidden';
 
-    private $id;
-    private $title;
-    private $sortKey;
     private $actions;
 
     /**
@@ -22,11 +19,11 @@ class ActionGroup implements \Countable
      * @param string $title Title to display to the end user. Empty string means no title.
      * @param int $sortKey Navigation menus are displayed in the order sorted by this integer.
      */
-    public function __construct(string $id, string $title, int $sortKey)
-    {
-        $this->id = $id;
-        $this->title = $title;
-        $this->sortKey = $sortKey;
+    public function __construct(
+        private string $id,
+        private string $title,
+        private int $sortKey
+    ) {
         $this->actions = [];
     }
 
