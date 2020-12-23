@@ -16,15 +16,10 @@ use LotGD\Core\Models\EventSubscription;
  */
 class EventManager
 {
-    private $g;
-
     /**
      * @param Game $g The game.
      */
-    public function __construct(Game $g)
-    {
-        $this->g = $g;
-    }
+    public function __construct(private Game $g) {}
 
     /**
      * Publish an event. Will immediately cause handleEvent() to be called on all
@@ -119,6 +114,7 @@ class EventManager
      * @param string $pattern Regular expression, in PHP format, to match against
      * published event names.
      * @param string $class Fully qualified class name.
+     * @param string $library
      * @throws SubscriptionNotFoundException if the specified subscription does not exist.
      */
     public function unsubscribe(string $pattern, string $class, string $library)
