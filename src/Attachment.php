@@ -9,18 +9,17 @@ namespace LotGD\Core;
  */
 abstract class Attachment
 {
-    protected $id;
-    protected $type;
+    protected string $id;
 
     /**
      * Construct a new attachment of the given type. Randomly assigns it an ID.
      * @param string $type Type of this attachment, in the vendor/module/type format.
      * @return Attachment
      */
-    public function __construct(string $type)
-    {
+    public function __construct(
+        protected string $type
+    ) {
         $this->id = \bin2hex(\random_bytes(8));
-        $this->type = $type;
     }
 
     /**
