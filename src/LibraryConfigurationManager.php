@@ -8,8 +8,8 @@ namespace LotGD\Core;
  */
 class LibraryConfigurationManager
 {
-    /** @var array<LibraryConfiguration> */
-    private $configurations = null;
+    /** @var LibraryConfiguration[] */
+    private array $configurations = [];
 
     /**
      * Construct a manager.
@@ -19,7 +19,6 @@ class LibraryConfigurationManager
     public function __construct(ComposerManager $composerManager, string $cwd)
     {
         $packages = $composerManager->getPackages();
-        $this->configurations = [];
 
         foreach ($packages as $package) {
             if ($package->getType() === "lotgd-crate" || $package->getType() === "lotgd-module") {
@@ -32,6 +31,7 @@ class LibraryConfigurationManager
     /**
      * Return a library configuration for the specified library, in 'vendor/library'
      * format.
+     * @param string $library
      * @return LibraryConfiguration|null
      */
     public function getConfigurationForLibrary(string $library): ?LibraryConfiguration
