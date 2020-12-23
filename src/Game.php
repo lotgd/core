@@ -25,16 +25,12 @@ use Monolog\Logger;
  */
 class Game
 {
-    private EntityManagerInterface $entityManager;
     private EventManager $eventManager;
     private ComposerManager $composerManager;
     private ModuleManager $moduleManager;
     private MessageManager $messageManager;
-    private Logger $logger;
-    private Configuration $configuration;
     private Character $character;
     private DiceBag $diceBag;
-    private string $cwd;
     private TimeKeeper $timeKeeper;
 
     /**
@@ -45,15 +41,11 @@ class Game
      * @param string $cwd
      */
     public function __construct(
-        Configuration $configuration,
-        Logger $logger,
-        EntityManagerInterface $entityManager,
-        string $cwd
+        private Configuration $configuration,
+        private Logger $logger,
+        private EntityManagerInterface $entityManager,
+        private string $cwd
     ) {
-        $this->configuration = $configuration;
-        $this->logger = $logger;
-        $this->entityManager = $entityManager;
-        $this->cwd = $cwd;
     }
 
     /**
