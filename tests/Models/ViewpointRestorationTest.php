@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests\Models;
 
 use Composer\Repository\RepositoryInterface;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
