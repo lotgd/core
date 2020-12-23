@@ -13,17 +13,11 @@ use Symfony\Component\Yaml\Yaml;
  */
 class LibraryConfiguration
 {
-    /** @var ComposerManager */
-    private $composerManager;
-    /** @var PackageInterface */
-    private $package;
-    /** @var string */
-    private $rootNamespace;
-    /** @var array */
-    private $subscriptionPatterns;
-    /** @var array */
-    private $rawConfig;
-    private $daenerysCommands;
+    private string $rootNamespace;
+    private ?string $entityDirectory;
+    private array $subscriptionPatterns;
+    private array $rawConfig;
+    private array $daenerysCommands;
 
     /**
      * Construct a configuration.
@@ -31,11 +25,11 @@ class LibraryConfiguration
      * @param PackageInterface $package
      * @param string $cwd
      */
-    public function __construct(ComposerManager $composerManager, PackageInterface $package, string $cwd)
-    {
-        $this->composerManager = $composerManager;
-        $this->package = $package;
-
+    public function __construct(
+        private ComposerManager $composerManager,
+        private PackageInterface $package,
+        string $cwd,
+    ) {
         $path = '';
         $basePackage = $composerManager->getComposer()->getPackage();
         if ($basePackage && $basePackage->getName() === $package->getName()) {
@@ -141,9 +135,9 @@ class LibraryConfiguration
 
     /**
      * Tries to iterate an array element given by the arguments.
-     * @param scalar $argument1,... array keys, by increasing depth
+     * @param bool|int|float|string|bool[]|int[]|float[]|string[] $arguments array keys, by increasing depth
      */
-    public function iterateKey(...$arguments)
+    public function iterateKey(array|bool|int|float|string ...$arguments)
     {
         $result = $this->getSubKeyIfItExists($arguments);
 
@@ -159,7 +153,7 @@ class LibraryConfiguration
      * @param mixed ...$arguments
      * @return mixed
      */
-    protected function getConfig(...$arguments)
+    protected function getConfig(mixed ...$arguments)
     {
         $result = $this->getSubKeyIfItExists($arguments);
         return $result;
@@ -190,7 +184,7 @@ class LibraryConfiguration
 
     /**
      * Returns true if there are any models to add.
-     * @return type
+     * @return bool
      */
     public function hasEntityDirectory(): bool
     {
@@ -225,7 +219,7 @@ class LibraryConfiguration
      */
     public function hasDaenerysCommands(): bool
     {
-        return \count($this->daenerysCommands) > 0 ? true : false;
+        return \count($this->daenerysCommands) > 0;
     }
 
     /**
