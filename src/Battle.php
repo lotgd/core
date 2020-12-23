@@ -30,18 +30,10 @@ class Battle
     const RESULT_PLAYERDEATH = 1;
     const RESULT_MONSTERDEATH = 2;
     
-    protected $player;
-    protected $monster;
-    protected $game;
-    protected $events;
-    protected $result = 0;
-    protected $round = 0;
-    
-    /**
-     * Battle Configuration.
-     * @var array
-     */
-    protected $configuration = [
+    protected ArrayCollection $events;
+    protected int $result = 0;
+    protected int $round = 0;
+    protected array $configuration = [
         "riposteEnabled" => true,
         "levelAdjustementEnabled" => true,
         "criticalHitEnabled" => true,
@@ -51,13 +43,13 @@ class Battle
      * Takes a game object and two participants (Player and Monster) to fight a battle.
      * @param Game $game
      * @param FighterInterface $player
-     * @param FighterInterface $monster
+     * @param FighterInterface|null $monster
      */
-    public function __construct(Game $game, FighterInterface $player, ?FighterInterface $monster)
-    {
-        $this->game = $game;
-        $this->player = $player;
-        $this->monster = $monster;
+    public function __construct(
+        protected Game $game,
+        protected FighterInterface $player,
+        protected ?FighterInterface $monster
+    ) {
         $this->events = new ArrayCollection();
     }
 
@@ -106,7 +98,7 @@ class Battle
     /**
      * Disables ripostes.
      */
-    public function disableRiposte()
+    public function disableRiposte(): void
     {
         $this->configuration["riposteEnabled"] = false;
     }
@@ -114,7 +106,7 @@ class Battle
     /**
      * Enables ripostes.
      */
-    public function enableRiposte()
+    public function enableRiposte(): void
     {
         $this->configuration["riposteEnabled"] = true;
     }
@@ -131,7 +123,7 @@ class Battle
     /**
      * Enables level adjustement.
      */
-    public function enableLevelAdjustement()
+    public function enableLevelAdjustement(): void
     {
         $this->configuration["levelAdjustementEnabled"] = true;
     }
@@ -139,7 +131,7 @@ class Battle
     /**
      * Disables level adjustement.
      */
-    public function disableLevelAdjustement()
+    public function disableLevelAdjustement(): void
     {
         $this->configuration["levelAdjustementEnabled"] = false;
     }
@@ -165,7 +157,7 @@ class Battle
     /**
      * Disable critical hits.
      */
-    public function disableCriticalHit()
+    public function disableCriticalHit(): void
     {
         $this->configuration["criticalHitEnabled"] = false;
     }
@@ -173,7 +165,7 @@ class Battle
     /**
      * enables critical hits.
      */
-    public function enableCriticalHit()
+    public function enableCriticalHit(): void
     {
         $this->configuration["criticalHitEnabled"] = true;
     }
@@ -268,7 +260,7 @@ class Battle
      * Fights exactly 1 round.
      * @param int $firstDamageRound
      */
-    protected function fightOneRound(int $firstDamageRound)
+    protected function fightOneRound(int $firstDamageRound): void
     {
         $damageHasBeenDone = false;
         
@@ -281,7 +273,7 @@ class Battle
         $offenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_PLAYER ? $this->turn($this->player, $this->monster) : new ArrayCollection();
         $defenseTurnEvents = $firstDamageRound & self::DAMAGEROUND_MONSTER ? $this->turn($this->monster, $this->player) : new ArrayCollection();
 
-        $events = new ArrayCollection(\array_merge($offenseTurnEvents->toArray(), $defenseTurnEvents->toArray()));
+        $events = new ArrayCollection([...$offenseTurnEvents->toArray(), ...$defenseTurnEvents->toArray()]);
         $eventsToAdd = new ArrayCollection();
 
         foreach ($events as $event) {
@@ -311,17 +303,17 @@ class Battle
         $monsterBuffExpiringEvents = $this->monster->getBuffs()->expireOneRound();
         
         $this->events = new ArrayCollection(
-            \array_merge(
-                $this->events->toArray(),
-                $playerBuffStartEvents->toArray(),
-                $monsterBuffStartEvents->toArray(),
-                $eventsToAdd->toArray(),
-                $playerBuffEndEvents->toArray(),
-                $monsterBuffEndEvents->toArray(),
-                $playerBuffExpiringEvents->toArray(),
-                $monsterBuffExpiringEvents->toArray(),
-                isset($deathEvent) ? [$deathEvent] : []
-            )
+            [
+                ...$this->events->toArray(),
+                ...$playerBuffStartEvents->toArray(),
+                ...$monsterBuffStartEvents->toArray(),
+                ...$eventsToAdd->toArray(),
+                ...$playerBuffEndEvents->toArray(),
+                ...$monsterBuffEndEvents->toArray(),
+                ...$playerBuffExpiringEvents->toArray(),
+                ...$monsterBuffExpiringEvents->toArray(),
+                ...isset($deathEvent) ? [$deathEvent] : [],
+            ]
         );
     }
     
@@ -451,15 +443,15 @@ class Battle
         $defendersDamageDependentBuffEvents = $defendersBuffs->processDamageDependentBuffs(Buff::ACTIVATE_DEFENSE, -$damage, $this->game, $defender, $attacker);
         
         return new ArrayCollection(
-            \array_merge(
-                $attackersBuffStartEvents->toArray(),
-                $attackersDirectBuffEvents->toArray(),
-                $defendersBuffStartEvents->toArray(),
-                $defendersDirectBuffEvents->toArray(),
-                $events->toArray(),
-                $attackersDamageDependentBuffEvents->toArray(),
-                $defendersDamageDependentBuffEvents->toArray()
-            )
+            [
+                ...$attackersBuffStartEvents->toArray(),
+                ...$attackersDirectBuffEvents->toArray(),
+                ...$defendersBuffStartEvents->toArray(),
+                ...$defendersDirectBuffEvents->toArray(),
+                ...$events->toArray(),
+                ...$attackersDamageDependentBuffEvents->toArray(),
+                ...$defendersDamageDependentBuffEvents->toArray(),
+            ]
         );
     }
 }
