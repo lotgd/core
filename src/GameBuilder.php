@@ -16,16 +16,16 @@ use Monolog\Logger;
  */
 class GameBuilder
 {
-    private $cwd;
-    private $configuration;
-    private $entityManager;
-    private $logger;
+    private string $cwd;
+    private Configuration $configuration;
+    private EntityManagerInterface $entityManager;
+    private Logger $logger;
 
-    private $moduleManagerClass;
-    private $composerManagerClass;
-    private $eventManagerClass;
-    private $diceBagClass;
-    private $messageManagerClass;
+    private string $moduleManagerClass;
+    private string $composerManagerClass;
+    private string$eventManagerClass;
+    private string $diceBagClass;
+    private string $messageManagerClass;
 
     /**
      * Creates the game instance with the prepared parameters.
