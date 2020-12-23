@@ -9,10 +9,7 @@ namespace LotGD\Core;
  */
 class Action
 {
-    protected $id;
-    protected $destinationSceneId;
-    protected $title = null;
-    protected $parameters = [];
+    protected string $id;
 
     /**
      * Construct a new action with the specified Scene as its destination.
@@ -20,12 +17,12 @@ class Action
      * @param string|null $title
      * @param array $parameters
      */
-    public function __construct(string $destinationSceneId, ?string $title = null, array $parameters = [])
-    {
+    public function __construct(
+        protected string $destinationSceneId,
+        protected ?string $title = null,
+        protected array $parameters = []
+    ) {
         $this->id = \bin2hex(\random_bytes(8));
-        $this->destinationSceneId = $destinationSceneId;
-        $this->title = $title;
-        $this->parameters = $parameters;
     }
 
     /**
@@ -57,7 +54,7 @@ class Action
     }
 
     /**
-     * @param string $title
+     * @param string|null $title
      * @return string|null
      */
     public function setTitle(?string $title): ?string
