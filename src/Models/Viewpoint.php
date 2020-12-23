@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -140,7 +141,7 @@ class Viewpoint implements CreateableInterface
         $snapshot = new ViewpointSnapshot(
             $this->getTitle(),
             $this->getDescription(),
-            $this->getTemplate(),
+            \get_class($this->getTemplate()),
             $this->getActionGroups(),
             $this->getAttachments(),
             $this->getData()
@@ -153,11 +154,13 @@ class Viewpoint implements CreateableInterface
      * Changes the current viewpoint to the state saved in the given restoration point.
      * @param ViewpointSnapshot $snapshot
      */
-    public function changeFromSnapshot(ViewpointSnapshot $snapshot)
+    public function changeFromSnapshot(EntityManager $entityManager, ViewpointSnapshot $snapshot)
     {
+        $templateInstance = $entityManager->getRepository(SceneTemplate::class)->find($snapshot->getTemplate());
+
         $this->setTitle($snapshot->getTitle());
         $this->setDescription($snapshot->getDescription());
-        $this->setTemplate($snapshot->getTemplate());
+        $this->setTemplate($templateInstance);
         $this->setActionGroups($snapshot->getActionGroups());
         $this->setAttachments($snapshot->getAttachments());
         $this->setData($snapshot->getData());

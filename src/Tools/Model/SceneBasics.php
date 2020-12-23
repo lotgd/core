@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tools\Model;
 
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
+use LotGD\Core\Models\SceneTemplate;
+
 /**
  * Provides scene basics.
  */
@@ -13,7 +18,11 @@ trait SceneBasics
     /** @Column(type="text") */
     private $description = "{No scene set}";
     /** @Column(type="string", length=255) */
-    private $template = "{No template set}";
+    /**
+     * @ManyToOne(targetEntity="SceneTemplate", fetch="EAGER")
+     * @JoinColumn(name="template", referencedColumnName="class", nullable=true)
+     */
+    private $template;
 
     /**
      * Sets scene title.
@@ -53,18 +62,18 @@ trait SceneBasics
 
     /**
      * Sets scene template.
-     * @param string $template
+     * @param SceneTemplate|null $template
      */
-    public function setTemplate(string $template)
+    public function setTemplate(?SceneTemplate $template)
     {
         $this->template = $template;
     }
 
     /**
      * Returns scene template.
-     * @return string
+     * @return SceneTemplate|null
      */
-    public function getTemplate(): string
+    public function getTemplate(): ?SceneTemplate
     {
         return $this->template;
     }

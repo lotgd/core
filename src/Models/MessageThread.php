@@ -26,7 +26,7 @@ class MessageThread implements SaveableInterface
     private $id;
     /** @Column(type="string", length=255, unique=true) */
     private $threadKey;
-    /** @Column(type="boolean", options={"default"= false}) */
+    /** @Column(type="boolean", options={"default"=false}) */
     private $readonly = false;
     /** @ManyToMany(targetEntity="Character", cascade={"persist"}, mappedBy="messageThreads")  */
     private $participants;

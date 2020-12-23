@@ -47,11 +47,11 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     private $name = "";
     /** @Column(type="text"); */
     private $displayName = "";
-    /** @Column(type="integer", options={"default"= 10}) */
+    /** @Column(type="integer", options={"default"=10}) */
     private $maxHealth = 10;
-    /** @Column(type="integer", options={"default"= 10}) */
+    /** @Column(type="integer", options={"default"=10}) */
     private $health = 10;
-    /** @Column(type="integer", options={"default"= 1})/ */
+    /** @Column(type="integer", options={"default"=1})/ */
     private $level = 1;
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist", "remove"}) */
     private $properties;

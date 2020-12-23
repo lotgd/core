@@ -8,9 +8,21 @@ use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 use Monolog\Handler\NullHandler;
 
-use LotGD\Core\{
-    Action, ActionGroup, Bootstrap, Configuration, ComposerManager, DiceBag, EventHandler, EventManager, Events\NewViewpointData, Game, GameBuilder, TimeKeeper, ModuleManager
-};
+use LotGD\Core\{Action,
+    ActionGroup,
+    Bootstrap,
+    Configuration,
+    ComposerManager,
+    DiceBag,
+    EventHandler,
+    EventManager,
+    Events\NewViewpointData,
+    Game,
+    GameBuilder,
+    Tests\SceneTemplates\ParameterTestSceneTemplate,
+    Tests\SceneTemplates\VillageSceneTemplate,
+    TimeKeeper,
+    ModuleManager};
 use LotGD\Core\Models\{
     Character, Viewpoint, Scene
 };
@@ -40,7 +52,7 @@ class DefaultSceneProvider implements EventHandler
                 $context->setDataField("scene", $g->getEntityManager()->getRepository(Scene::class)
                     ->find("30000000-0000-0000-0000-000000000001"));
                 break;
-            case 'h/lotgd/core/navigate-to/lotgd/tests/village':
+            case "h/lotgd/core/navigate-to/".VillageSceneTemplate::getNavigationEvent();
                 $v = $context->getDataField('viewpoint');
 
                 self::$actionGroups = [new ActionGroup('default', 'Title', 0)];
@@ -54,7 +66,7 @@ class DefaultSceneProvider implements EventHandler
                 $v->setData(self::$data);
                 break;
 
-            case 'h/lotgd/core/navigate-to/lotgd/tests/paramaters':
+            case "h/lotgd/core/navigate-to/".ParameterTestSceneTemplate::getNavigationEvent():
                 /* @var Viewpoint $v //*/
                 $v = $context->getDataField('viewpoint');
                 /* @var array //*/
@@ -164,8 +176,9 @@ class GameTest extends CoreModelTestCase
 
         $v = $this->g->getViewpoint();
         // Run it twice to make sure no additional DB operations happen.
+        /** @var Viewpoint $v */
         $v = $this->g->getViewpoint();
-        $this->assertEquals('lotgd/tests/village', $v->getTemplate());
+        $this->assertSame(VillageSceneTemplate::class, $v->getTemplate()->getClass());
 
         // Validate the changes made by the hook.
         $this->assertSame(DefaultSceneProvider::$actionGroups, $v->getActionGroups());
@@ -215,7 +228,7 @@ class GameTest extends CoreModelTestCase
         $this->g->setCharacter($c);
 
         // subscribe event
-        $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->g->getEventManager()->subscribe('#'.ParameterTestSceneTemplate::getNavigationEvent().'#', DefaultSceneProvider::class, 'lotgd/core/tests');
         $this->getEntityManager()->flush();
 
         $action = new Action("30000000-0000-0000-0000-000000000007", null, ["foo" => "baz"]);
@@ -235,7 +248,7 @@ class GameTest extends CoreModelTestCase
         $this->assertSame("Parameter is baz.", $v->getDescription());
 
         // unsubscribe event
-        $this->g->getEventManager()->unsubscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->g->getEventManager()->unsubscribe('#'.ParameterTestSceneTemplate::getNavigationEvent().'#', DefaultSceneProvider::class, 'lotgd/core/tests');
     }
 
     public function testIfActionParametersTakePriorityToOtherParameters()
@@ -245,7 +258,7 @@ class GameTest extends CoreModelTestCase
         $this->g->setCharacter($c);
 
         // subscribe event
-        $this->g->getEventManager()->subscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->g->getEventManager()->subscribe('#'.ParameterTestSceneTemplate::getNavigationEvent().'#', DefaultSceneProvider::class, 'lotgd/core/tests');
         $this->getEntityManager()->flush();
 
         $action = new Action("30000000-0000-0000-0000-000000000007", null, ["foo" => "baz"]);
@@ -265,7 +278,7 @@ class GameTest extends CoreModelTestCase
         $this->assertSame("Parameter is baz.", $v->getDescription());
 
         // unsubscribe event
-        $this->g->getEventManager()->unsubscribe('#h/lotgd/core/navigate-to/lotgd/tests/paramaters#', DefaultSceneProvider::class, 'lotgd/core/tests');
+        $this->g->getEventManager()->unsubscribe('#'.ParameterTestSceneTemplate::getNavigationEvent().'#', DefaultSceneProvider::class, 'lotgd/core/tests');
     }
 
     public function testIfActionsAreAddedAsExpected()
