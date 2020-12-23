@@ -43,16 +43,11 @@ class PermissionManager
     const EditCharacters = "lotgd/core/characters/edit";
     const DeleteCharacters = "lotgd/core/characters/delete";
 
-    private $game;
-
     /**
      * Construct a permission manager.
      * @param Game $game The game.
      */
-    public function __construct(Game $game)
-    {
-        $this->game = $game;
-    }
+    public function __construct(private Game $game) {}
 
     /**
      * Checks if an actor has a permission set. No assumption can be made if it's allowed or denied.
@@ -111,6 +106,7 @@ class PermissionManager
     private function findPermission(string $permissionId): Permission
     {
         $em = $this->game->getEntityManager();
+        /** @var Permission $result */
         $result = $em->getRepository(Permission::class)->find($permissionId);
 
         if ($result) {
