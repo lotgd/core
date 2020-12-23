@@ -26,16 +26,16 @@ use Monolog\Logger;
 class Game
 {
     private EntityManagerInterface $entityManager;
-    private $eventManager;
-    private $composerManager;
-    private $moduleManager;
-    private $messageManager;
-    private $logger;
-    private $configuration;
-    private $character;
-    private $diceBag;
-    private $cwd;
-    private $timeKeeper;
+    private EventManager $eventManager;
+    private ComposerManager $composerManager;
+    private ModuleManager $moduleManager;
+    private MessageManager $messageManager;
+    private Logger $logger;
+    private Configuration $configuration;
+    private Character $character;
+    private DiceBag $diceBag;
+    private string $cwd;
+    private TimeKeeper $timeKeeper;
 
     /**
      * Construct a game. You probably want to use Bootstrap to do this.
