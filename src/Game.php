@@ -29,9 +29,9 @@ class Game
     private ComposerManager $composerManager;
     private ModuleManager $moduleManager;
     private MessageManager $messageManager;
-    private Character $character;
+    private ?Character $character = null;
     private DiceBag $diceBag;
-    private TimeKeeper $timeKeeper;
+    private ?TimeKeeper $timeKeeper = null;
 
     /**
      * Construct a game. You probably want to use Bootstrap to do this.
