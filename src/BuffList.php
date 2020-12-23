@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Exceptions\BuffListAlreadyActivatedException;
+use LotGD\Core\Exceptions\BuffSlotOccupiedException;
 use LotGD\Core\Models\BattleEvents\BuffMessageEvent;
 use LotGD\Core\Models\BattleEvents\DamageLifetapEvent;
 use LotGD\Core\Models\BattleEvents\DamageReflectionEvent;
@@ -21,41 +22,33 @@ use LotGD\Core\Models\FighterInterface;
  */
 class BuffList
 {
-    protected $buffs;
-    protected $buffsBySlot;
-    protected $activeBuffs = [];
-    /** @var ArrayCollection */
-    protected $usedBuffs;
+    protected array $buffsBySlot;
+    protected array $activeBuffs = [];
+    protected ArrayCollection $usedBuffs;
 
-    /** @var bool True of the modifiers have already been calculated */
-    protected $modifiersCalculated = false;
-    /** @var bool True if the badguy is invulnurable */
-    protected $badguyInvulnurable = false;
-    /** @var float */
-    protected $badguyDamageModifier = 1.;
-    /** @var float */
-    protected $badguyAttackModifier = 1.;
-    /** @var float */
-    protected $badguyDefenseModifier = 1.;
-    /** @var bool True if the goodguy is invulnurable */
-    protected $goodguyInvulnurable = false;
-    /** @var float */
-    protected $goodguyDamageModifier = 1.;
-    /** @var float */
-    protected $goodguyAttackModifier = 1.;
-    /** @var float */
-    protected $goodguyDefenseModifier = 1.;
+    /** True of the modifiers have already been calculated */
+    protected bool $modifiersCalculated = false;
+    /** True if the badguy is invulnurable */
+    protected bool $badguyInvulnurable = false;
 
-    protected $events;
-    protected $loaded = false;
+    protected float $badguyDamageModifier = 1.;
+    protected float $badguyAttackModifier = 1.;
+    protected float $badguyDefenseModifier = 1.;
+    protected bool $goodguyInvulnurable = false;
+    protected float $goodguyDamageModifier = 1.;
+    protected float $goodguyAttackModifier = 1.;
+    protected float $goodguyDefenseModifier = 1.;
+
+    protected ArrayCollection $events;
+    protected bool $loaded = false;
 
     /**
      * Initiates some variables.
      * @param Collection $buffs
      */
-    public function __construct(Collection $buffs)
-    {
-        $this->buffs = $buffs;
+    public function __construct(
+        protected Collection $buffs
+    ) {
         $this->events = new ArrayCollection();
         $this->usedBuffs = new ArrayCollection();
     }
@@ -132,7 +125,7 @@ class BuffList
      */
     public function hasBuffsInUse(): bool
     {
-        return \count($this->usedBuffs) > 0 ? true : false;
+        return \count($this->usedBuffs) > 0;
     }
 
     /**
