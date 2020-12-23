@@ -84,8 +84,8 @@ class DiceBag
      * half as likely to happen.
      * The code for this function was taken from LotGD in version 0.9.7.
      * @author MightyE, JT
-     * @param int $min
-     * @param int $max
+     * @param int|null $min
+     * @param int|null $max
      * @return int
      */
     public function pseudoBell(int $min = null, int $max = null): int
