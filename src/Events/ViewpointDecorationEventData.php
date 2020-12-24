@@ -17,7 +17,7 @@ class ViewpointDecorationEventData extends EventContextData
             "required" => "bool",
         ],
     ])]
-    protected static array $argumentConfig = [
+    protected static ?array $argumentConfig = [
         "viewpoint" => ["type" => Viewpoint::class, "required" => true],
     ];
 }

@@ -23,7 +23,8 @@
         "symfony/console": "*",
         "symfony/yaml": "*",
         "d11wtq/boris": "*",
-        "ramsey/uuid-doctrine": "*"
+        "ramsey/uuid-doctrine": "*",
+        "jetbrains/phpstorm-attributes": "*"
     },
     "repositories": [
         {

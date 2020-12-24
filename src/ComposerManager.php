@@ -18,7 +18,7 @@ use LotGD\Core\Exceptions\LibraryDoesNotExistException;
  */
 class ComposerManager
 {
-    private ?Composer $composer;
+    private ?Composer $composer = null;
 
     /**
      * Construct a manager with an optional working directory where composer.json
@@ -71,10 +71,10 @@ class ComposerManager
      */
     public function getPackages(): array
     {
-        return \array_merge(
-            [$this->getComposer()->getPackage()],
-            $this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages()
-        );
+        return [
+            $this->getComposer()->getPackage(),
+            ...$this->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages(),
+        ];
     }
 
     /**

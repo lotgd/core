@@ -21,7 +21,7 @@ class CharacterEventData extends EventContextData
             "required" => "bool",
         ],
     ])]
-    protected static array $argumentConfig = [
+    protected static ?array $argumentConfig = [
         "character" => ["type" => Character::class, "required" => true],
         "value" => ["type" => "mixed", "required" => false],
     ];
