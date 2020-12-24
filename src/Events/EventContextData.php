@@ -13,7 +13,14 @@ use LotGD\Core\Exceptions\ArgumentException;
  */
 class EventContextData
 {
-    private $data;
+    protected static ?array $argumentConfig = null;
+
+    /**
+     * protected constructor..
+     * @see self::create
+     * @param array $data
+     */
+    protected function __construct(private array $data) {}
 
     /**
      * Creates a new instance of a data container.
@@ -33,10 +40,10 @@ class EventContextData
 
     /**
      * Checks a field configuration given in self::$argumentConfig.
-     * @param $data
+     * @param array $data
      * @throws ArgumentException
      */
-    public static function checkConfiguration($data)
+    public static function checkConfiguration(array $data)
     {
         $configuration = static::$argumentConfig;
         $types = [
@@ -81,16 +88,6 @@ class EventContextData
     }
 
     /**
-     * protected constructor..
-     * @see self::create
-     * @param array $data
-     */
-    protected function __construct(array $data)
-    {
-        $this->data = $data;
-    }
-
-    /**
      * Returns true if container has a certain field.
      * @param string $field
      * @return bool
@@ -116,10 +113,10 @@ class EventContextData
     /**
      * Sets a field to a new value and returns a new data container.
      * @param string $field
-     * @param $value
+     * @param mixed $value
      * @return EventContextData
      */
-    public function set(string $field, $value): self
+    public function set(string $field, mixed $value): self
     {
         if ($this->has($field)) {
             $data = $this->data;

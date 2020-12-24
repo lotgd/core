@@ -9,10 +9,6 @@ namespace LotGD\Core\Events;
  */
 class EventContext
 {
-    private $matchingPattern;
-    private $event;
-    private $data;
-
     /**
      * EventContext constructor.
      * @param string $event The published event
@@ -20,13 +16,10 @@ class EventContext
      * @param EventContextData $data
      */
     public function __construct(
-        string $event,
-        string $matchingPattern,
-        EventContextData $data
+        private string $event,
+        private string $matchingPattern,
+        private EventContextData $data
     ) {
-        $this->event = $event;
-        $this->matchingPattern = $matchingPattern;
-        $this->data = $data;
     }
 
     /**

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Events;
 
+use JetBrains\PhpStorm\ArrayShape;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Scene;
@@ -21,8 +22,13 @@ class NewViewpointData extends EventContextData
      * @param array $data
      * @throws ArgumentException In case $data contains invalid data.
      */
-    protected function __construct(array $data)
-    {
+    protected function __construct(
+        #[ArrayShape([
+            "character" => Character::class,
+            "scene" => Scene::class . "|null",
+        ])]
+        array $data,
+    ) {
         if (\array_keys($data) !== ["character", "scene"]) {
             throw new ArgumentException("A NewViewpoint event must have only character and scene.");
         }

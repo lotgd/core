@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Events;
 
+use JetBrains\PhpStorm\ArrayShape;
 use LotGD\Core\Models\Viewpoint;
 
 /**
@@ -10,7 +11,13 @@ use LotGD\Core\Models\Viewpoint;
  */
 class ViewpointDecorationEventData extends EventContextData
 {
-    protected static $argumentConfig = [
+    #[ArrayShape([
+        "viewpoint" => [
+            "type" => Viewpoint::class,
+            "required" => "bool",
+        ],
+    ])]
+    protected static array $argumentConfig = [
         "viewpoint" => ["type" => Viewpoint::class, "required" => true],
     ];
 }

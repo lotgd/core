@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Events;
 
+use JetBrains\PhpStorm\ArrayShape;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\Viewpoint;
@@ -24,8 +25,16 @@ class NavigateToSceneData extends EventContextData
      * @param array $data Must contain fields referrer, viewpoint, scene, parameters and redirect; none more.
      * @throws ArgumentException
      */
-    protected function __construct(array $data)
-    {
+    protected function __construct(
+        #[ArrayShape([
+            "referrer" => Scene::class . "|null",
+            "viewpoint" => Viewpoint::class,
+            "scene" => Scene::class,
+            "parameters" => "array",
+            "reddirect" => Scene::class . "|null",
+        ])]
+        array $data,
+    ) {
         $mustHaveForm = ["referrer", "viewpoint", "scene", "parameters", "redirect"];
         $doesHaveForm = \array_keys($data);
         \sort($mustHaveForm);
