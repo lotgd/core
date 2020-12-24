@@ -18,8 +18,7 @@ use LotGD\Core\Exceptions\ArgumentException;
  */
 class ExtensionMethod
 {
-    /** @var string */
-    private $methodName = "";
+    private string $methodName = "";
 
     /**
      * ExtensionMethod constructor.

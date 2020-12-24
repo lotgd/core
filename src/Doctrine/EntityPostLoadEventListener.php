@@ -12,17 +12,12 @@ use LotGD\Core\GameAwareInterface;
  */
 class EntityPostLoadEventListener
 {
-    /** @var Game $game */
-    private $game;
 
     /**
      * EntityPostLoadEventListener constructor.
-     * @param Game $g
+     * @param Game $game
      */
-    public function __construct(Game $g)
-    {
-        $this->game = $g;
-    }
+    public function __construct(private Game $game) {}
 
     /**
      * Called upon event postLoad.

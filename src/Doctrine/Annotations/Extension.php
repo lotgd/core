@@ -19,8 +19,7 @@ use LotGD\Core\Models\ExtendableModelInterface;
  */
 class Extension
 {
-    /** @var string */
-    private $modelClass;
+    private string $modelClass;
 
     /**
      * Extension constructor.
