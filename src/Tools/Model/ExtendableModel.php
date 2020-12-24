@@ -15,12 +15,10 @@ trait ExtendableModel
      * @param mixed $arguments
      * @return mixed
      */
-    public function __call($method, $arguments)
+    public function __call(mixed $method, mixed $arguments)
     {
         $callback = ModelExtender::get(self::class, $method);
 
-        if ($callback) {
-            return \call_user_func_array($callback, \array_merge([$this], $arguments));
-        }
+        return $callback(...[$this, ...$arguments]);
     }
 }

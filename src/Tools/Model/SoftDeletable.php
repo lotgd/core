@@ -36,9 +36,9 @@ trait SoftDeletable
     
     /**
      * Sets deletedAt to a specific date.
-     * @param DateTime $deletedAt
+     * @param ?DateTime $deletedAt
      */
-    public function setDeletedAt(DateTime $deletedAt = null)
+    public function setDeletedAt(?DateTime $deletedAt = null)
     {
         $this->deletedAt = $deletedAt;
     }

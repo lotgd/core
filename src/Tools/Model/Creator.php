@@ -20,7 +20,7 @@ trait Creator
      * @param array $arguments The values the instance should get
      * @throws AttributeMissingException
      * @throws WrongTypeException
-     * @return \self The created Entity
+     * @return CreateableInterface The created Entity
      */
     public static function create(array $arguments): CreateableInterface
     {

@@ -17,14 +17,8 @@ use LotGD\Core\Exceptions\WrongTypeException;
  */
 class OneToManyCollection implements Collection
 {
-    /** @var string */
-    private $typeClass;
-    /** @var EntityManagerInterface */
-    private $entityManager = null;
-    /** @var array */
-    private $collection;
-    /** @var int */
-    private $numberOfRows;
+    private array $collection;
+    private int $numberOfRows;
 
     /**
      * Constructor for a one to many colelction of type $typeClass.
@@ -32,14 +26,13 @@ class OneToManyCollection implements Collection
      * @param string $typeClass
      * @throws ClassNotFoundException
      */
-    public function __construct(EntityManagerInterface $entityManager, string $typeClass)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private string $typeClass
+    ) {
         if (\class_exists($typeClass) === false) {
             throw new ClassNotFoundException(\sprintf("The class %s has not been found.", $typeClass));
         }
-
-        $this->entityManager = $entityManager;
-        $this->typeClass = $typeClass;
 
         // Load eagerly everything.
         $this->collection = $this->entityManager->getRepository($this->typeClass)->findAll();

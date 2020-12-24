@@ -9,7 +9,7 @@ namespace LotGD\Core\Tools;
  */
 class SceneDescription
 {
-    private $description = [];
+    private array $description = [];
 
     /**
      * SceneDescription constructor.

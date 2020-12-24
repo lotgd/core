@@ -19,7 +19,7 @@ trait MockCharacter
      * @param mixed $arguments
      * @throws IsNullException
      */
-    public function __call($name, $arguments)
+    public function __call(mixed $name, mixed $arguments)
     {
         throw new IsNullException();
     }

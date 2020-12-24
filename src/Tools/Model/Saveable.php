@@ -5,6 +5,7 @@ namespace LotGD\Core\Tools\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+use LotGD\Core\Models\CreateableInterface;
 use LotGD\Core\Models\SaveableInterface;
 
 /**
@@ -14,7 +15,7 @@ trait Saveable
 {
     /**
      * Static, protected save function to call from trait-overwriting methods.
-     * @param \LotGD\Core\Tools\Model\CreateableInterface $object
+     * @param SaveableInterface $object
      * @param EntityManagerInterface $em
      */
     public static function _save(SaveableInterface $object, EntityManagerInterface $em)

@@ -10,7 +10,7 @@ use LotGD\Core\Game;
  */
 trait GameAware
 {
-    private $game;
+    private Game $game;
 
     /**
      * @param Game $game
