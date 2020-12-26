@@ -44,7 +44,7 @@ class CharacterResetViewpointCommand extends BaseCommand
 
         if ($character === null) {
             $io->error("Character not found.");
-            return;
+            return Command::FAILURE;
         }
 
         $this->game->getEntityManager()->remove($character->getViewpoint());
