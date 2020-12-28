@@ -139,12 +139,12 @@ class Viewpoint implements CreateableInterface
     public function getSnapshot(): ViewpointSnapshot
     {
         $snapshot = new ViewpointSnapshot(
-            $this->getTitle(),
-            $this->getDescription(),
-            \get_class($this->getTemplate()),
-            $this->getActionGroups(),
-            $this->getAttachments(),
-            $this->getData()
+            title: $this->getTitle(),
+            description: $this->getDescription(),
+            template: $this->getTemplate() === null ? null : \get_class($this->getTemplate()),
+            actionGroups: $this->getActionGroups(),
+            attachments: $this->getAttachments(),
+            data: $this->getData()
         );
 
         return $snapshot;
@@ -156,7 +156,11 @@ class Viewpoint implements CreateableInterface
      */
     public function changeFromSnapshot(EntityManager $entityManager, ViewpointSnapshot $snapshot)
     {
-        $templateInstance = $entityManager->getRepository(SceneTemplate::class)->find($snapshot->getTemplate());
+        if ($snapshot->getTemplate() !== null) {
+            $templateInstance = $entityManager->getRepository(SceneTemplate::class)->find($snapshot->getTemplate());
+        } else {
+            $templateInstance = null;
+        }
 
         $this->setTitle($snapshot->getTitle());
         $this->setDescription($snapshot->getDescription());

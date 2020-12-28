@@ -32,6 +32,11 @@ scenes:
         title: "The Weaponry"
         description: "This is the place where you can buy awesome weapons"
         template: "lotgd/tests/weaponry"
+
+    -
+        id: "30000000-0000-0000-0000-000000000004"
+        title: "Template-less scene"
+        description: "This scene does not have a template"
 scene_connections:
     -
         outgoingScene: "30000000-0000-0000-0000-000000000001"
@@ -39,3 +44,6 @@ scene_connections:
     -
         outgoingScene: "30000000-0000-0000-0000-000000000001"
         incomingScene: "30000000-0000-0000-0000-000000000003"
+    -
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        incomingScene: "30000000-0000-0000-0000-000000000004"

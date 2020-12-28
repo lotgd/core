@@ -8,36 +8,23 @@ namespace LotGD\Core\Models;
  */
 class ViewpointSnapshot
 {
-    private $title;
-    private $description;
-    private $template;
-    private $actionGroups;
-    private $attachments;
-    private $data;
-
     /**
      * ViewpointRestorationPoint constructor.
      * @param string $title
      * @param string $description
-     * @param string $template
+     * @param string|null $template
      * @param array $actionGroups
      * @param array $attachments
      * @param array $data
      */
     public function __construct(
-        string $title,
-        string $description,
-        string $template,
-        array $actionGroups,
-        array $attachments,
-        array $data
+        private string $title,
+        private string $description,
+        private ?string $template,
+        private array $actionGroups,
+        private array $attachments,
+        private array $data,
     ) {
-        $this->title = $title;
-        $this->description = $description;
-        $this->template = $template;
-        $this->actionGroups = $actionGroups;
-        $this->attachments = $attachments;
-        $this->data = $data;
     }
 
     /**
@@ -60,9 +47,9 @@ class ViewpointSnapshot
 
     /**
      * Template of the viewpoint.
-     * @return string
+     * @return string|null
      */
-    public function getTemplate(): string
+    public function getTemplate(): ?string
     {
         return $this->template;
     }

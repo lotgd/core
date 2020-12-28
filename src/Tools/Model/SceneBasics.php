@@ -14,15 +14,15 @@ use LotGD\Core\Models\SceneTemplate;
 trait SceneBasics
 {
     /** @Column(type="string", length=255) */
-    private $title = "{No scene set}";
+    private string $title = "{No scene set}";
     /** @Column(type="text") */
-    private $description = "{No scene set}";
+    private string $description = "{No scene set}";
     /** @Column(type="string", length=255) */
     /**
      * @ManyToOne(targetEntity="SceneTemplate", fetch="EAGER")
      * @JoinColumn(name="template", referencedColumnName="class", nullable=true)
      */
-    private $template;
+    private ?SceneTemplate $template;
 
     /**
      * Sets scene title.

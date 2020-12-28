@@ -31,9 +31,12 @@ class ViewpointRestorationTest extends CoreModelTestCase
         return $actionGroup;
     }
 
-    protected function getViewpoint()
+    protected function getViewpoint($useNullTemplate = false)
     {
-        $sceneTemplateMock = $this->createMock(SceneTemplate::class);
+        $sceneTemplateMock = null;
+        if ($useNullTemplate === false) {
+            $sceneTemplateMock = $this->createMock(SceneTemplate::class);
+        }
 
         $sceneMock = $this->createMock(Scene::class);
         $sceneMock->method("getTitle")->willReturn("Scene Mock Title");
@@ -55,9 +58,12 @@ class ViewpointRestorationTest extends CoreModelTestCase
         return [$entityManager, $viewpoint];
     }
 
-    protected function getAlternativeViewpoint()
+    protected function getAlternativeViewpoint($useNullTemplate = false)
     {
-        $sceneTemplateMock = $this->createMock(SceneTemplate::class);
+        $sceneTemplateMock = null;
+        if ($useNullTemplate === false) {
+            $sceneTemplateMock = $this->createMock(SceneTemplate::class);
+        }
 
         $sceneMock = $this->createMock(Scene::class);
         $sceneMock->method("getTitle")->willReturn("Another Scene Mock Title");
@@ -84,6 +90,24 @@ class ViewpointRestorationTest extends CoreModelTestCase
         $viewpointRestored = unserialize($serialized);
 
         [$entityManager2, $newViewpoint] = $this->getAlternativeViewpoint();
+        $newViewpoint->changeFromSnapshot($entityManager, $viewpointRestored);
+
+        $this->assertSame($viewpoint->getTitle(), $newViewpoint->getTitle());
+        $this->assertSame($viewpoint->getDescription(), $newViewpoint->getDescription());
+        $this->assertSame($viewpoint->getTemplate(), $newViewpoint->getTemplate());
+        $this->assertEquals($viewpoint->getActionGroups(), $newViewpoint->getActionGroups());;
+        $this->assertSame($viewpoint->getData(), $newViewpoint->getData());
+        $this->assertSame($viewpoint->getAttachments(), $newViewpoint->getAttachments());
+    }
+
+    public function testIfViewpointAfterUnserializationIsEqualToBeforeItsSerializationWhenTemplateIsNull()
+    {
+        [$entityManager, $viewpoint] = $this->getViewpoint(useNullTemplate: true);
+        $viewpointRestoration = $viewpoint->getSnapshot();
+        $serialized = serialize($viewpointRestoration);
+        $viewpointRestored = unserialize($serialized);
+
+        [$entityManager2, $newViewpoint] = $this->getAlternativeViewpoint(useNullTemplate: true);
         $newViewpoint->changeFromSnapshot($entityManager, $viewpointRestored);
 
         $this->assertSame($viewpoint->getTitle(), $newViewpoint->getTitle());
