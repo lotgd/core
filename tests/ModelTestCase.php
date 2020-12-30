@@ -20,6 +20,7 @@ use LotGD\Core\Exceptions\InvalidConfigurationException;
 use LotGD\Core\ModelExtender;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,7 +28,7 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class ModelTestCase extends TestCase
 {
-    /** @var \PDO */
+    /** @var PDO */
     static private $pdo = null;
     /** @var EntityManager */
     static private $em = null;
@@ -48,7 +49,7 @@ abstract class ModelTestCase extends TestCase
             $config = new Configuration($configFilePath);
 
             if (self::$pdo === null) {
-                self::$pdo = new \PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
+                self::$pdo = new PDO($config->getDatabaseDSN(), $config->getDatabaseUser(), $config->getDatabasePassword());
 
                 // Read db annotations from model files
                 $composerManager = new ComposerManager(getcwd());
@@ -79,7 +80,7 @@ abstract class ModelTestCase extends TestCase
 
     protected function insertData($dataSet)
     {
-        /** @var \PDO $pdo */
+        /** @var PDO $pdo */
         $pdo = $this->connection[0];
 
         foreach ($dataSet as $table => $rows) {
@@ -153,7 +154,7 @@ abstract class ModelTestCase extends TestCase
     protected function tearDown(): void {
         parent::tearDown();
 
-        /** @var \PDO $pdo */
+        /** @var PDO $pdo */
         $pdo = $this->connection[0];
 
         foreach ($this->tables as $table) {
@@ -163,6 +164,41 @@ abstract class ModelTestCase extends TestCase
 
         // Clear out the cache so tests don't get confused.
         $this->getEntityManager()->clear();
+    }
+
+    public function assertDataWasKeptIntact(?array $restrictToTables = null): void
+    {
+        // Assert that databases are the same before and after.
+        // TODO for module author: update list of tables below to include the
+        // tables you modify during registration/unregistration.
+        $dataSetBefore = $this->getDataSet();
+        /** @var PDO $pdo */
+        $pdo = $this->getConnection()[0];
+
+        foreach ($dataSetBefore as $table => $rowsBefore) {
+            // Ignore table if $restrictToTables is an array and the table is not on the list.
+            if (is_array($restrictToTables) and empty($restrictToTables[$table])) {
+                continue;
+            }
+
+            $query = $pdo->query("SELECT * FROM `$table`");
+            $rowsAfter = $query->fetchAll(PDO::FETCH_ASSOC);
+
+            // Assert equal row counts
+            $this->assertCount(count($rowsBefore), $rowsAfter,
+                "Database assertion: Table <$table> does not match the expected number of rows. 
+                Expected was <".count($rowsBefore).">, but found was <".count($rowsAfter).">"
+            );
+
+            foreach ($rowsBefore as $key => $rowBefore) {
+                foreach ($rowBefore as $field => $value) {
+                    $this->assertEquals($value, $rowsAfter[$key][$field],
+                        "Database assertion: In table <$table>, field <$field> does not match expected value <$value>,
+                        is <{$rowsAfter[$key][$field]}> instead.",
+                    );
+                }
+            }
+        }
     }
 
     protected function flushAndClear()
