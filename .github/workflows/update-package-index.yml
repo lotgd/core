@@ -1,0 +1,20 @@
+name: PHP Composer
+
+on:
+    push:
+        branches: [ master ]
+
+jobs:
+    build:
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: "Checkouts satis and packages"
+              run: git clone https://github.com/composer/satis && git clone https://github.com/lotgd/packages
+
+            - name: "Build satis"
+              run: satis/bin/satis build packages/satis.json packages/build
+
+            - name: "Commit changes and push to origin"
+              run: composer commit -a -m "Updated packages" && composer push origin master
