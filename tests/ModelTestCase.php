@@ -19,6 +19,7 @@ use LotGD\Core\LibraryConfigurationManager;
 use LotGD\Core\Exceptions\InvalidConfigurationException;
 use LotGD\Core\ModelExtender;
 use Monolog\Handler\NullHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -104,6 +105,21 @@ abstract class ModelTestCase extends TestCase
         return self::$em;
     }
 
+    public function getCwd(): string
+    {
+        return implode(DIRECTORY_SEPARATOR, [__DIR__, '..']);
+    }
+
+    public function getDataSet(): ?array
+    {
+        return null;
+    }
+
+    public function useSilentHandler(): bool
+    {
+        return true;
+    }
+
     protected function setUp(): void
     {
         $this->getConnection();
@@ -111,7 +127,9 @@ abstract class ModelTestCase extends TestCase
         // Set up database content
         if (method_exists($this, "getDataSet")) {
             $dataSet = $this->getDataSet();
-            $this->insertData($dataSet);
+            if (!empty($dataSet)) {
+                $this->insertData($dataSet);
+            }
         }
 
         parent::setUp();
@@ -122,14 +140,19 @@ abstract class ModelTestCase extends TestCase
         // Make an empty logger for these tests. Feel free to change this
         // to place log messages somewhere you can easily find them.
         $logger  = new Logger('test');
-        $logger->pushHandler(new NullHandler());
+
+        if ($this->useSilentHandler()) {
+            $logger->pushHandler(new NullHandler());
+        } else {
+            $logger->pushHandler(new StreamHandler("php://stdout."));
+        }
 
         // Create a Game object for use in these tests.
         $this->g = (new GameBuilder())
             ->withConfiguration(new Configuration(getenv('LOTGD_TESTS_CONFIG_PATH')))
             ->withLogger($logger)
             ->withEntityManager($this->getEntityManager())
-            ->withCwd(implode(DIRECTORY_SEPARATOR, [__DIR__, '..']))
+            ->withCwd($this->getCwd())
             ->create();
 
         // Add Event listener to entity manager

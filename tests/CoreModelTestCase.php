@@ -11,7 +11,7 @@ class CoreModelTestCase extends ModelTestCase
      * Returns a .yml dataset under this name
      * @return array
      */
-    protected function getDataSet(): array
+    public function getDataSet(): array
     {
         $datasetFile = implode(DIRECTORY_SEPARATOR, [__DIR__, 'datasets', $this->dataset . '.yml']);
         $dataset = Yaml::parseFile($datasetFile);
