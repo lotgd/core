@@ -31,7 +31,7 @@ jobs:
               run: satis/bin/satis build packages/satis.json packages/build
 
             - name: Set git url with credentials for pushing
-              run: git remote add origin https://Vassyli:${{ secrets.GH_TOKEN }}@github.com/lotgd/packages.git
+              run: cd packages && git remote add origin https://Vassyli:${{ secrets.GH_TOKEN }}@github.com/lotgd/packages.git
 
             - name: "Commit changes and push to origin"
-              run: cd packages && git commit -a -m "Updated packages" && git push origin master
+              run: git commit -a -m "Updated packages" && git push origin master
