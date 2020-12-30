@@ -15,6 +15,9 @@ jobs:
                 with:
                     php-version: '7.4'
 
+            - name: Set git credentials
+              run: git config --global user.name "Vassyli" && git config --global user.email "basilius.sauter+automated@gmail.com" && git config --global user.password "${{ secrets.GH_TOKEN }}"
+
             - name: "Checkouts satis and packages"
               run: git clone https://github.com/composer/satis && git clone https://github.com/lotgd/packages
 
