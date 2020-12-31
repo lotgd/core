@@ -1,8 +1,0 @@
-sudo: false
-language: php
-php:
-  - '8.0'
-install:
-  - composer install
-script:
-  - ./t
