@@ -144,7 +144,7 @@ abstract class ModelTestCase extends TestCase
         if ($this->useSilentHandler()) {
             $logger->pushHandler(new NullHandler());
         } else {
-            $logger->pushHandler(new StreamHandler("php://stdout."));
+            $logger->pushHandler(new StreamHandler("php://stdout"));
         }
 
         // Create a Game object for use in these tests.
