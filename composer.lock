@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e334149a757d64088235328e16c3df50",
+    "content-hash": "9cab3ccd48d3179741e9597ca856fb08",
     "packages": [
         {
             "name": "brick/math",
@@ -529,46 +529,6 @@
                 }
             ],
             "time": "2020-11-13T08:04:11+00:00"
-        },
-        {
-            "name": "d11wtq/boris",
-            "version": "v1.0.10",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/borisrepl/boris.git",
-                "reference": "31055b15e2d3fe47f31f6aa8e277f8f3fc7eb483"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/borisrepl/boris/zipball/31055b15e2d3fe47f31f6aa8e277f8f3fc7eb483",
-                "reference": "31055b15e2d3fe47f31f6aa8e277f8f3fc7eb483",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pcntl": "*",
-                "ext-posix": "*",
-                "ext-readline": "*",
-                "php": ">=5.3.0"
-            },
-            "bin": [
-                "bin/boris"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Boris": "lib"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "A tiny, but robust REPL (Read-Evaluate-Print-Loop) for PHP.",
-            "support": {
-                "issues": "https://github.com/borisrepl/boris/issues",
-                "source": "https://github.com/borisrepl/boris/tree/v1.0.10"
-            },
-            "time": "2015-03-01T08:05:19+00:00"
         },
         {
             "name": "doctrine/annotations",
@@ -5942,7 +5902,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0.0",
+        "php": "^8.0",
         "ext-pdo": "*"
     },
     "platform-dev": [],

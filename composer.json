@@ -1,8 +1,7 @@
 {
     "name": "lotgd/core",
     "description": "Core functionality for Legend of the Green Dragon, a text-based RPG game.",
-    "license": "AGPL-3.0",
-    "version": "0.6.0",
+    "license": "AGPL-3.0-or-later",
     "autoload": {
         "psr-4": {
             "LotGD\\Core\\": "src/",
@@ -13,18 +12,17 @@
         "bin/daenerys"
     ],
     "require": {
-        "php": "^8.0.0",
+        "php": "^8.0",
         "ext-pdo": "*",
-        "composer/composer": "*",
-        "gedmo/doctrine-extensions": "*",
+        "composer/composer": "^1.10|^2.0",
+        "gedmo/doctrine-extensions": "^2.3|^3.0",
         "doctrine/orm": "^2.8",
         "doctrine/common": "^3.0",
-        "monolog/monolog": "*",
-        "symfony/console": "*",
-        "symfony/yaml": "*",
-        "d11wtq/boris": "*",
-        "ramsey/uuid-doctrine": "*",
-        "jetbrains/phpstorm-attributes": "*"
+        "monolog/monolog": "^2.0",
+        "symfony/console": "^5.0",
+        "symfony/yaml": "^5.0",
+        "ramsey/uuid-doctrine": "^1.5",
+        "jetbrains/phpstorm-attributes": "^1.0"
     },
     "repositories": [
         {
