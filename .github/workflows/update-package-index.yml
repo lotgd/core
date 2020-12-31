@@ -1,8 +1,10 @@
-name: PHP Composer
+name: Package push
 
 on:
     push:
         branches: [ master ]
+    release:
+        types: [ created ]
 
 jobs:
     build:
