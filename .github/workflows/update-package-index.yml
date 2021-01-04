@@ -36,4 +36,4 @@ jobs:
               run: cd packages && git config remote.origin.url 'https://Vassyli:${{ secrets.GH_TOKEN }}@github.com/lotgd/packages.git' && cd ..
 
             - name: "Commit changes and push to origin"
-              run: cd packages && git commit -a -m "Updated packages" && git push origin master && cd ..
+              run: cd packages && git add build/* && git commit -a -m "Updated packages" && git push origin master && cd ..
