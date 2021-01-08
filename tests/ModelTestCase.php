@@ -18,6 +18,7 @@ use LotGD\Core\GameBuilder;
 use LotGD\Core\LibraryConfigurationManager;
 use LotGD\Core\Exceptions\InvalidConfigurationException;
 use LotGD\Core\ModelExtender;
+use LotGD\Core\PHPUnit\LotGDTestCase;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -27,7 +28,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Description of ModelTestCase
  */
-abstract class ModelTestCase extends TestCase
+abstract class ModelTestCase extends LotGDTestCase
 {
     /** @var PDO */
     static private $pdo = null;
@@ -187,41 +188,6 @@ abstract class ModelTestCase extends TestCase
 
         // Clear out the cache so tests don't get confused.
         $this->getEntityManager()->clear();
-    }
-
-    public function assertDataWasKeptIntact(?array $restrictToTables = null): void
-    {
-        // Assert that databases are the same before and after.
-        // TODO for module author: update list of tables below to include the
-        // tables you modify during registration/unregistration.
-        $dataSetBefore = $this->getDataSet();
-        /** @var PDO $pdo */
-        $pdo = $this->getConnection()[0];
-
-        foreach ($dataSetBefore as $table => $rowsBefore) {
-            // Ignore table if $restrictToTables is an array and the table is not on the list.
-            if (is_array($restrictToTables) and empty($restrictToTables[$table])) {
-                continue;
-            }
-
-            $query = $pdo->query("SELECT * FROM `$table`");
-            $rowsAfter = $query->fetchAll(PDO::FETCH_ASSOC);
-
-            // Assert equal row counts
-            $this->assertCount(count($rowsBefore), $rowsAfter,
-                "Database assertion: Table <$table> does not match the expected number of rows. 
-                Expected was <".count($rowsBefore).">, but found was <".count($rowsAfter).">"
-            );
-
-            foreach ($rowsBefore as $key => $rowBefore) {
-                foreach ($rowBefore as $field => $value) {
-                    $this->assertEquals($value, $rowsAfter[$key][$field],
-                        "Database assertion: In table <$table>, field <$field> does not match expected value <$value>,
-                        is <{$rowsAfter[$key][$field]}> instead.",
-                    );
-                }
-            }
-        }
     }
 
     protected function flushAndClear()
