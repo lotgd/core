@@ -286,36 +286,6 @@ class BattleTest extends CoreModelTestCase
     }
 
     /**
-     * Asserts that a certain BuffMessageEvent with a specific text is contained in the lst of events
-     * @param Collection $events The list of events
-     * @param string $battleEventText The text to test for
-     * @param int $timesAtLeast Mininum number of times the message is expected to be in the event list
-     * @param int? $timesAtMax Maximum number of times the message is expected to be in the event list, or $timesAtLeast if null.
-     */
-    protected function assertBuffEventMessageExists(
-        Collection $events,
-        string $battleEventText,
-        int $timesAtLeast = 1,
-        int $timesAtMax = null
-    ) {
-        $eventCounter = 0;
-        foreach($events as $event) {
-            if ($event instanceof BuffMessageEvent) {
-                if ($battleEventText === $event->getMessage()) {
-                    $eventCounter++;
-                }
-            }
-        }
-
-        if ($timesAtMax === null) {
-            $timesAtMax = $timesAtLeast;
-        }
-
-        $this->assertGreaterThanOrEqual($timesAtLeast, $eventCounter);
-        $this->assertLessThanOrEqual($timesAtMax, $eventCounter);
-    }
-
-    /**
      * Tests normal buff messages - message upon start of the buff, message every
      * round (except when it's started), and the message displayed if the buff expires.
      */
