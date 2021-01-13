@@ -223,8 +223,8 @@ class Game
 
     /**
      * Return the viewpoint for the current user.
-     * @throws InvalidConfigurationException
      * @return Viewpoint
+     * @throws InvalidConfigurationException|CharacterNotFoundException
      */
     public function getViewpoint(): Viewpoint
     {
@@ -263,6 +263,7 @@ class Game
      * by the hook.
      * @param Scene $scene
      * @param array $parameters
+     * @throws CharacterNotFoundException
      */
     private function navigateToScene(Scene $scene, array $parameters)
     {
