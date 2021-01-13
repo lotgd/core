@@ -18,6 +18,11 @@ class HasAction extends Constraint
 
     }
 
+    public function count(): int
+    {
+        return 1;
+    }
+
     public function toString(): string
     {
         if ($this->groupTitle) {

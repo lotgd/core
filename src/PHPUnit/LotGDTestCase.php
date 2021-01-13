@@ -60,6 +60,8 @@ class LotGDTestCase extends TestCase
                 }
             }
         }
+
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -99,6 +101,8 @@ class LotGDTestCase extends TestCase
             constraint: static::lessThanOrEqual($timesAtMax),
             message: "The desired message {$battleEventText} has been found to exist more than {$timesAtLeast} times",
         );
+
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -180,6 +184,8 @@ class LotGDTestCase extends TestCase
         );
 
         static::assertThat($viewpoint, $constraint, $message);
+
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -199,6 +205,8 @@ class LotGDTestCase extends TestCase
         $constraint = new HasAction($actionParams, $groupTitle);
 
         static::assertThat($viewpoint, $constraint, $message);
+
+        $this->addToAssertionCount(1);
     }
 }
 
