@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
+use LotGD\Core\Tools\Model\PropertyManager;
 use LotGD\Core\Tools\Model\SceneBasics;
 use Ramsey\Uuid\Uuid;
 
@@ -26,6 +27,7 @@ class Scene implements CreateableInterface, SceneConnectable
     use Creator;
     use Deletor;
     use SceneBasics;
+    use PropertyManager;
 
     /** @Id @Column(type="string", length=36, unique=True, name="id", options={"fixed"=true}) */
     protected $id;
@@ -44,6 +46,14 @@ class Scene implements CreateableInterface, SceneConnectable
      * @OneToMany(targetEntity="SceneConnection", mappedBy="incomingScene", cascade={"persist", "remove"})
      */
     private $incomingConnections = null;
+
+    /**
+     * @OneToMany(targetEntity="SceneProperty", mappedBy="owner", cascade={"persist", "remove"})
+     */
+    private $properties;
+
+    // required for PropertyManager to now which class the properties belong to.
+    private $propertyClass = SceneProperty::class;
 
     /**
      * @var array
