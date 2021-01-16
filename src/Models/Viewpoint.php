@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
+use LotGD\Core\Attachment;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Game;
 use LotGD\Core\Services\TwigSceneRenderer;
@@ -37,30 +38,30 @@ class Viewpoint implements CreateableInterface
      * @OneToOne(targetEntity="Character", inversedBy="viewpoint", cascade="persist")
      * @JoinColumn(fieldName="owner_id", referencedColumnName="id")
      */
-    private $owner;
+    private Character $owner;
     /** @Column(type="array") */
-    private $actionGroups = [];
+    private array $actionGroups = [];
     /** @Column(type="array") */
-    private $attachments = [];
+    private array $attachments = [];
     /** @Column(type="array") */
-    private $data = [];
+    private array $data = [];
     /**
      * @ManyToOne(targetEntity="Scene")
      * @JoinColumn(name="scene_id", referencedColumnName="id")
      */
-    private $scene;
+    private Scene $scene;
 
     /** @var SceneDescription */
-    private $_description;
+    private SceneDescription $_description;
 
     /** @var array */
-    private static $fillable = [
+    private static array $fillable = [
         "owner",
     ];
 
     /**
      * Returns the owner.
-     * @return \LotGD\Core\Models\Character
+     * @return Character
      */
     public function getOwner(): Character
     {
@@ -69,7 +70,7 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Sets the owner.
-     * @param \LotGD\Core\Models\Character $owner
+     * @param Character $owner
      */
     public function setOwner(Character $owner)
     {
@@ -287,11 +288,19 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Sets attachments.
-     * @param array $attachments
+     * @param Attachment[] $attachments
      */
     public function setAttachments(array $attachments)
     {
         $this->attachments = $attachments;
+    }
+
+    /**
+     * Adds an attachment
+     */
+    public function addAttachment(Attachment $attachment)
+    {
+        $this->attachments[] = $attachment;
     }
 
     /**
