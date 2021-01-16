@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core\Console\Command;
+namespace LotGD\Core\Console\Command\Character;
 
+use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Models\Character;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;

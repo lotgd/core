@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core\Console\Command;
+namespace LotGD\Core\Console\Command\Database;
 
-use Doctrine\ORM\Tools\SchemaTool;
+use LotGD\Core\Console\Command\BaseCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,15 +11,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Danerys command to initiate the database with default values.
  */
-class DatabaseSchemaUpdateCommand extends BaseCommand
+class DatabaseInitCommand extends BaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('database:schemaUpdate')
-            ->setDescription('Updates the database schema manually.')
+        $this->setName('database:init')
+            ->setDescription('Initiates database with default values.')
         ;
     }
 
@@ -28,12 +28,7 @@ class DatabaseSchemaUpdateCommand extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $entityManager = $this->game->getEntityManager();
-        $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->updateSchema($metaData);
-
-        $entityManager->flush();
+        $this->game->getEntityManager()->flush();
 
         return Command::SUCCESS;
     }
