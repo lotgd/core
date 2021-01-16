@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core\Console\Command;
+namespace LotGD\Core\Console\Command\Module;
 
+use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\Exceptions\ModuleAlreadyExistsException;
 use LotGD\Core\LibraryConfiguration;
