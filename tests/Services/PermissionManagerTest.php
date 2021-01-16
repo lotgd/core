@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core\Tests\Managers;
+namespace LotGD\Core\Tests\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
 
