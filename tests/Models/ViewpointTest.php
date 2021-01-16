@@ -9,6 +9,7 @@ use LotGD\Core\Attachment;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Viewpoint;
 use LotGD\Core\Models\Scene;
+use LotGD\Core\Services\TwigSceneRenderer;
 use LotGD\Core\Tests\CoreModelTestCase;
 
 class SampleAttachment extends Attachment
@@ -61,6 +62,9 @@ class ViewpointTest extends CoreModelTestCase
     // Tests if a scene can be changed correctly.
     public function testSceneChange()
     {
+        $rendererMock = $this->createMock(TwigSceneRenderer::class);
+        $rendererMock->method("render")->willReturnArgument(0);
+
         $em = $this->getEntityManager();
 
         $testCharacter = $em->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000002");
@@ -69,7 +73,7 @@ class ViewpointTest extends CoreModelTestCase
 
         $this->assertSame("The Village", $testCharacter->getViewpoint()->getTitle());
 
-        $testCharacter->getViewpoint()->changeFromScene($testScene);
+        $testCharacter->getViewpoint()->changeFromScene($testScene, $rendererMock);
 
         $this->assertSame("The Forest", $testCharacter->getViewpoint()->getTitle());
 

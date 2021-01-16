@@ -6,6 +6,7 @@ namespace LotGD\Core;
 use Doctrine\ORM\EntityManagerInterface;
 use LotGD\Core\Exceptions\BuilderException;
 
+use LotGD\Core\Services\TwigSceneRenderer;
 use Monolog\Logger;
 
 /**
@@ -26,6 +27,7 @@ class GameBuilder
     private string$eventManagerClass;
     private string $diceBagClass;
     private string $messageManagerClass;
+    private string $sceneRendererClass;
 
     /**
      * Creates the game instance with the prepared parameters.
@@ -63,6 +65,10 @@ class GameBuilder
 
         $messageManager = $this->messageManagerClass ?? MessageManager::class;
         $game->setMessageManager(new $messageManager());
+
+        $sceneRenderer = $this->sceneRendererClass ?? TwigSceneRenderer::class;
+        $game->setSceneRenderer(new $sceneRenderer($game));
+
         return $game;
     }
 
@@ -162,6 +168,17 @@ class GameBuilder
     public function useDiceBag(string $diceBagFqcn): self
     {
         $this->diceBagClass = $diceBagFqcn;
+        return $this;
+    }
+
+    /**
+     * Sets the class name for the scene renderer to be used.
+     * @param string $sceneRendererFqcn
+     * @return $this
+     */
+    public function useSceneRenderer(string $sceneRendererFqcn): self
+    {
+        $this->sceneRendererClass = $sceneRendererFqcn;
         return $this;
     }
 }

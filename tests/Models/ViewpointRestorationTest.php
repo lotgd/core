@@ -11,6 +11,7 @@ use LotGD\Core\ActionGroup;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneTemplate;
 use LotGD\Core\Models\Viewpoint;
+use LotGD\Core\Services\TwigSceneRenderer;
 use LotGD\Core\Tests\CoreModelTestCase;
 
 class ViewpointRestorationTest extends CoreModelTestCase
@@ -43,6 +44,9 @@ class ViewpointRestorationTest extends CoreModelTestCase
         $sceneMock->method("getDescription")->willReturn("Scene Mock Description");
         $sceneMock->method("getTemplate")->willReturn($sceneTemplateMock);
 
+        $rendererMock = $this->createMock(TwigSceneRenderer::class);
+        $rendererMock->method("render")->willReturnArgument(0);
+
         $repository = $this->createMock(ObjectRepository::class);
         $repository->method("find")->willReturn($sceneTemplateMock);
 
@@ -52,7 +56,7 @@ class ViewpointRestorationTest extends CoreModelTestCase
         $actionGroup = $this->getActionGroup();
 
         $viewpoint = new Viewpoint();
-        $viewpoint->changeFromScene($sceneMock);
+        $viewpoint->changeFromScene($sceneMock, $rendererMock);
         $viewpoint->setActionGroups([$actionGroup]);
 
         return [$entityManager, $viewpoint];
@@ -70,6 +74,9 @@ class ViewpointRestorationTest extends CoreModelTestCase
         $sceneMock->method("getDescription")->willReturn("Another Scene Mock Description");
         $sceneMock->method("getTemplate")->willReturn($sceneTemplateMock);
 
+        $rendererMock = $this->createMock(TwigSceneRenderer::class);
+        $rendererMock->method("render")->willReturnArgument(0);
+
         $repository = $this->createMock(ObjectRepository::class);
         $repository->method("find")->willReturn($sceneTemplateMock);
 
@@ -77,7 +84,7 @@ class ViewpointRestorationTest extends CoreModelTestCase
         $entityManager->method("getRepository")->willReturn($repository);
 
         $viewpoint = new Viewpoint();
-        $viewpoint->changeFromScene($sceneMock);
+        $viewpoint->changeFromScene($sceneMock, $rendererMock);
 
         return [$entityManager, $viewpoint];
     }
