@@ -39,22 +39,24 @@ class Viewpoint implements CreateableInterface
      * @JoinColumn(fieldName="owner_id", referencedColumnName="id")
      */
     private Character $owner;
+
     /** @Column(type="array") */
     private array $actionGroups = [];
+
     /** @Column(type="array") */
     private array $attachments = [];
+
     /** @Column(type="array") */
     private array $data = [];
+
     /**
      * @ManyToOne(targetEntity="Scene")
      * @JoinColumn(name="scene_id", referencedColumnName="id")
      */
-    private Scene $scene;
+    private ?Scene $scene = null;
 
-    /** @var SceneDescription */
-    private SceneDescription $_description;
+    private ?SceneDescription $_description = null;
 
-    /** @var array */
     private static array $fillable = [
         "owner",
     ];
