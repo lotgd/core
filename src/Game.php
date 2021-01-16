@@ -18,6 +18,7 @@ use LotGD\Core\Models\SceneConnection;
 use LotGD\Core\Models\Viewpoint;
 use LotGD\Core\SceneTemplates\BasicSceneTemplate;
 use LotGD\Core\SceneTemplates\SceneTemplateInterface;
+use LotGD\Core\Services\TwigSceneRenderer;
 use Monolog\Logger;
 
 /**
@@ -32,6 +33,7 @@ class Game
     private ?Character $character = null;
     private DiceBag $diceBag;
     private ?TimeKeeper $timeKeeper = null;
+    private TwigSceneRenderer $sceneRenderer;
 
     /**
      * Construct a game. You probably want to use Bootstrap to do this.
@@ -200,6 +202,24 @@ class Game
     }
 
     /**
+     * Returns the default scene renderer.
+     * @return TwigSceneRenderer
+     */
+    public function getSceneRenderer(): TwigSceneRenderer
+    {
+        return $this->sceneRenderer;
+    }
+
+    /**
+     * Sets a scene renderer.
+     * @param TwigSceneRenderer $sceneRenderer
+     */
+    public function setSceneRenderer(TwigSceneRenderer $sceneRenderer): void
+    {
+        $this->sceneRenderer = $sceneRenderer;
+    }
+
+    /**
      * Returns the currently configured user character.
      * @throws CharacterNotFoundException
      * @return Character
@@ -276,7 +296,7 @@ class Game
             $this->getLogger()->debug("Navigating to sceneId={$id} from referrer sceneId={$referrerId}");
 
             // Copy over the basic structure from the scene database.
-            $viewpoint->changeFromScene($scene);
+            $viewpoint->changeFromScene($scene, $this->getSceneRenderer());
 
             // Generate the default set of actions: the default group with
             // all children.

@@ -15,6 +15,8 @@ use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
 use LotGD\Core\Exceptions\ArgumentException;
+use LotGD\Core\Game;
+use LotGD\Core\Services\TwigSceneRenderer;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\SceneBasics;
 use LotGD\Core\Tools\SceneDescription;
@@ -118,12 +120,16 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Copies the static data from a scene to this Viewpoint entity.
-     * @param \LotGD\Core\Models\Scene $scene
+     * @param Scene $scene
+     * @param TwigSceneRenderer $renderer Required to parse title and description.
      */
-    public function changeFromScene(Scene $scene)
+    public function changeFromScene(Scene $scene, TwigSceneRenderer $renderer)
     {
-        $this->setTitle($scene->getTitle());
-        $this->setDescription($scene->getDescription());
+        $title = $renderer->render($scene->getTitle(), $scene, ignoreErrors: true);
+        $description = $renderer->render($scene->getDescription(), $scene, ignoreErrors: true);
+
+        $this->setTitle($title);
+        $this->setDescription($description);
         $this->setTemplate($scene->getTemplate());
         $this->setScene($scene);
 
