@@ -72,7 +72,7 @@ class SceneAddCommand extends BaseCommand
             $template = $em->getRepository(SceneTemplate::class)->find($templateClass);
 
             if (!$template) {
-                $io->warning("Template '$template' has not been found. Set to NULL instead.")
+                $io->warning("Template '$template' has not been found. Set to NULL instead.");
             }
         } else {
             $template = $templateClass;
