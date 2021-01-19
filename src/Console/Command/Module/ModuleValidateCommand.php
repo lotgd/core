@@ -34,7 +34,8 @@ class ModuleValidateCommand extends BaseCommand
             foreach ($results as $r) {
                 $output->writeln($r);
             }
-            return 1;
+
+            return Command::FAILURE;
         }
         $output->writeln("<info>LotGD modules validated</info>");
 

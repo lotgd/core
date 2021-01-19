@@ -6,6 +6,7 @@ namespace LotGD\Core\Console\Command\Character;
 use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Models\Character;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,7 +27,7 @@ class CharacterResetViewpointCommand extends BaseCommand
             ->setDescription('Resets the viewpoint of a given character.')
             ->setDefinition(
                 new InputDefinition([
-                    new InputOption('id', null, InputOption::VALUE_REQUIRED),
+                    new InputArgument("id", InputArgument::REQUIRED, "ID of the character"),
                 ])
             )
         ;
@@ -37,21 +38,24 @@ class CharacterResetViewpointCommand extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $id = $input->getOption("id");
+        $em = $this->game->getEntityManager();
 
-        /* @var $character \LotGD\Core\Models\Character */
-        $character = $this->game->getEntityManager()->getRepository(Character::class)->find($id);
+        $io = new SymfonyStyle($input, $output);
+        $id = $input->getArgument("id");
+
+        /* @var $character Character */
+        $character = $em->getRepository(Character::class)->find($id);
 
         if ($character === null) {
             $io->error("Character not found.");
             return Command::FAILURE;
         }
 
-        $this->game->getEntityManager()->remove($character->getViewpoint());
+        $em->remove($character->getViewpoint());
         $character->setViewpoint(null);
 
-        $this->game->getEntityManager()->flush();
+        # Save
+        $em->flush();
 
         return Command::SUCCESS;
     }
