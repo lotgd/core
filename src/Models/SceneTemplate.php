@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
@@ -19,13 +20,25 @@ use LotGD\Core\SceneTemplates\SceneTemplateInterface;
 class SceneTemplate
 {
     /** @Id @Column(type="string", length=255, unique=True, name="class") */
-    protected $class;
+    protected string $class;
 
     /** @Column(type="string", length=255, name="module") */
-    protected $module;
+    protected string $module;
 
     /** @Column(type="boolean", options={"default"=true}) */
-    protected $userAssignable = true;
+    protected bool $userAssignable = true;
+
+    /**
+     * @OneToMany(targetEntity="Scene", mappedBy="template")
+     * @var Collection<Scene>
+     */
+    private Collection $owningScenes;
+
+    /**
+     * @OneToMany(targetEntity="Viewpoint", mappedBy="template", fetch="EXTRA_LAZY")
+     * @var Collection<Viewpoint>
+     */
+    private Collection $owningViewpoints;
 
     /**
      * SceneTemplates constructor.
@@ -55,11 +68,43 @@ class SceneTemplate
     }
 
     /**
+     * @return string
+     */
+    public function getModule(): string
+    {
+        return $this->module;
+    }
+
+    /**
      * Changes whether the template should be able to get manually assigned to a template or not.
      * @param bool $flag
      */
     public function setUserAssignable(bool $flag = true)
     {
         $this->userAssignable = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUserAssignable(): bool
+    {
+        return $this->userAssignable;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getOwningScenes(): Collection
+    {
+        return $this->owningScenes;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getOwningViewpoints(): Collection
+    {
+        return $this->owningViewpoints;
     }
 }

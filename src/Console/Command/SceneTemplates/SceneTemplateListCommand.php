@@ -34,10 +34,14 @@ class SceneTemplateListCommand extends BaseCommand
         /** @var SceneTemplate[] $templates */
         $templates = $em->getRepository(SceneTemplate::class)->findAll();
 
-        $table = [["class"], []];
+        $table = [["class", "module", "assignable", "# scenes", "# viewpoints"], []];
         foreach ($templates as $template) {
             $table[1][] = [
                 $template->getClass(),
+                $template->getModule(),
+                $template->isUserAssignable()?"X":"-",
+                count($template->getOwningScenes()),
+                count($template->getOwningViewpoints()),
             ];
         }
 
