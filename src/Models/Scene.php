@@ -53,7 +53,7 @@ class Scene implements CreateableInterface, SceneConnectable
     private $properties;
 
     // required for PropertyManager to now which class the properties belong to.
-    private $propertyClass = SceneProperty::class;
+    private string $propertyClass = SceneProperty::class;
 
     /**
      * @var array
@@ -64,8 +64,7 @@ class Scene implements CreateableInterface, SceneConnectable
         "template",
     ];
 
-    /* @var ?ArrayCollection */
-    private $connectedScenes = null;
+    private ?Collection $connectedScenes = null;
 
     /**
      * Constructor for a scene.
@@ -110,13 +109,13 @@ class Scene implements CreateableInterface, SceneConnectable
      */
     public function hasConnectionGroup(string $name): bool
     {
-        return \count($this->filterConnectionGroupCollectionByName($name)) === 1 ? true : false;
+        return \count($this->filterConnectionGroupCollectionByName($name)) === 1;
     }
 
     /**
      * Returns a connection group entity associated with this scene by a given name.
      * @param string $name
-     * @return \LotGD\Core\Models\SceneConnectionGroup
+     * @return SceneConnectionGroup
      */
     public function getConnectionGroup(string $name): SceneConnectionGroup
     {
@@ -125,7 +124,7 @@ class Scene implements CreateableInterface, SceneConnectable
 
     /**
      * Returns all connection groups associated with this scene.
-     * @return Collection
+     * @return Collection<SceneConnectionGroup>
      */
     public function getConnectionGroups(): Collection
     {
@@ -199,9 +198,9 @@ class Scene implements CreateableInterface, SceneConnectable
      * This procedure can get slow, especially if there are a lot of scenes connected
      * to one. Use this method only for the installation and removal of modules,
      * or for administrative purposes (like a scene graph).
-     * @return ArrayCollection
+     * @return Collection
      */
-    public function getConnectedScenes(): ArrayCollection
+    public function getConnectedScenes(): Collection
     {
         $this->loadConnectedScenes();
         return $this->connectedScenes;

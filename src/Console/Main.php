@@ -12,6 +12,9 @@ use LotGD\Core\Console\Command\Database\DatabaseInitCommand;
 use LotGD\Core\Console\Command\Database\DatabaseSchemaUpdateCommand;
 use LotGD\Core\Console\Command\Module\ModuleRegisterCommand;
 use LotGD\Core\Console\Command\Module\ModuleValidateCommand;
+use LotGD\Core\Console\Command\Scene\SceneListCommand;
+use LotGD\Core\Console\Command\Scene\SceneAddCommand;
+use LotGD\Core\Console\Command\SceneTemplates\SceneTemplateListCommand;
 use LotGD\Core\Game;
 use Symfony\Component\Console\Application;
 
@@ -47,6 +50,9 @@ class Main
         $this->application->add(new ConsoleCommand($this->game));
         $this->application->add(new CharacterListCommand($this->game));
         $this->application->add(new CharacterResetViewpointCommand($this->game));
+        $this->application->add(new SceneListCommand($this->game));
+        $this->application->add(new SceneAddCommand($this->game));
+        $this->application->add(new SceneTemplateListCommand($this->game));
 
         // Add additional ones
         $this->bootstrap->addDaenerysCommands($this->application);
