@@ -65,7 +65,7 @@ class SceneAddCommand extends BaseCommand
 
         $title = $input->getArgument("title");
         $description = $input->getArgument("description");
-        $templateClass = $input->getArgument("template");
+        $templateClass = $input->getOption("template");
 
         /* @var $template SceneTemplate */
         if ($templateClass) {
