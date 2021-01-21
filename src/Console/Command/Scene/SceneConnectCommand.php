@@ -30,7 +30,7 @@ class SceneConnectCommand extends BaseCommand
     protected function configure()
     {
         $this->setName('scene:connect')
-            ->setDescription('Connects to scenes.')
+            ->setDescription('Connects two scenes.')
             ->setDefinition(
                 new InputDefinition([
                     new InputArgument(
@@ -81,7 +81,7 @@ class SceneConnectCommand extends BaseCommand
 
         /** @var ?Scene $outgoingScene */
         $outgoingScene = $sceneRepository->find($input->getArgument("outgoing"));
-        /** @var ?Scene $outgoingScene */
+        /** @var ?Scene $incomingScene */
         $incomingScene = $sceneRepository->find($input->getArgument("incoming"));
 
         // Check of scenes actually exist
@@ -146,6 +146,8 @@ class SceneConnectCommand extends BaseCommand
 
         // Commit changes
         $em->flush();
+
+        $io->success("The two scenes were successfully connected.");
 
         return Command::SUCCESS;
     }
