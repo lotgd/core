@@ -6,6 +6,8 @@ namespace LotGD\Core\Models;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
 
 use LotGD\Core\Exceptions\ArgumentException;
@@ -30,27 +32,31 @@ class Scene implements CreateableInterface, SceneConnectable
     use PropertyManager;
 
     /** @Id @Column(type="string", length=36, unique=True, name="id", options={"fixed"=true}) */
-    protected $id;
+    protected string $id;
 
     /**
      * @OneToMany(targetEntity="SceneConnectionGroup", mappedBy="scene", cascade={"persist", "remove"})
+     * @var ?Collection<SceneConnectionGroup>
      */
-    private $connectionGroups = null;
+    private ?Collection $connectionGroups = null;
 
     /**
      * @OneToMany(targetEntity="SceneConnection", mappedBy="outgoingScene", cascade={"persist", "remove"})
+     * @var ?Collection<SceneConnection>
      */
-    private $outgoingConnections = null;
+    private ?Collection $outgoingConnections = null;
 
     /**
      * @OneToMany(targetEntity="SceneConnection", mappedBy="incomingScene", cascade={"persist", "remove"})
+     * @var ?Collection<SceneConnection>
      */
-    private $incomingConnections = null;
+    private ?Collection $incomingConnections = null;
 
     /**
      * @OneToMany(targetEntity="SceneProperty", mappedBy="owner", cascade={"persist", "remove"})
+     * @var ?Collection<SceneProperty>
      */
-    private $properties;
+    private ?Collection $properties;
 
     // required for PropertyManager to now which class the properties belong to.
     private string $propertyClass = SceneProperty::class;
@@ -219,6 +225,23 @@ class Scene implements CreateableInterface, SceneConnectable
             return true;
         }
         return false;
+    }
+
+    public function getConnectionTo(self $scene): ?SceneConnection
+    {
+        foreach ($this->outgoingConnections as $outgoingConnection) {
+            if ($outgoingConnection->getIncomingScene() == $scene) {
+                return $outgoingConnection;
+            }
+        }
+
+        foreach ($this->incomingConnections as $incomingConnection) {
+            if ($incomingConnection->getOutgoingScene() == $scene) {
+                return $incomingConnection;
+            }
+        }
+
+        return null;
     }
 
     /**
