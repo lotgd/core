@@ -3,7 +3,11 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\Table;
 
 /**
@@ -18,34 +22,34 @@ class SceneConnection
      * @ManyToOne(targetEntity="Scene", inversedBy="outgoingConnections")
      * @JoinColumn(name="outgoingScene", referencedColumnName="id")
      */
-    private $outgoingScene;
+    private ?Scene $outgoingScene = null;
 
     /**
      * @Id
      * @ManyToOne(targetEntity="Scene", inversedBy="incomingConnections")
      * @JoinColumn(name="incomingScene", referencedColumnName="id")
      */
-    private $incomingScene;
+    private ?Scene $incomingScene = null;
 
     /**
      * @Column(type="integer", options={"default"=0})
      */
-    private $directionality = 0;
+    private int $directionality = 0;
 
     /**
      * @Column(type="string", nullable=True)
      */
-    private $outgoingConnectionGroupName;
+    private ?string $outgoingConnectionGroupName;
 
     /**
      * @Column(type="string", nullable=True)
      */
-    private $incomingConnectionGroupName;
+    private ?string $incomingConnectionGroupName;
 
     /**
      *
-     * @param \LotGD\Core\Models\Scene $outgoing
-     * @param \LotGD\Core\Models\Scene $incoming
+     * @param Scene $outgoing
+     * @param Scene $incoming
      * @param int $directionality
      */
     public function __construct(

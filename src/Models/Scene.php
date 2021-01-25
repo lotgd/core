@@ -152,6 +152,10 @@ class Scene implements CreateableInterface, SceneConnectable
             throw new ArgumentException("The given connection group is already owned by another scene entity.");
         }
 
+        if ($this->hasConnectionGroup($group->getName())) {
+            throw new ArgumentException("Cannot add a second group with the same name to this scene.");
+        }
+
         $group->setScene($this);
         $this->connectionGroups->add($group);
     }

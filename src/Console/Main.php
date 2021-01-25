@@ -13,9 +13,12 @@ use LotGD\Core\Console\Command\Database\DatabaseSchemaUpdateCommand;
 use LotGD\Core\Console\Command\Module\ModuleRegisterCommand;
 use LotGD\Core\Console\Command\Module\ModuleValidateCommand;
 use LotGD\Core\Console\Command\Scene\SceneAddCommand;
+use LotGD\Core\Console\Command\Scene\SceneAddConnectionGroupCommand;
 use LotGD\Core\Console\Command\Scene\SceneConnectCommand;
 use LotGD\Core\Console\Command\Scene\SceneListCommand;
 use LotGD\Core\Console\Command\Scene\SceneDisconnectCommand;
+use LotGD\Core\Console\Command\Scene\SceneRemoveConnectionGroupCommand;
+use LotGD\Core\Console\Command\Scene\SceneShowCommand;
 use LotGD\Core\Console\Command\SceneTemplates\SceneTemplateListCommand;
 use LotGD\Core\Game;
 use Symfony\Component\Console\Application;
@@ -56,6 +59,9 @@ class Main
         $this->application->add(new SceneAddCommand($this->game));
         $this->application->add(new SceneConnectCommand($this->game));
         $this->application->add(new SceneDisconnectCommand($this->game));
+        $this->application->add(new SceneShowCommand($this->game));
+        $this->application->add(new SceneAddConnectionGroupCommand($this->game));
+        $this->application->add(new SceneRemoveConnectionGroupCommand($this->game));
         $this->application->add(new SceneTemplateListCommand($this->game));
 
         // Add additional ones
