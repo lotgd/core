@@ -3,8 +3,13 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Models;
 
+use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\Table;
+use LotGD\Core\Exceptions\ArgumentException;
 
 /**
  *
@@ -18,18 +23,18 @@ class SceneConnectionGroup implements SceneConnectable
      * @ManyToOne(targetEntity="Scene", inversedBy="outgoingConnections", cascade={"persist"})
      * @JoinColumn(name="scene", referencedColumnName="id")
      */
-    private $scene;
+    private ?Scene $scene = null;
 
     /**
      * @Id
      * @Column(type="string")
      */
-    private $name;
+    private string $name;
 
     /**
      * @Column(type="string", length=255)
      */
-    private $title;
+    private string $title;
 
     /**
      * SceneConnectionGroup constructor.
@@ -44,7 +49,7 @@ class SceneConnectionGroup implements SceneConnectable
 
     /**
      * Returns the scene associated with this connection group.
-     * @return \LotGD\Core\Models\Scene
+     * @return Scene
      */
     public function getScene(): ?Scene
     {
@@ -53,7 +58,7 @@ class SceneConnectionGroup implements SceneConnectable
 
     /**
      * Sets the scene associated with this connection group.
-     * @param \LotGD\Core\Models\Scene $scene
+     * @param Scene $scene
      */
     public function setScene(Scene $scene): void
     {
@@ -100,6 +105,7 @@ class SceneConnectionGroup implements SceneConnectable
      * @param SceneConnectable $connectable
      * @param int|null $directionality
      * @return SceneConnection
+     * @throws ArgumentException
      */
     public function connect(SceneConnectable $connectable, int $directionality = null): SceneConnection
     {
