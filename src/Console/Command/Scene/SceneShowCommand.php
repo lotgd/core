@@ -80,21 +80,40 @@ class SceneShowCommand extends BaseCommand
         $connections = $scene->getConnections();
         $list = [];
         foreach ($connections as $connection) {
+            # Get formatting for outgoing scene connection group name
+            $outgoingSceneConnectionGroup = $connection->getOutgoingConnectionGroupName();
+            if ($outgoingSceneConnectionGroup) {
+                $outgoingSceneConnectionGroup = "(on $outgoingSceneConnectionGroup)";
+            } else {
+                $outgoingSceneConnectionGroup = "";
+            }
+
+            # Get formatting for incoming scene connection group name
+            $incomingSceneConnectionGroup = $connection->getIncomingConnectionGroupName();
+            if ($incomingSceneConnectionGroup) {
+                $incomingSceneConnectionGroup = " (on $incomingSceneConnectionGroup)";
+            } else {
+                $incomingSceneConnectionGroup = " ";
+            }
+
+            # Treat outgoing and incoming connections slightly differently
             if ($connection->getOutgoingScene() === $scene) {
                 $other = $connection->getIncomingScene();
 
+                # Check if the connection is bidirectional (only out (this)->in)
                 if ($connection->isDirectionality(SceneConnectable::Bidirectional)) {
-                    $list[] = "this <=> {$other->getTitle()} (id={$other->getId()})";
+                    $list[] = "this$outgoingSceneConnectionGroup <=> {$other->getTitle()}$incomingSceneConnectionGroup (id={$other->getId()})";
                 } else {
-                    $list[] = "this  => {$other->getTitle()} (id={$other->getId()})";
+                    $list[] = "this$outgoingSceneConnectionGroup => {$other->getTitle()}$incomingSceneConnectionGroup (id={$other->getId()})";
                 }
             } else {
                 $other = $connection->getOutgoingScene();
 
+                # Check if the connection is bidirectional (only out->in (this))
                 if ($connection->isDirectionality(SceneConnectable::Bidirectional)) {
-                    $list[] = "this <=> {$other->getTitle()} (id={$other->getId()})";
+                    $list[] = "this$incomingSceneConnectionGroup <=> {$other->getTitle()}$outgoingSceneConnectionGroup (id={$other->getId()})";
                 } else {
-                    $list[] = "this <= {$other->getTitle()} (id={$other->getId()})";
+                    $list[] = "this$incomingSceneConnectionGroup <= {$other->getTitle()}$outgoingSceneConnectionGroup (id={$other->getId()})";
                 }
             }
         }
