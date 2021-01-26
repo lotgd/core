@@ -5,8 +5,11 @@ namespace LotGD\Core\Console;
 
 use LotGD\Core\Bootstrap;
 
+use LotGD\Core\Console\Command\Character\CharacterAddCommand;
 use LotGD\Core\Console\Command\Character\CharacterListCommand;
+use LotGD\Core\Console\Command\Character\CharacterRemoveCommand;
 use LotGD\Core\Console\Command\Character\CharacterResetViewpointCommand;
+use LotGD\Core\Console\Command\Character\CharacterShowCommand;
 use LotGD\Core\Console\Command\ConsoleCommand;
 use LotGD\Core\Console\Command\Database\DatabaseInitCommand;
 use LotGD\Core\Console\Command\Database\DatabaseSchemaUpdateCommand;
@@ -56,8 +59,11 @@ class Main
         $this->application->add(new ConsoleCommand($this->game));
 
         // Character commands
+        $this->application->add(new CharacterAddCommand($this->game));
         $this->application->add(new CharacterListCommand($this->game));
+        $this->application->add(new CharacterRemoveCommand($this->game));
         $this->application->add(new CharacterResetViewpointCommand($this->game));
+        $this->application->add(new CharacterShowCommand($this->game));
 
         // Scene commands
         $this->application->add(new SceneListCommand($this->game));
