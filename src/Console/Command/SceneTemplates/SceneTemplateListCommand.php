@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core\Console\Command\SceneTemplates;
 
 use LotGD\Core\Console\Command\BaseCommand;
-use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

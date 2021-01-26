@@ -3,14 +3,11 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command\Scene;
 
+use Exception;
 use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Exceptions\ArgumentException;
-use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneConnectable;
-use LotGD\Core\Models\SceneConnection;
-use LotGD\Core\Models\SceneConnectionGroup;
-use LotGD\Core\Models\SceneTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -75,6 +72,7 @@ class SceneConnectCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
+        $logger = $this->game->getLogger();
         $sceneRepository = $em->getRepository(Scene::class);
 
         $io = new SymfonyStyle($input, $output);
@@ -139,15 +137,19 @@ class SceneConnectCommand extends BaseCommand
         // Connect the connectables
         try {
             $outgoing->connect($incoming, $directionality);
+
+            // Commit changes
+            $em->flush();
         } catch (ArgumentException $e) {
             $io->error("Scenes were not connected. Reason: {$e}.");
             return Command::FAILURE;
+        } catch (Exception $e) {
+            $io->error("An unknown error occured: {$e->getMessage()}");
+            return Command::FAILURE;
         }
 
-        // Commit changes
-        $em->flush();
-
         $io->success("The two scenes were successfully connected.");
+        $logger->info("Connected {$outgoingScene} to {$incomingScene}.");
 
         return Command::SUCCESS;
     }

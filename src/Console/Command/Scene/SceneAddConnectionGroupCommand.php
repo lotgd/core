@@ -3,19 +3,15 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command\Scene;
 
+use Exception;
 use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Exceptions\ArgumentException;
-use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Scene;
-use LotGD\Core\Models\SceneConnectable;
-use LotGD\Core\Models\SceneConnection;
 use LotGD\Core\Models\SceneConnectionGroup;
-use LotGD\Core\Models\SceneTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -47,6 +43,7 @@ class SceneAddConnectionGroupCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
+        $logger = $this->game->getLogger();
 
         $io = new SymfonyStyle($input, $output);
 
@@ -69,14 +66,18 @@ class SceneAddConnectionGroupCommand extends BaseCommand
         // Add
         try {
             $scene->addConnectionGroup($connectionGroup);
+
+            // Commit changes
+            $em->flush();
         } catch(ArgumentException $e) {
             $io->error($e->getMessage());
             return Command::FAILURE;
+        } catch (Exception $e) {
+            $io->error("An unknown error occured: {$e->getMessage()}");
         }
 
-        $em->flush();
-
-        $io->success("Group successfully added");
+        $io->success("{$connectionGroup} successfully added.");
+        $logger->info("{$connectionGroup} was added to {$scene}.");
 
         return Command::SUCCESS;
     }

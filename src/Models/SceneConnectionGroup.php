@@ -47,6 +47,11 @@ class SceneConnectionGroup implements SceneConnectable
         $this->title = $title;
     }
 
+    public function __toString(): string
+    {
+        return "<SceneConnectionGroup#{$this->name} '{$this->title}>";
+    }
+
     /**
      * Returns the scene associated with this connection group.
      * @return Scene

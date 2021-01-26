@@ -3,12 +3,9 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command\Scene;
 
+use Exception;
 use LotGD\Core\Console\Command\BaseCommand;
-use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Scene;
-use LotGD\Core\Models\SceneConnectable;
-use LotGD\Core\Models\SceneConnection;
-use LotGD\Core\Models\SceneConnectionGroup;
 use LotGD\Core\Models\SceneTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -60,6 +57,7 @@ class SceneAddCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
+        $logger = $this->game->getLogger();
 
         $io = new SymfonyStyle($input, $output);
 
@@ -84,8 +82,18 @@ class SceneAddCommand extends BaseCommand
             "template" => $template,
         ]);
 
-        $em->persist($scene);
-        $em->flush();
+        try {
+            $em->persist($scene);
+
+            // Commit changes
+            $em->flush();
+        } catch (Exception $e) {
+            $io->error("Persisting of the scene was not possible. Reason: {$e->getMessage()}.");
+            return Command::FAILURE;
+        }
+
+        $io->success("Scene was successfully created. ID: {$scene->getId()}.");
+        $logger->info("{$scene} was created.");
 
         return Command::SUCCESS;
     }

@@ -91,6 +91,11 @@ class Scene implements CreateableInterface, SceneConnectable
         $this->incomingConnections = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return "<Scene#{$this->id} '{$this->title}'>";
+    }
+
     /**
      * @return bool
      */
