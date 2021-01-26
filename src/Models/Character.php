@@ -42,21 +42,29 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     use ExtendableModel;
 
     /** @Id @Column(type="uuid", unique=True) */
-    private $id;
+    private UuidInterface $id;
+
     /** @Column(type="string", length=50); */
-    private $name = "";
+    private string $name = "";
+
     /** @Column(type="text"); */
-    private $displayName = "";
+    private string $displayName = "";
+
     /** @Column(type="integer", options={"default"=10}) */
-    private $maxHealth = 10;
+    private int $maxHealth = 10;
+
     /** @Column(type="integer", options={"default"=10}) */
-    private $health = 10;
+    private int $health = 10;
+
     /** @Column(type="integer", options={"default"=1})/ */
-    private $level = 1;
+    private int $level = 1;
+
     /** @OneToMany(targetEntity="CharacterProperty", mappedBy="owner", cascade={"persist", "remove"}) */
-    private $properties;
+    private ?Collection $properties;
+
     /** @OneToOne(targetEntity="Viewpoint", mappedBy="owner", cascade={"persist", "remove"}) */
-    private $viewpoint;
+    private ?Viewpoint $viewpoint = null;
+
     /**
      * @ManyToMany(targetEntity="MessageThread", inversedBy="participants", cascade={"persist"})
      * @JoinTable(
@@ -69,20 +77,20 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
      *     }
      * )
      */
-    private $messageThreads;
-    /** @OneToMany(targetEntity="Buff", mappedBy="character", cascade={"persist"}) */
-    private $buffs;
-    /** @var BuffList */
-    private $buffList;
+    private ?Collection $messageThreads;
 
-    /** @var array */
-    private static $fillable = [
+    /** @OneToMany(targetEntity="Buff", mappedBy="character", cascade={"persist"}) */
+    private ?Collection $buffs;
+
+    private ?BuffList $buffList;
+
+    private static array $fillable = [
         "name",
         "maxHealth",
         "level",
     ];
 
-    private $propertyClass = CharacterProperty::class;
+    private string $propertyClass = CharacterProperty::class;
 
     /**
      * Creates a character at full health.
@@ -91,6 +99,7 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     {
         $newCharacter = self::create($arguments);
         $newCharacter->setHealth($newCharacter->getMaxHealth());
+
         return $newCharacter;
     }
 
@@ -296,7 +305,7 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
 
     /**
      * Returns the current character viewpoint or null if one is not set.
-     * @return \LotGD\Core\Models\Viewpoint|null
+     * @return Viewpoint|null
      */
     public function getViewpoint(): ?Viewpoint
     {
@@ -305,6 +314,7 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
 
     /**
      * Sets the current character viewpoint.
+     * @param Viewpoint|null $v
      */
     public function setViewpoint(?Viewpoint $v)
     {
@@ -322,6 +332,8 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
 
     /**
      * Adds a buff to the buffList.
+     * @param Buff $buff
+     * @param bool $override
      */
     public function addBuff(Buff $buff, bool $override = false)
     {
