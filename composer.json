@@ -23,7 +23,8 @@
         "symfony/yaml": "^5.0",
         "twig/twig": "^3.0",
         "ramsey/uuid-doctrine": "^1.5",
-        "jetbrains/phpstorm-attributes": "^1.0"
+        "jetbrains/phpstorm-attributes": "^1.0",
+        "d11wtq/boris": "^1.0"
     },
     "repositories": [
         {
