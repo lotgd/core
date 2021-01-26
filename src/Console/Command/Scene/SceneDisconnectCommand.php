@@ -3,19 +3,13 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command\Scene;
 
+use Exception;
 use LotGD\Core\Console\Command\BaseCommand;
-use LotGD\Core\Exceptions\ArgumentException;
-use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Scene;
-use LotGD\Core\Models\SceneConnectable;
-use LotGD\Core\Models\SceneConnection;
-use LotGD\Core\Models\SceneConnectionGroup;
-use LotGD\Core\Models\SceneTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -54,6 +48,7 @@ class SceneDisconnectCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
+        $logger = $this->game->getLogger();
         $sceneRepository = $em->getRepository(Scene::class);
 
         $io = new SymfonyStyle($input, $output);
@@ -80,11 +75,17 @@ class SceneDisconnectCommand extends BaseCommand
             return Command::FAILURE;
         }
 
-        // Commit changes
-        $em->remove($connection);
-        $em->flush();
+        try {
+            // Commit changes
+            $em->remove($connection);
+            $em->flush();
+        } catch (Exception $e) {
+            $io->error("An unknown error occured: {$e->getMessage()}");
+            return Command::FAILURE;
+        }
 
         $io->success("The connections between the two given scenes was removed.");
+        $logger->info("Disconnected {$connection->getOutgoingScene()} and {$connection->getIncomingScene()}.");
 
         return Command::SUCCESS;
     }

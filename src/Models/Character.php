@@ -107,6 +107,14 @@ class Character implements CharacterInterface, CreateableInterface, GameAwareInt
     }
 
     /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return "<Character#{$this->id} '$this->name', Lvl. {$this->level}>";
+    }
+
+    /**
      * Returns the entity's id.
      * @return int The id
      */

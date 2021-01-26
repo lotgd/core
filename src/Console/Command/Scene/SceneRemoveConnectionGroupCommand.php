@@ -40,6 +40,7 @@ class SceneRemoveConnectionGroupCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
+        $logger = $this->game->getLogger();
 
         $io = new SymfonyStyle($input, $output);
 
@@ -80,9 +81,15 @@ class SceneRemoveConnectionGroupCommand extends BaseCommand
             }
         }
 
-        $em->flush();
+        try {
+            $em->flush();
+        } catch (\Exception $e) {
+            $io->error("An unknown error occured: {$e->getMessage()}");
+            return Command::FAILURE;
+        }
 
-        $io->success("Group successfully added");
+        $io->success("{$connectionGroup} was successfully removed");
+        $logger->info("Removed {$connectionGroup} from {$scene}.");
 
         return Command::SUCCESS;
     }
