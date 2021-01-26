@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\Column;
 
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Tools\Model\Creator;
@@ -31,8 +32,14 @@ class Scene implements CreateableInterface, SceneConnectable
     use SceneBasics;
     use PropertyManager;
 
-    /** @Id @Column(type="string", length=36, unique=True, name="id", options={"fixed"=true}) */
+    /**
+     * @Id
+     * @Column(type="string", length=36, unique=True, name="id", options={"fixed"=true})
+     */
     protected string $id;
+
+    /** @Column(type="boolean", nullable=false, options={"default"=true}) */
+    protected bool $removeable = true;
 
     /**
      * @OneToMany(targetEntity="SceneConnectionGroup", mappedBy="scene", cascade={"persist", "remove"})
@@ -82,6 +89,22 @@ class Scene implements CreateableInterface, SceneConnectable
         $this->connectionGroups = new ArrayCollection();
         $this->outgoingConnections = new ArrayCollection();
         $this->incomingConnections = new ArrayCollection();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRemovable(): bool
+    {
+        return $this->removeable;
+    }
+
+    /**
+     * @param bool $removable
+     */
+    public function setRemovable(bool $removable)
+    {
+        $this->removeable = $removable;
     }
 
     /**

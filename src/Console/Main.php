@@ -13,6 +13,7 @@ use LotGD\Core\Console\Command\Database\DatabaseSchemaUpdateCommand;
 use LotGD\Core\Console\Command\Module\ModuleRegisterCommand;
 use LotGD\Core\Console\Command\Module\ModuleValidateCommand;
 use LotGD\Core\Console\Command\Scene\SceneAddCommand;
+use LotGD\Core\Console\Command\Scene\SceneRemoveCommand;
 use LotGD\Core\Console\Command\Scene\SceneAddConnectionGroupCommand;
 use LotGD\Core\Console\Command\Scene\SceneConnectCommand;
 use LotGD\Core\Console\Command\Scene\SceneListCommand;
@@ -53,15 +54,26 @@ class Main
         $this->application->add(new DatabaseInitCommand($this->game));
         $this->application->add(new DatabaseSchemaUpdateCommand($this->game));
         $this->application->add(new ConsoleCommand($this->game));
+
+        // Character commands
         $this->application->add(new CharacterListCommand($this->game));
         $this->application->add(new CharacterResetViewpointCommand($this->game));
+
+        // Scene commands
         $this->application->add(new SceneListCommand($this->game));
         $this->application->add(new SceneAddCommand($this->game));
+        $this->application->add(new SceneRemoveCommand($this->game));
+        $this->application->add(new SceneShowCommand($this->game));
+
+        // Scene connections
         $this->application->add(new SceneConnectCommand($this->game));
         $this->application->add(new SceneDisconnectCommand($this->game));
-        $this->application->add(new SceneShowCommand($this->game));
+
+        // Scene connection group
         $this->application->add(new SceneAddConnectionGroupCommand($this->game));
         $this->application->add(new SceneRemoveConnectionGroupCommand($this->game));
+
+        // Scene templates
         $this->application->add(new SceneTemplateListCommand($this->game));
 
         // Add additional ones
