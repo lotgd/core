@@ -17,7 +17,7 @@ trait SceneBasics
     private string $title = "{No scene set}";
     /** @Column(type="text") */
     private string $description = "{No scene set}";
-    /** @Column(type="string", length=255) */
+
     /**
      * @ManyToOne(targetEntity="SceneTemplate", fetch="EAGER")
      * @JoinColumn(name="template", referencedColumnName="class", nullable=true)

@@ -18,9 +18,9 @@ trait Creator
     /**
      * Creates and returns an entity instance and fills values.
      * @param array $arguments The values the instance should get
-     * @throws AttributeMissingException
-     * @throws WrongTypeException
      * @return CreateableInterface The created Entity
+     * @throws WrongTypeException|UnexpectedArrayKeyException
+     * @throws AttributeMissingException
      */
     public static function create(array $arguments): CreateableInterface
     {
