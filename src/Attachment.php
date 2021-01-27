@@ -3,22 +3,25 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use Exception;
+use LotGD\Core\Models\Scene;
+
 /**
  * An attachment to a scene. This is desigend to be subclasses by modules to
  * provide functinoality like forms or maybe image attachments to go along with a scene.
  */
-abstract class Attachment
+abstract class Attachment implements AttachmentInterface
 {
     protected string $id;
 
     /**
      * Construct a new attachment of the given type. Randomly assigns it an ID.
-     * @param string $type Type of this attachment, in the vendor/module/type format.
-     * @return Attachment
+     * @param Game $game
+     * @param Scene $scene
+     * @throws Exception
      */
-    public function __construct(
-        protected string $type
-    ) {
+    public function __construct(Game $game, Scene $scene)
+    {
         $this->id = \bin2hex(\random_bytes(8));
     }
 
@@ -30,14 +33,5 @@ abstract class Attachment
     public function getId(): string
     {
         return $this->id;
-    }
-
-    /**
-     * Returns the type of this attachment, in vendor/module/type format.
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
     }
 }
