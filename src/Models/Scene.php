@@ -7,16 +7,25 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinTable;
+use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Column;
-
+use JetBrains\PhpStorm\Deprecated;
 use LotGD\Core\Exceptions\ArgumentException;
+use LotGD\Core\Exceptions\AttributeMissingException;
+use LotGD\Core\Exceptions\UnexpectedArrayKeyException;
+use LotGD\Core\Exceptions\WrongTypeException;
 use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\PropertyManager;
+use LotGD\Core\Tools\Model\Saveable;
 use LotGD\Core\Tools\Model\SceneBasics;
 use Ramsey\Uuid\Uuid;
+
+use function array_merge;
+use function count;
 
 /**
  * A scene is a location within the game, such as the Village or the Tavern. Designed
@@ -27,7 +36,7 @@ use Ramsey\Uuid\Uuid;
  */
 class Scene implements CreateableInterface, SceneConnectable
 {
-    use Creator;
+    use Saveable;
     use Deletor;
     use SceneBasics;
     use PropertyManager;
@@ -65,6 +74,20 @@ class Scene implements CreateableInterface, SceneConnectable
      */
     private ?Collection $properties;
 
+    /**
+     * @ManyToMany(targetEntity="SceneAttachment", inversedBy="scenes", cascade={"persist"})
+     * @JoinTable(
+     *     name="scenes_x_scene_attachments",
+     *     joinColumns={
+     *         @JoinColumn(name="scene_id", referencedColumnName="id")
+     *     },
+     *     inverseJoinColumns={
+     *         @JoinColumn(name="attachment_id", referencedColumnName="class")
+     *     }
+     * )
+     */
+    private ?Collection $attachments;
+
     // required for PropertyManager to now which class the properties belong to.
     private string $propertyClass = SceneProperty::class;
 
@@ -80,15 +103,45 @@ class Scene implements CreateableInterface, SceneConnectable
     private ?Collection $connectedScenes = null;
 
     /**
-     * Constructor for a scene.
+     * Creates and returns an entity instance and fills values.
+     * @param array $arguments The values the instance should get
+     * @return CreateableInterface The created Entity
+     * @throws WrongTypeException|UnexpectedArrayKeyException
+     * @throws AttributeMissingException
      */
-    public function __construct()
+    #[Deprecated("Use constructor directly.")]
+    public static function create(array $arguments): CreateableInterface
+    {
+        if (isset(self::$fillable) === false) {
+            throw new AttributeMissingException('self::$fillable is not defined.');
+        }
+
+        if (\is_array(self::$fillable) === false) {
+            throw new WrongTypeException('self::$fillable needs to be an array.');
+        }
+
+        $entity = new self($arguments["title"], $arguments["description"], $arguments["template"]);
+
+        return $entity;
+    }
+
+    /**
+     * Constructor for a scene.
+     * @param string $title
+     * @param string $description
+     * @param SceneTemplate|null $template
+     */
+    public function __construct(string $title, string $description, ?SceneTemplate $template = null)
     {
         $this->id = Uuid::uuid4()->toString();
+        $this->setTitle($title);
+        $this->setDescription($description);
+        $this->setTemplate($template);
 
         $this->connectionGroups = new ArrayCollection();
         $this->outgoingConnections = new ArrayCollection();
         $this->incomingConnections = new ArrayCollection();
+        $this->attachments = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -143,7 +196,7 @@ class Scene implements CreateableInterface, SceneConnectable
      */
     public function hasConnectionGroup(string $name): bool
     {
-        return \count($this->filterConnectionGroupCollectionByName($name)) === 1;
+        return count($this->filterConnectionGroupCollectionByName($name)) === 1;
     }
 
     /**
@@ -259,6 +312,11 @@ class Scene implements CreateableInterface, SceneConnectable
         return false;
     }
 
+    /**
+     * Returns a connection to another scene if it exists. Returns null if it does not exist.
+     * @param Scene $scene
+     * @return SceneConnection|null
+     */
     public function getConnectionTo(self $scene): ?SceneConnection
     {
         foreach ($this->outgoingConnections as $outgoingConnection) {
@@ -283,7 +341,7 @@ class Scene implements CreateableInterface, SceneConnectable
     public function getConnections(): Collection
     {
         return new ArrayCollection(
-            \array_merge(
+            array_merge(
                 $this->outgoingConnections->toArray(),
                 $this->incomingConnections->toArray()
             )
@@ -362,5 +420,32 @@ class Scene implements CreateableInterface, SceneConnectable
         $incomingScene->addIncomingConnection($connection);
 
         return $connection;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAttachments(): Collection
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * @param SceneAttachment $sceneAttachment
+     * @return bool
+     */
+    public function hasAttachment(SceneAttachment $sceneAttachment): bool
+    {
+        return $this->attachments->contains($sceneAttachment);
+    }
+
+    /**
+     * @param SceneAttachment $attachmentClass
+     */
+    public function addAttachment(SceneAttachment $attachmentClass): void
+    {
+        if (!$this->hasAttachment($attachmentClass)) {
+            $this->attachments->add($attachmentClass);
+        }
     }
 }
