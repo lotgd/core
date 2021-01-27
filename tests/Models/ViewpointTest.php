@@ -6,6 +6,7 @@ namespace LotGD\Core\Tests\Models;
 use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
 use LotGD\Core\Attachment;
+use LotGD\Core\Game;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Viewpoint;
 use LotGD\Core\Models\Scene;
@@ -16,15 +17,25 @@ class SampleAttachment extends Attachment
 {
     protected $foo;
 
-    public function __construct(string $foo)
+    public function __construct(Game $game, Scene $scene, $testParam = null)
     {
-        parent::__construct('bar');
-        $this->foo = $foo;
+        parent::__construct($game, $scene);
+        $this->foo = $testParam;
     }
 
     public function getFoo()
     {
         return $this->foo;
+    }
+
+    public function getData(): array
+    {
+        return [];
+    }
+
+    public function getActions(): array
+    {
+        return [];
     }
 }
 
@@ -122,13 +133,14 @@ class ViewpointTest extends CoreModelTestCase
     public function testAttachments()
     {
         $em = $this->getEntityManager();
+        $input = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
 
-        $a1 = new SampleAttachment('baz');
-        $a2 = new SampleAttachment('fiz');
+        $a1 = new SampleAttachment($this->g, $input->getScene(), "baz");
+        $a2 = new SampleAttachment($this->g, $input->getScene(), "fiz");
 
         $attachments = [$a1, $a2];
 
-        $input = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
+
         $input->setAttachments($attachments);
         $input->save($em);
 

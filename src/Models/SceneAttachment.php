@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Attachment;
+use LotGD\Core\AttachmentInterface;
 use LotGD\Core\Exceptions\ArgumentException;
 
 /**
@@ -36,13 +37,13 @@ class SceneAttachment
 
     /**
      * SceneAttachment constructor.
-     * @param string $class A class inheriting from Attachment.
+     * @param string $class A class inheriting from AttachmentInterface.
      * @param string $title
-     * @throws ArgumentException if $class does not implement Attachment
+     * @throws ArgumentException if $class does not implement AttachmentInterface
      */
     public function __construct(string $class, string $title) {
-        if (!is_subclass_of($class, Attachment::class)) {
-            throw new ArgumentException("The class '{$class}' must inherit from " . Attachment::class);
+        if (!is_subclass_of($class, AttachmentInterface::class)) {
+            throw new ArgumentException("The class '{$class}' must inherit from " . AttachmentInterface::class);
         }
 
         $this->class = $class;

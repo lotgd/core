@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Models;
 
+use LotGD\Core\Action;
 use LotGD\Core\Attachment;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Models\{Scene, SceneAttachment, SceneConnection, SceneConnectionGroup, SceneTemplate};
@@ -11,7 +12,15 @@ use LotGD\Core\Tests\SceneTemplates\NewSceneSceneTemplate;
 
 class TestAttachment extends Attachment
 {
+    public function getData(): array
+    {
+        return [];
+    }
 
+    public function getActions(): array
+    {
+        return [];
+    }
 }
 
 class InvalidTestAttachment
