@@ -25,6 +25,11 @@ abstract class Attachment implements AttachmentInterface
         $this->id = \bin2hex(\random_bytes(8));
     }
 
+    public function __toString(): string
+    {
+        return "<Attachment#{$this->id} '{". static::class . "}'>";
+    }
+
     /**
      * Returns an unique identifier for this attachment. Each attachment instance
      * will have its own unique ID, assigned at time of the instantiation.

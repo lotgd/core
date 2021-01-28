@@ -342,13 +342,30 @@ class Game
                 }
             });
 
+            // Create hidden group
+            $actionGroups[ActionGroup::HiddenGroup] = new ActionGroup(ActionGroup::HiddenGroup, '', 100);
+
+            // Iterates over all SceneAttachments and creates the corresponding attachment objects, adding them to the
+            // viewpoint. Additionally, all actions from the Attachments are added here to the hidden ActionGroup.
+            $sceneAttachments = $scene->getSceneAttachments();
+            foreach ($sceneAttachments as $sceneAttachment) {
+                /** @var AttachmentInterface $attachment */
+                $attachment = new ($sceneAttachment->getClass())($this, $scene);
+                $viewpoint->addAttachment($attachment);
+
+                // Add attachment actions to the hidden group.
+                foreach ($attachment->getActions() as $action) {
+                    $actionGroups[ActionGroup::HiddenGroup]->addAction($action);
+                }
+
+                $this->getLogger()->debug("Adding attachment {$attachment}");
+            }
+
             // Logging
             $counts = \implode(", ", \array_map(function ($k, $v) {
                 return $k .\count($v);
             }, \array_keys($actionGroups), \array_values($actionGroups)));
             $this->getLogger()->debug("Total actions: {$counts}");
-
-            $actionGroups[ActionGroup::HiddenGroup] = new ActionGroup(ActionGroup::HiddenGroup, '', 100);
 
             $viewpoint->setActionGroups(\array_values($actionGroups));
 

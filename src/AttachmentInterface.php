@@ -13,6 +13,7 @@ interface AttachmentInterface
      * @param Scene $scene Should not be saved internally.
      */
     public function __construct(Game $g, Scene $scene);
+    public function __toString(): string;
     public function getId(): string;
 
     /**

@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
 use LotGD\Core\Attachment;
+use LotGD\Core\AttachmentInterface;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Game;
 use LotGD\Core\Services\TwigSceneRenderer;
@@ -281,7 +282,7 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Returns all attachments.
-     * @return array
+     * @return AttachmentInterface[]
      */
     public function getAttachments(): array
     {
@@ -290,7 +291,7 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Sets attachments.
-     * @param Attachment[] $attachments
+     * @param AttachmentInterface[] $attachments
      */
     public function setAttachments(array $attachments)
     {
@@ -299,8 +300,9 @@ class Viewpoint implements CreateableInterface
 
     /**
      * Adds an attachment
+     * @param AttachmentInterface $attachment
      */
-    public function addAttachment(Attachment $attachment)
+    public function addAttachment(AttachmentInterface $attachment)
     {
         $this->attachments[] = $attachment;
     }
