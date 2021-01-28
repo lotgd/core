@@ -425,7 +425,7 @@ class Scene implements CreateableInterface, SceneConnectable
     /**
      * @return Collection
      */
-    public function getAttachments(): Collection
+    public function getSceneAttachments(): Collection
     {
         return $this->attachments;
     }
@@ -434,7 +434,7 @@ class Scene implements CreateableInterface, SceneConnectable
      * @param SceneAttachment $sceneAttachment
      * @return bool
      */
-    public function hasAttachment(SceneAttachment $sceneAttachment): bool
+    public function hasSceneAttachment(SceneAttachment $sceneAttachment): bool
     {
         return $this->attachments->contains($sceneAttachment);
     }
@@ -442,9 +442,9 @@ class Scene implements CreateableInterface, SceneConnectable
     /**
      * @param SceneAttachment $attachmentClass
      */
-    public function addAttachment(SceneAttachment $attachmentClass): void
+    public function addSceneAttachment(SceneAttachment $attachmentClass): void
     {
-        if (!$this->hasAttachment($attachmentClass)) {
+        if (!$this->hasSceneAttachment($attachmentClass)) {
             $this->attachments->add($attachmentClass);
         }
     }
