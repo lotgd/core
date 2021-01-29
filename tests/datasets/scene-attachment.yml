@@ -21,6 +21,7 @@ scene_attachments:
     -
         class: "LotGD\\Core\\Tests\\Models\\TestAttachmentWithActions"
         title: "Test Attachment With Actions"
+        userAssignable: false
 scenes:
     -
         id: "30000000-0000-0000-0000-000000000001"

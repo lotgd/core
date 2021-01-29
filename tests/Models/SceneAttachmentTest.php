@@ -111,10 +111,12 @@ class SceneAttachmentTest extends CoreModelTestCase
         $em = $this->getEntityManager();
 
         $scene = new Scene("Test scene", "A test scene");
-        $sceneAttachment = new SceneAttachment(TestAttachment::class, "Test Attachment");
+        $sceneAttachment = new SceneAttachment(TestAttachment::class, "Test Attachment", userAssignable: false);
 
         $scene->addSceneAttachment($sceneAttachment);
         $sceneId = $scene->getId();
+
+        $this->assertFalse($sceneAttachment->isUserAssignable());
 
         // persist
         $em->persist($scene);
@@ -127,6 +129,7 @@ class SceneAttachmentTest extends CoreModelTestCase
         // assert
         $this->assertInstanceOf(SceneAttachment::class, $retrievedSceneAttachment);
         $this->assertCount(1, $retrievedSceneAttachment->getScenes());
+        $this->assertFalse($sceneAttachment->isUserAssignable());
 
         // remove scene
         $scene = $retrievedSceneAttachment->getScenes()[0];

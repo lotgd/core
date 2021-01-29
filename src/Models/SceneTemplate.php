@@ -7,10 +7,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\Table;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Exceptions\ClassNotFoundException;
 use LotGD\Core\SceneTemplates\SceneTemplateInterface;
+use LotGD\Core\Tools\Model\UserAssignable;
 
 /**
  * Class SceneTemplates.
@@ -19,14 +21,13 @@ use LotGD\Core\SceneTemplates\SceneTemplateInterface;
  */
 class SceneTemplate
 {
+    use UserAssignable;
+
     /** @Id @Column(type="string", length=255, unique=True, name="class") */
     protected string $class;
 
     /** @Column(type="string", length=255, name="module") */
     protected string $module;
-
-    /** @Column(type="boolean", options={"default"=true}) */
-    protected bool $userAssignable = true;
 
     /**
      * @OneToMany(targetEntity="Scene", mappedBy="template")
@@ -44,10 +45,11 @@ class SceneTemplate
      * SceneTemplates constructor.
      * @param string $class FQCN of the scene handling class.
      * @param string $module Module from where the class is from.
-     * @throws ClassNotFoundException
+     * @param bool $userAssignable Set to false to flag the scene as not-assignable for the user.
      * @throws ArgumentException
+     * @throws ClassNotFoundException
      */
-    public function __construct(string $class, string $module)
+    public function __construct(string $class, string $module, bool $userAssignable = true)
     {
         if (!\class_exists($class)) {
             throw new ClassNotFoundException("The class {$class} cannot be found.");
@@ -57,6 +59,7 @@ class SceneTemplate
 
         $this->class = $class;
         $this->module = $module;
+        $this->setUserAssignable($userAssignable);
     }
 
     /**
