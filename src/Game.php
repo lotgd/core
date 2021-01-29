@@ -353,11 +353,6 @@ class Game
                 $attachment = new ($sceneAttachment->getClass())($this, $scene);
                 $viewpoint->addAttachment($attachment);
 
-                // Add attachment actions to the hidden group.
-                foreach ($attachment->getActions() as $action) {
-                    $actionGroups[ActionGroup::HiddenGroup]->addAction($action);
-                }
-
                 $this->getLogger()->debug("Adding attachment {$attachment}");
             }
 
