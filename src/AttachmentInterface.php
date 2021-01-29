@@ -21,9 +21,4 @@ interface AttachmentInterface
      * @return array
      */
     public function getData(): array;
-
-    /**
-     * @return Action[]
-     */
-    public function getActions(): array;
 }

@@ -184,7 +184,5 @@ class SceneAttachmentTest extends CoreModelTestCase
 
         $this->assertCount(1, $newViewpoint->getAttachments());
         $this->assertSame(TestAttachmentWithActions::$attachmentId, $newViewpoint->getAttachments()[0]->getId());
-        $this->assertCount(1, $newViewpoint->getActionGroups()[1]->getActions());
-        $this->assertSame(TestAttachmentWithActions::$actionId, $newViewpoint->getActionGroups()[1]->getActions()[0]->getId());
     }
 }
