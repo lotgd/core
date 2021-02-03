@@ -202,11 +202,17 @@ class Scene implements CreateableInterface, SceneConnectable
     /**
      * Returns a connection group entity associated with this scene by a given name.
      * @param string $name
-     * @return SceneConnectionGroup
+     * @return SceneConnectionGroup|null
      */
-    public function getConnectionGroup(string $name): SceneConnectionGroup
+    public function getConnectionGroup(string $name): ?SceneConnectionGroup
     {
-        return $this->filterConnectionGroupCollectionByName($name)->first();
+        $filtered = $this->filterConnectionGroupCollectionByName($name)->first();
+
+        if (!$filtered) {
+            return null;
+        } else {
+            return $filtered;
+        }
     }
 
     /**

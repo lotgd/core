@@ -364,4 +364,21 @@ class SceneModelTest extends CoreModelTestCase
         $this->expectException(ArgumentException::class);
         $scene1->getConnectionGroup("lotgd/tests/village/hidden")->connect($scene2->getConnectionGroup("lotgd/tests/forest/category"));
     }
+
+    /**
+     * @see https://github.com/lotgd/core/issues/150
+     */
+    public function testIfGetConnectionGroupReturnsNullAndDoesNotThrowATypeError()
+    {
+        $scene1 = $this->getEntityManager()->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000001");
+
+        # Positively assert that this usually works
+        $connectionGroup = $scene1->getConnectionGroup("lotgd/tests/village/empty");
+        $this->assertNotNull($connectionGroup);
+        $this->assertInstanceOf(SceneConnectionGroup::class, $connectionGroup);
+
+        # Assert that connectionGroup is null if it does not exist.
+        $connectionGroup = $scene1->getConnectionGroup("this-does-not-exist");
+        $this->assertNull($connectionGroup);
+    }
 }
