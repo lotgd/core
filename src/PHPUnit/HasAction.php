@@ -78,8 +78,7 @@ class HasAction extends Constraint
                     $checkedOnce = True;
                 }
 
-                # Using KNF, !A or B is only false if A is true and B is not.
-                if ($action->$methodToCheck() == $valueToHave and (!is_null($groupTitle) or $group->getTitle() === $groupTitle)) {
+                if ($action->$methodToCheck() == $valueToHave and (is_null($groupTitle) or $group->getTitle() === $groupTitle)) {
                     $found = $action;
                 }
             }
