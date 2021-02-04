@@ -55,9 +55,8 @@ class Action
 
     /**
      * @param string|null $title
-     * @return string|null
      */
-    public function setTitle(?string $title): ?string
+    public function setTitle(?string $title): void
     {
         $this->title = $title;
     }
