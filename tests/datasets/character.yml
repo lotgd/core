@@ -18,6 +18,12 @@ characters:
         health: 90
         maxhealth: 90
         deletedAt: "2011-11-11 11:11:11"
+    -
+        id: "10000000-0000-0000-0000-000000000004"
+        name: "Testcharacter 4"
+        displayName: "Testcharacter 4"
+        health: 80
+        maxhealth: 90
 character_properties:
     -
         owner_id: "10000000-0000-0000-0000-000000000001"

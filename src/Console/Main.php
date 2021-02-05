@@ -6,6 +6,7 @@ namespace LotGD\Core\Console;
 use LotGD\Core\Bootstrap;
 
 use LotGD\Core\Console\Command\Character\CharacterAddCommand;
+use LotGD\Core\Console\Command\Character\CharacterEditCommand;
 use LotGD\Core\Console\Command\Character\CharacterListCommand;
 use LotGD\Core\Console\Command\Character\CharacterRemoveCommand;
 use LotGD\Core\Console\Command\Character\CharacterResetViewpointCommand;
@@ -15,15 +16,15 @@ use LotGD\Core\Console\Command\Database\DatabaseInitCommand;
 use LotGD\Core\Console\Command\Database\DatabaseSchemaUpdateCommand;
 use LotGD\Core\Console\Command\Module\ModuleRegisterCommand;
 use LotGD\Core\Console\Command\Module\ModuleValidateCommand;
+use LotGD\Core\Console\Command\SceneTemplates\SceneTemplateListCommand;
 use LotGD\Core\Console\Command\Scene\SceneAddCommand;
-use LotGD\Core\Console\Command\Scene\SceneRemoveCommand;
 use LotGD\Core\Console\Command\Scene\SceneAddConnectionGroupCommand;
 use LotGD\Core\Console\Command\Scene\SceneConnectCommand;
-use LotGD\Core\Console\Command\Scene\SceneListCommand;
 use LotGD\Core\Console\Command\Scene\SceneDisconnectCommand;
+use LotGD\Core\Console\Command\Scene\SceneListCommand;
+use LotGD\Core\Console\Command\Scene\SceneRemoveCommand;
 use LotGD\Core\Console\Command\Scene\SceneRemoveConnectionGroupCommand;
 use LotGD\Core\Console\Command\Scene\SceneShowCommand;
-use LotGD\Core\Console\Command\SceneTemplates\SceneTemplateListCommand;
 use LotGD\Core\Game;
 use Symfony\Component\Console\Application;
 
@@ -44,7 +45,7 @@ class Main
         $this->application = new Application();
 
         $this->application->setName("daenerys 🐲 ");
-        $this->application->setVersion("0.0.1 (lotgd/core version " . \LotGD\Core\Game::getVersion() . ")");
+        $this->application->setVersion("lotgd/core version " . Game::getVersion() . "");
     }
 
     /**
@@ -60,14 +61,15 @@ class Main
 
         // Character commands
         $this->application->add(new CharacterAddCommand($this->game));
+        $this->application->add(new CharacterEditCommand($this->game));
         $this->application->add(new CharacterListCommand($this->game));
         $this->application->add(new CharacterRemoveCommand($this->game));
         $this->application->add(new CharacterResetViewpointCommand($this->game));
         $this->application->add(new CharacterShowCommand($this->game));
 
         // Scene commands
-        $this->application->add(new SceneListCommand($this->game));
         $this->application->add(new SceneAddCommand($this->game));
+        $this->application->add(new SceneListCommand($this->game));
         $this->application->add(new SceneRemoveCommand($this->game));
         $this->application->add(new SceneShowCommand($this->game));
 
@@ -87,7 +89,7 @@ class Main
     }
 
     /**
-     * Run the danerys tool.
+     * Run the Daenerys tool.
      */
     public function run()
     {
