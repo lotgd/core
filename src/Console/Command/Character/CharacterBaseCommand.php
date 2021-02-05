@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class CharacterBaseCommand extends BaseCommand
 {
+    protected ?string $namespace = "character";
+
     /**
      * @return InputArgument
      */

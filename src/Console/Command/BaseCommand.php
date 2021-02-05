@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core\Console\Command;
 
 use LotGD\Core\Game;
-
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 
@@ -13,7 +12,8 @@ use Symfony\Component\Console\Command\Command;
  */
 abstract class BaseCommand extends Command
 {
-    protected $game;
+    protected Game $game;
+    protected ?string $namespace = null;
 
     /**
      * Construct the command, using the provided Game.
@@ -29,8 +29,17 @@ abstract class BaseCommand extends Command
      * Returns a cloned logger with a different context name.
      * @return Logger
      */
-    public function getLogger(): Logger
+    public function getCliLogger(): Logger
     {
         return $this->game->getLogger()->withName("daenerys-cli");
+    }
+
+    protected function namespaced(string $command): string
+    {
+        if ($this->namespace) {
+            return "{$this->namespace}:{$command}";
+        } else {
+            return $command;
+        }
     }
 }

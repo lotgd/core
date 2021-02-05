@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core\Tests\Commands\CharacterCommands;
 
 use LotGD\Core\Console\Command\Character\CharacterEditCommand;
-use LotGD\Core\Game;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Tests\CoreModelTestCase;
 use Symfony\Component\Console\Command\Command;

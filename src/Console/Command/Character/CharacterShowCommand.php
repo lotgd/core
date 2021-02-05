@@ -18,26 +18,22 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Resets the viewpoint of a given character.
  */
-class CharacterShowCommand extends BaseCommand
+class CharacterShowCommand extends CharacterBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('character:show')
-            ->setDescription('Shows details about character.')
+        $this->setName($this->namespaced("show"))
+            ->setDescription("Shows details about character.")
             ->setDefinition(
                 new InputDefinition([
-                    new InputArgument(
-                        "id",
-                        mode: InputArgument::REQUIRED,
-                        description: "Character ID",
-                    ),
+                    $this->getCharacterIdArgumentDefinition(),
                     new InputOption(
                         "onlyViewpoint",
                         mode: InputOption::VALUE_NONE,
-                        description: "Set to true to only display viewpoint",
+                        description: "Set to only display viewpoint",
                     )
                 ])
             )

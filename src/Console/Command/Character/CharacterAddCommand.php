@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core\Console\Command\Character;
 
 use Exception;
-use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Models\Character;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,15 +16,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Resets the viewpoint of a given character.
  */
-class CharacterAddCommand extends BaseCommand
+class CharacterAddCommand extends CharacterBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('character:add')
-            ->setDescription('Add a character.')
+        $this->setName($this->namespaced("add"))
+            ->setDescription("Add a character.")
             ->setDefinition(
                 new InputDefinition([
                     new InputArgument(
@@ -56,8 +55,7 @@ class CharacterAddCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
-        $logger = $this->game->getLogger();
-
+        $logger = $this->getCliLogger();
         $io = new SymfonyStyle($input, $output);
 
         $name = $input->getArgument("name");
@@ -74,6 +72,13 @@ class CharacterAddCommand extends BaseCommand
             $maxHealth = $level*10;
         } else {
             $maxHealth = intval($maxHealth);
+        }
+
+        if ($maxHealth < 0) {
+            $io->error("Maximum health must be at least 0.");
+            return Command::FAILURE;
+        } elseif ($maxHealth === 0) {
+            $io->warning("The character will have 0 max health and will be permanently dead.");
         }
 
         $character = Character::createAtFullHealth([
@@ -93,7 +98,7 @@ class CharacterAddCommand extends BaseCommand
         }
 
         $io->success("{$character} was successfully created.");
-        $logger->info("{$character} was created.");
+        $logger->info("Character was created.", ["character" => $character]);
 
         return Command::SUCCESS;
     }
