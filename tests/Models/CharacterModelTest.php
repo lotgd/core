@@ -32,7 +32,7 @@ class CharacterModelTest extends CoreModelTestCase
         $this->assertSame(null, $chars);
 
         $allChars = $this->getEntityManager()->getRepository(Character::class)->findAll();
-        $this->assertSame(2, count($allChars));
+        $this->assertSame(3, count($allChars));
 
         $char = $this->getEntityManager()->getRepository(Character::class)->find("10000000-0000-0000-0000-000000000001");
         $char->delete($this->getEntityManager());
@@ -43,12 +43,12 @@ class CharacterModelTest extends CoreModelTestCase
         $allChars = $this->getEntityManager()
             ->getRepository(Character::class)
             ->findAll();
-        $this->assertSame(1, count($allChars));
+        $this->assertSame(2, count($allChars));
 
         $allChars = $this->getEntityManager()
             ->getRepository(Character::class)
             ->findAll(CharacterRepository::INCLUDE_SOFTDELETED);
-        $this->assertSame(3, count($allChars));
+        $this->assertSame(4, count($allChars));
     }
 
     /**

@@ -1,0 +1,12 @@
+modules:
+    -
+        library: "lotgd/tests"
+        createdAt: "2016-05-01"
+    -
+        library: "lotgd/tests-other"
+        createdAt: "2020-02-07"
+module_properties:
+    -
+        owner: 'lotgd/tests'
+        propertyName: "test"
+        propertyValue: 's:5:"hallo";'
