@@ -18,14 +18,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Danerys command to register and initiate any newly installed modules.
  */
-class ModuleRegisterCommand extends BaseCommand
+class ModuleRegisterCommand extends ModuleBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('module:register')
+        $this->setName($this->namespaced("register"))
             ->setDescription('Register and initialize any newly installed modules')
         ;
     }

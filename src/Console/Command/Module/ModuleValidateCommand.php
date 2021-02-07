@@ -11,14 +11,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Danerys command to validate installed modules.
  */
-class ModuleValidateCommand extends BaseCommand
+class ModuleValidateCommand extends ModuleBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('module:validate')
+        $this->setName($this->namespaced("validate"))
             ->setDescription('Validate installed modules')
         ;
     }
