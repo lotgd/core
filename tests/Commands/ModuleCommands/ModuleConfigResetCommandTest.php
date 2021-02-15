@@ -3,15 +3,10 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Tests\Commands\CharacterCommands;
 
-use LotGD\Core\Console\Command\Module\ModuleConfigListCommand;
-use LotGD\Core\Console\Command\Module\ModuleConfigSetCommand;
-use LotGD\Core\Console\Command\Module\ModuleListCommand;
-use LotGD\Core\EventHandler;
+use LotGD\Core\Console\Command\Module\ModuleConfigResetCommand;
 use LotGD\Core\EventManager;
-use LotGD\Core\Events\EventContext;
 use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Game;
-use LotGD\Core\Models\Module;
 use LotGD\Core\Tests\CoreModelTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -24,7 +19,7 @@ class ModuleConfigResetCommandTest extends CoreModelTestCase
 
     protected function getCommand(): CommandTester
     {
-        return new CommandTester(new ModuleConfigSetCommand($this->g));
+        return new CommandTester(new ModuleConfigResetCommand($this->g));
     }
 
     public function testIfCommandEmitsEvent()
@@ -73,14 +68,14 @@ class ModuleConfigResetCommandTest extends CoreModelTestCase
             $command->execute([
                 "moduleName" => $module,
                 "setting" => $setting,
-                "value" => $value,
             ]);
 
             $output = $command->getDisplay();
 
             $this->assertSame(Command::FAILURE, $command->getStatusCode());
-            $this->assertStringContainsString("Module {$module}", $output);
+            $this->assertStringContainsString("Module lotgd/tests", $output);
             $this->assertStringContainsString("[ERROR]", $output);
+            $this->assertStringNotContainsString("[OK]", $output);
             $this->assertStringContainsString("Setting does not exist.", $output);
         }
     }

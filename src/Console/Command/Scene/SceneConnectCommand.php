@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core\Console\Command\Scene;
 
 use Exception;
-use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneConnectable;
@@ -19,15 +18,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Resets the viewpoint of a given character.
  */
-class SceneConnectCommand extends BaseCommand
+class SceneConnectCommand extends SceneBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('scene:connect')
-            ->setDescription('Connects two scenes.')
+        $this->setName($this->namespaced("connect"))
+            ->setDescription("Connects two scenes.")
             ->setDefinition(
                 new InputDefinition([
                     new InputArgument(
@@ -72,7 +71,7 @@ class SceneConnectCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
-        $logger = $this->game->getLogger();
+        $logger = $this->getCliLogger();
         $sceneRepository = $em->getRepository(Scene::class);
 
         $io = new SymfonyStyle($input, $output);
@@ -141,10 +140,10 @@ class SceneConnectCommand extends BaseCommand
             // Commit changes
             $em->flush();
         } catch (ArgumentException $e) {
-            $io->error("Scenes were not connected. Reason: {$e}.");
+            $io->error("Scenes were not connected. Reason: {$e->getMessage()}.");
             return Command::FAILURE;
         } catch (Exception $e) {
-            $io->error("An unknown error occured: {$e->getMessage()}");
+            $io->error("An unknown error occurred: {$e}");
             return Command::FAILURE;
         }
 

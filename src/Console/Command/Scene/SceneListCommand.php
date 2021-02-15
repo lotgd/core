@@ -10,15 +10,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class SceneListCommand extends BaseCommand
+class SceneListCommand extends SceneBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('scene:list')
-            ->setDescription('Lists all scenes')
+        $this->setName($this->namespaced("list"))
+            ->setDescription("Lists all scenes")
         ;
     }
 
@@ -33,12 +33,13 @@ class SceneListCommand extends BaseCommand
         /** @var Scene[] $scenes */
         $scenes = $em->getRepository(Scene::class)->findAll();
 
-        $table = [["id", "title", "connections"], []];
+        $table = [["id", "title", "connections", "template"], []];
         foreach ($scenes as $scene) {
             $table[1][] = [
                 $scene->getId(),
                 $scene->getTitle(),
                 count($scene->getConnectedScenes()),
+                $scene->getTemplate()?->getClass(),
             ];
         }
 

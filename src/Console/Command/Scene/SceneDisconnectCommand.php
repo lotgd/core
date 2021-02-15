@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core\Console\Command\Scene;
 
 use Exception;
-use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Models\Scene;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,26 +15,26 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Resets the viewpoint of a given character.
  */
-class SceneDisconnectCommand extends BaseCommand
+class SceneDisconnectCommand extends SceneBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('scene:disconnect')
-            ->setDescription('Disconnects two scenes.')
+        $this->setName($this->namespaced("disconnect"))
+            ->setDescription("Disconnects two scenes.")
             ->setDefinition(
                 new InputDefinition([
                     new InputArgument(
                         "scene1",
                         mode: InputArgument::REQUIRED,
-                        description: "Outgoing scene ID",
+                        description: "One scene ID",
                     ),
                     new InputArgument(
                         "scene2",
                         mode: InputArgument::REQUIRED,
-                        description: "Incoming scene ID",
+                        description: "The other scene ID",
                     ),
                 ])
             )
@@ -48,7 +47,7 @@ class SceneDisconnectCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
-        $logger = $this->game->getLogger();
+        $logger = $this->getCliLogger();
         $sceneRepository = $em->getRepository(Scene::class);
 
         $io = new SymfonyStyle($input, $output);
@@ -71,7 +70,7 @@ class SceneDisconnectCommand extends BaseCommand
         $connection = $scene1->getConnectionTo($scene2);
 
         if (!$connection) {
-            $io->error("The to given scenes do not share a connection.");
+            $io->error("The given scenes do not share a connection.");
             return Command::FAILURE;
         }
 
@@ -80,7 +79,7 @@ class SceneDisconnectCommand extends BaseCommand
             $em->remove($connection);
             $em->flush();
         } catch (Exception $e) {
-            $io->error("An unknown error occured: {$e->getMessage()}");
+            $io->error("An unknown error occurred: {$e->getMessage()}");
             return Command::FAILURE;
         }
 
