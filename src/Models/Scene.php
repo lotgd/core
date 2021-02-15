@@ -17,7 +17,6 @@ use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Exceptions\AttributeMissingException;
 use LotGD\Core\Exceptions\UnexpectedArrayKeyException;
 use LotGD\Core\Exceptions\WrongTypeException;
-use LotGD\Core\Tools\Model\Creator;
 use LotGD\Core\Tools\Model\Deletor;
 use LotGD\Core\Tools\Model\PropertyManager;
 use LotGD\Core\Tools\Model\Saveable;

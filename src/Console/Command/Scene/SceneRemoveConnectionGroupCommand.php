@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command\Scene;
 
-use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneConnection;
 use Symfony\Component\Console\Command\Command;
@@ -16,18 +15,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Resets the viewpoint of a given character.
  */
-class SceneRemoveConnectionGroupCommand extends BaseCommand
+class SceneRemoveConnectionGroupCommand extends SceneBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('scene:removeConnectionGroup')
-            ->setDescription('Removes a connection group from an existing scene.')
+        $this->setName($this->namespaced("removeConnectionGroup"))
+            ->setDescription("Removes a connection group from an existing scene.")
             ->setDefinition(
                 new InputDefinition([
-                    new InputArgument("id", InputArgument::REQUIRED, "ID of the scene"),
+                    $this->getSceneIdArgumentDefinition(),
                     new InputArgument("groupName", InputArgument::REQUIRED, "Internal id of the group."),
                 ]),
             )
@@ -40,7 +39,7 @@ class SceneRemoveConnectionGroupCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
-        $logger = $this->game->getLogger();
+        $logger = $this->getCliLogger();
 
         $io = new SymfonyStyle($input, $output);
 
@@ -52,12 +51,12 @@ class SceneRemoveConnectionGroupCommand extends BaseCommand
         $scene = $em->getRepository(Scene::class)->find($sceneId);
 
         if (!$scene) {
-            $io->error("The requested scene with the ID {$sceneId} was not found");
+            $io->error("The scene with the ID {$sceneId} was not found.");
             return Command::FAILURE;
         }
 
         if (!$scene->hasConnectionGroup($groupName)) {
-            $io->error("The scene {$sceneId} oes not have a connection group with the name {$groupName}");
+            $io->error("The scene {$sceneId} does not have a connection group with the name {$groupName}");
             return Command::FAILURE;
         }
 
@@ -84,7 +83,7 @@ class SceneRemoveConnectionGroupCommand extends BaseCommand
         try {
             $em->flush();
         } catch (\Exception $e) {
-            $io->error("An unknown error occured: {$e->getMessage()}");
+            $io->error("An unknown error occurred: {$e->getMessage()}");
             return Command::FAILURE;
         }
 

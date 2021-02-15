@@ -41,6 +41,8 @@ class ModuleConfigResetCommand extends ModuleBaseCommand
             return Command::FAILURE;
         }
 
+        $io->title("Module {$module->getLibrary()}");
+
         // Create hook
         $context = EventContextData::create([
             "module" => $module,

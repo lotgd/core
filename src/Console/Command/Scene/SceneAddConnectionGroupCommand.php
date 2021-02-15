@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core\Console\Command\Scene;
 
 use Exception;
-use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Exceptions\ArgumentException;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneConnectionGroup;
@@ -18,18 +17,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Resets the viewpoint of a given character.
  */
-class SceneAddConnectionGroupCommand extends BaseCommand
+class SceneAddConnectionGroupCommand extends SceneBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('scene:addConnectionGroup')
-            ->setDescription('Add a connection group to an existing scene.')
+        $this->setName($this->namespaced('addConnectionGroup'))
+            ->setDescription("Add a connection group to an existing scene.")
             ->setDefinition(
                 new InputDefinition([
-                    new InputArgument("id", InputArgument::REQUIRED, "ID of the scene"),
+                    $this->getSceneIdArgumentDefinition(),
                     new InputArgument("groupName", InputArgument::REQUIRED, "Internal id of the group."),
                     new InputArgument("groupTitle", InputArgument::REQUIRED, "Title of the group (what the character can see"),
                 ]),
@@ -43,7 +42,7 @@ class SceneAddConnectionGroupCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
-        $logger = $this->game->getLogger();
+        $logger = $this->getCliLogger();
 
         $io = new SymfonyStyle($input, $output);
 
@@ -56,7 +55,7 @@ class SceneAddConnectionGroupCommand extends BaseCommand
         $scene = $em->getRepository(Scene::class)->find($sceneId);
 
         if (!$scene) {
-            $io->error("The requested scene with the ID {$sceneId} was not found");
+            $io->error("The requested scene with the ID {$sceneId} was not found.");
             return Command::FAILURE;
         }
 
@@ -70,10 +69,12 @@ class SceneAddConnectionGroupCommand extends BaseCommand
             // Commit changes
             $em->flush();
         } catch(ArgumentException $e) {
+            // Catches the error if a group already exists.
             $io->error($e->getMessage());
             return Command::FAILURE;
         } catch (Exception $e) {
-            $io->error("An unknown error occured: {$e->getMessage()}");
+            $io->error("An unknown error occurred: {$e->getMessage()}");
+            return Command::FAILURE;
         }
 
         $io->success("{$connectionGroup} successfully added.");

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace LotGD\Core\Console\Command\Scene;
 
 use Exception;
-use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneTemplate;
 use Symfony\Component\Console\Command\Command;
@@ -18,15 +17,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Resets the viewpoint of a given character.
  */
-class SceneAddCommand extends BaseCommand
+class SceneAddCommand extends SceneBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('scene:add')
-            ->setDescription('Add a scene.')
+        $this->setName($this->namespaced("add"))
+            ->setDescription("Add a scene.")
             ->setDefinition(
                 new InputDefinition([
                     new InputArgument(
@@ -57,7 +56,7 @@ class SceneAddCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $em = $this->game->getEntityManager();
-        $logger = $this->game->getLogger();
+        $logger = $this->getCliLogger();
 
         $io = new SymfonyStyle($input, $output);
 
@@ -76,11 +75,11 @@ class SceneAddCommand extends BaseCommand
             $template = $templateClass;
         }
 
-        $scene = Scene::create([
-            "title" => $title,
-            "description" => $description,
-            "template" => $template,
-        ]);
+        $scene = new Scene(
+            title: $title,
+            description: $description,
+            template: $template
+        );
 
         try {
             $em->persist($scene);

@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace LotGD\Core\Console\Command\Scene;
 
-use LotGD\Core\Console\Command\BaseCommand;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\SceneConnectable;
 use LotGD\Core\Models\SceneConnection;
 use LotGD\Core\Models\SceneConnectionGroup;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,18 +16,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Resets the viewpoint of a given character.
  */
-class SceneShowCommand extends BaseCommand
+class SceneShowCommand extends SceneBaseCommand
 {
     /**
      * @inheritDoc
      */
     protected function configure()
     {
-        $this->setName('scene:show')
-            ->setDescription('Show details about a specific scene.')
+        $this->setName($this->namespaced("show"))
+            ->setDescription("Show details about a specific scene.")
             ->setDefinition(
                 new InputDefinition([
-                    new InputArgument("id", InputArgument::REQUIRED, "ID of the scene"),
+                    $this->getSceneIdArgumentDefinition(),
                 ])
             )
         ;
@@ -81,7 +79,7 @@ class SceneShowCommand extends BaseCommand
             # Get formatting for outgoing scene connection group name
             $outgoingSceneConnectionGroup = $connection->getOutgoingConnectionGroupName();
             if ($outgoingSceneConnectionGroup) {
-                $outgoingSceneConnectionGroup = "(on $outgoingSceneConnectionGroup)";
+                $outgoingSceneConnectionGroup = " (on $outgoingSceneConnectionGroup)";
             } else {
                 $outgoingSceneConnectionGroup = "";
             }
@@ -100,9 +98,9 @@ class SceneShowCommand extends BaseCommand
 
                 # Check if the connection is bidirectional (only out (this)->in)
                 if ($connection->isDirectionality(SceneConnectable::Bidirectional)) {
-                    $list[] = "this$outgoingSceneConnectionGroup <=> {$other->getTitle()}$incomingSceneConnectionGroup (id={$other->getId()})";
+                    $list[] = "this$outgoingSceneConnectionGroup <=> {$other->getTitle()}$incomingSceneConnectionGroup(id={$other->getId()})";
                 } else {
-                    $list[] = "this$outgoingSceneConnectionGroup => {$other->getTitle()}$incomingSceneConnectionGroup (id={$other->getId()})";
+                    $list[] = "this$outgoingSceneConnectionGroup => {$other->getTitle()}$incomingSceneConnectionGroup(id={$other->getId()})";
                 }
             } else {
                 $other = $connection->getOutgoingScene();

@@ -1,0 +1,108 @@
+scenes:
+    -
+        id: "30000000-0000-0000-0000-000000000001"
+        title: "The Village"
+        description: "This is the village."
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\Village"
+        removeable: true
+    -
+        id: "30000000-0000-0000-0000-000000000002"
+        title: "The Forest"
+        description: "This is a very dangerous and dark forest"
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\Forest"
+        removeable: true
+    -
+        id: "30000000-0000-0000-0000-000000000003"
+        title: "The Weaponry"
+        description: "This is the place where you can buy awesome weapons"
+        template: null
+        removeable: true
+    -
+        id: "30000000-0000-0000-0000-000000000004"
+        title: "Another Village"
+        description: "This is another village"
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\Village"
+        removeable: true
+    -
+        id: "30000000-0000-0000-0000-000000000005"
+        title: "Orphan"
+        description: "This is an orphan scene"
+        template: null
+        removeable: false
+    -
+        id: "30000000-0000-0000-0000-000000000006"
+        title: "Connection Test Scene"
+        description: "This is a connection test scene"
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\Village"
+        removeable: true
+scene_connection_groups:
+    -
+        scene: "30000000-0000-0000-0000-000000000001"
+        name: "lotgd/tests/village/outside"
+        title: "Outside"
+    -
+        scene: "30000000-0000-0000-0000-000000000001"
+        name: "lotgd/tests/village/market"
+        title: "Market"
+    -
+        scene: "30000000-0000-0000-0000-000000000001"
+        name: "lotgd/tests/village/empty"
+        title: "Empty"
+    -
+        scene: "30000000-0000-0000-0000-000000000002"
+        name: "lotgd/tests/forest/category"
+        title: "Empty"
+    -
+        scene: "30000000-0000-0000-0000-000000000003"
+        name: "lotgd/tests/weaponry/category"
+        title: "Empty"
+    -
+        scene: "30000000-0000-0000-0000-000000000006"
+        name: "lotgd/tests/testscene/one"
+        title: "Group One"
+    -
+        scene: "30000000-0000-0000-0000-000000000006"
+        name: "lotgd/tests/testscene/two"
+        title: "Group Two"
+    -
+        scene: "30000000-0000-0000-0000-000000000006"
+        name: "lotgd/tests/testscene/three"
+        title: "Group Three"
+scene_connections:
+    -
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        incomingScene: "30000000-0000-0000-0000-000000000002"
+    -
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        outgoingConnectionGroupName: "lotgd/tests/village/market"
+        incomingScene: "30000000-0000-0000-0000-000000000003"
+        incomingConnectionGroupName: "lotgd/tests/weaponry/category"
+    -
+        outgoingScene: "30000000-0000-0000-0000-000000000001"
+        incomingScene: "30000000-0000-0000-0000-000000000004"
+    -
+        outgoingScene: "30000000-0000-0000-0000-000000000006"
+        incomingScene: "30000000-0000-0000-0000-000000000001"
+    -
+        outgoingScene: "30000000-0000-0000-0000-000000000002"
+        incomingScene: "30000000-0000-0000-0000-000000000006"
+        incomingConnectionGroupName: "lotgd/tests/testscene/three"
+        directionality: 1
+    -
+        outgoingScene: "30000000-0000-0000-0000-000000000006"
+        outgoingConnectionGroupName: "lotgd/tests/testscene/three"
+        incomingScene: "30000000-0000-0000-0000-000000000003"
+        directionality: 1
+scene_templates:
+    -
+        class: "LotGD\\Core\\Tests\\SceneTemplates\\Village"
+        module: "lotgd/core"
+        userAssignable: true
+    -
+        class: "LotGD\\Core\\Tests\\SceneTemplates\\Forest"
+        module: "lotgd/core"
+        userAssignable: true
+    -
+        class: "LotGD\\Core\\Tests\\SceneTemplates\\NewSceneSceneTemplate"
+        module: "lotgd/core"
+        userAssignable: true
