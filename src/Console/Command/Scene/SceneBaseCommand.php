@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class SceneBaseCommand extends BaseCommand
 {
-    protected ?string $namespace = "character";
+    protected ?string $namespace = "scene";
 
     /**
      * @return InputArgument
