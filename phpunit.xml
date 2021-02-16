@@ -1,6 +1,7 @@
 <phpunit bootstrap="bootstrap/bootstrap.php">
     <php>
         <env name="LOTGD_TESTS_CONFIG_PATH" value="./config/lotgd.yml"/>
+        <env name="COLUMNS" value="120" />
     </php>
     <testsuites>
         <testsuite name="All">
