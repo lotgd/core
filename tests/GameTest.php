@@ -20,6 +20,7 @@ use LotGD\Core\{Action,
     Game,
     GameBuilder,
     Tests\SceneTemplates\ParameterTestSceneTemplate,
+    Tests\SceneTemplates\ForestSceneTemplate,
     Tests\SceneTemplates\VillageSceneTemplate,
     TimeKeeper,
     ModuleManager};

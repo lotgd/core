@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core\Tests\Commands\CharacterCommands;
+namespace LotGD\Core\Tests\Commands\ModuleCommands;
 
 use LotGD\Core\Console\Command\Module\ModuleConfigResetCommand;
 use LotGD\Core\EventManager;

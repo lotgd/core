@@ -39,7 +39,7 @@ class SceneShowCommandTest extends CoreModelTestCase
 
         $this->assertStringContainsString("Connection Test Scene", $output);
         $this->assertStringContainsString("30000000-0000-0000-0000-000000000006", $output);
-        $this->assertStringContainsString("LotGD\\Core\\Tests\\SceneTemplates\\Village", $output);
+        $this->assertStringContainsString("LotGD\\Core\\Tests\\SceneTemplates\\VillageSceneTemplate", $output);
         $this->assertStringContainsString("This is a connection test scene", $output);
 
         $this->assertStringContainsString("Group One (id=lotgd/tests/testscene/one)", $output);

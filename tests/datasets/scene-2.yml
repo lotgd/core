@@ -3,13 +3,13 @@ scenes:
         id: "30000000-0000-0000-0000-000000000001"
         title: "The Village"
         description: "This is the village."
-        template: "LotGD\\Core\\Tests\\SceneTemplates\\Village"
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\VillageSceneTemplate"
         removeable: true
     -
         id: "30000000-0000-0000-0000-000000000002"
         title: "The Forest"
         description: "This is a very dangerous and dark forest"
-        template: "LotGD\\Core\\Tests\\SceneTemplates\\Forest"
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\ForestSceneTemplate"
         removeable: true
     -
         id: "30000000-0000-0000-0000-000000000003"
@@ -33,7 +33,7 @@ scenes:
         id: "30000000-0000-0000-0000-000000000006"
         title: "Connection Test Scene"
         description: "This is a connection test scene"
-        template: "LotGD\\Core\\Tests\\SceneTemplates\\Village"
+        template: "LotGD\\Core\\Tests\\SceneTemplates\\VillageSceneTemplate"
         removeable: true
 scene_connection_groups:
     -
@@ -95,11 +95,11 @@ scene_connections:
         directionality: 1
 scene_templates:
     -
-        class: "LotGD\\Core\\Tests\\SceneTemplates\\Village"
+        class: "LotGD\\Core\\Tests\\SceneTemplates\\VillageSceneTemplate"
         module: "lotgd/core"
         userAssignable: true
     -
-        class: "LotGD\\Core\\Tests\\SceneTemplates\\Forest"
+        class: "LotGD\\Core\\Tests\\SceneTemplates\\ForestSceneTemplate"
         module: "lotgd/core"
         userAssignable: true
     -

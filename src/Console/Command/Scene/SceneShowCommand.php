@@ -55,7 +55,7 @@ class SceneShowCommand extends SceneBaseCommand
         $io->listing([
             "ID: {$scene->getId()}",
             "Title: {$scene->getTitle()}",
-            "Template: {$scene->getTemplate()->getClass()}",
+            "Template: {$scene->getTemplate()?->getClass()}",
         ]);
 
         $io->text($scene->getDescription());
