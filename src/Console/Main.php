@@ -6,6 +6,9 @@ namespace LotGD\Core\Console;
 use LotGD\Core\Bootstrap;
 
 use LotGD\Core\Console\Command\Character\CharacterAddCommand;
+use LotGD\Core\Console\Command\Character\CharacterConfigListCommand;
+use LotGD\Core\Console\Command\Character\CharacterConfigResetCommand;
+use LotGD\Core\Console\Command\Character\CharacterConfigSetCommand;
 use LotGD\Core\Console\Command\Character\CharacterEditCommand;
 use LotGD\Core\Console\Command\Character\CharacterListCommand;
 use LotGD\Core\Console\Command\Character\CharacterRemoveCommand;
@@ -14,12 +17,15 @@ use LotGD\Core\Console\Command\Character\CharacterShowCommand;
 use LotGD\Core\Console\Command\ConsoleCommand;
 use LotGD\Core\Console\Command\Database\DatabaseInitCommand;
 use LotGD\Core\Console\Command\Database\DatabaseSchemaUpdateCommand;
-use LotGD\Core\Console\Command\Module\CharacterConfigListCommand;
-use LotGD\Core\Console\Command\Module\CharacterConfigResetCommand;
-use LotGD\Core\Console\Command\Module\CharacterConfigSetCommand;
+use LotGD\Core\Console\Command\Module\ModuleConfigListCommand;
+use LotGD\Core\Console\Command\Module\ModuleConfigResetCommand;
+use LotGD\Core\Console\Command\Module\ModuleConfigSetCommand;
 use LotGD\Core\Console\Command\Module\ModuleListCommand;
 use LotGD\Core\Console\Command\Module\ModuleRegisterCommand;
 use LotGD\Core\Console\Command\Module\ModuleValidateCommand;
+use LotGD\Core\Console\Command\Scene\SceneConfigListCommand;
+use LotGD\Core\Console\Command\Scene\SceneConfigResetCommand;
+use LotGD\Core\Console\Command\Scene\SceneConfigSetCommand;
 use LotGD\Core\Console\Command\SceneTemplates\SceneTemplateListCommand;
 use LotGD\Core\Console\Command\Scene\SceneAddCommand;
 use LotGD\Core\Console\Command\Scene\SceneAddConnectionGroupCommand;
@@ -63,15 +69,18 @@ class Main
         $this->application->add(new ConsoleCommand($this->game));
 
         // Module commands
-        $this->application->add(new CharacterConfigListCommand($this->game));
-        $this->application->add(new CharacterConfigResetCommand($this->game));
-        $this->application->add(new CharacterConfigSetCommand($this->game));
+        $this->application->add(new ModuleConfigListCommand($this->game));
+        $this->application->add(new ModuleConfigResetCommand($this->game));
+        $this->application->add(new ModuleConfigSetCommand($this->game));
         $this->application->add(new ModuleListCommand($this->game));
         $this->application->add(new ModuleRegisterCommand($this->game));
         $this->application->add(new ModuleValidateCommand($this->game));
 
         // Character commands
         $this->application->add(new CharacterAddCommand($this->game));
+        $this->application->add(new CharacterConfigListCommand($this->game));
+        $this->application->add(new CharacterConfigResetCommand($this->game));
+        $this->application->add(new CharacterConfigSetCommand($this->game));
         $this->application->add(new CharacterEditCommand($this->game));
         $this->application->add(new CharacterListCommand($this->game));
         $this->application->add(new CharacterRemoveCommand($this->game));
@@ -80,6 +89,9 @@ class Main
 
         // Scene commands
         $this->application->add(new SceneAddCommand($this->game));
+        $this->application->add(new SceneConfigListCommand($this->game));
+        $this->application->add(new SceneConfigResetCommand($this->game));
+        $this->application->add(new SceneConfigSetCommand($this->game));
         $this->application->add(new SceneListCommand($this->game));
         $this->application->add(new SceneRemoveCommand($this->game));
         $this->application->add(new SceneShowCommand($this->game));
