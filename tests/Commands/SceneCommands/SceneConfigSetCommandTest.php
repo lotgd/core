@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core\Tests\Commands\ModuleCommands;
+namespace LotGD\Core\Tests\Commands\CharacterCommands;
 
-use LotGD\Core\Console\Command\Module\ModuleConfigSetCommand;
+use LotGD\Core\Console\Command\Character\CharacterConfigSetCommand;
+use LotGD\Core\Console\Command\Scene\SceneConfigSetCommand;
 use LotGD\Core\EventManager;
 use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Game;
@@ -12,14 +13,14 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class ModuleConfigSetCommandTest extends CoreModelTestCase
+class SceneConfigSetCommandTest extends CoreModelTestCase
 {
     /** @var string default data set */
-    protected $dataset = "module-2";
+    protected $dataset = "scene-2";
 
     protected function getCommand(): CommandTester
     {
-        return new CommandTester(new ModuleConfigSetCommand($this->g));
+        return new CommandTester(new SceneConfigSetCommand($this->g));
     }
 
     public function testIfCommandEmitsEvent()
@@ -27,12 +28,12 @@ class ModuleConfigSetCommandTest extends CoreModelTestCase
         /** @var Game $game */
         $game = $this->g;
 
-        $modules = [
-            ["lotgd/tests", "test", "0.126"],
-            ["lotgd/tests-other", "test-other", "hi"],
+        $characters = [
+            ["30000000-0000-0000-0000-000000000001", "The Village", "tests/village", "test", "0.126"],
+            ["30000000-0000-0000-0000-000000000002", "The Forest", "tests/forest", "test-other", "hi"],
         ];
 
-        foreach ($modules as [$module, $setting, $value]) {
+        foreach ($characters as [$character, $displayName, $path, $setting, $value]) {
             $eventManager = $this->getMockBuilder(EventManager::class)
                 ->disableOriginalConstructor()
                 ->setMethods(array('publish'))
@@ -40,12 +41,12 @@ class ModuleConfigSetCommandTest extends CoreModelTestCase
             $eventManager->expects($this->once())
                 ->method('publish')
                 ->with(
-                    $this->equalTo("h/lotgd/core/cli/module-config-set/{$module}"),
-                    $this->callback(function (EventContextData $eventContextData) use ($module, $setting, $value) {
+                    $this->equalTo("h/lotgd/core/cli/character-config-set/{$path}"),
+                    $this->callback(function (EventContextData $eventContextData) use ($character, $displayName, $setting, $value) {
                         $pass = 1;
 
-                        $pass &= $eventContextData->has("module") === true;
-                        $pass &= $eventContextData->get("module")->getLibrary() === $module;
+                        $pass &= $eventContextData->has("scene") === true;
+                        $pass &= $eventContextData->get("scene")->getTitle() === $displayName;
 
                         $pass &= $eventContextData->has("io") === true;
                         $pass &= $eventContextData->get("io") instanceof SymfonyStyle;
@@ -69,7 +70,7 @@ class ModuleConfigSetCommandTest extends CoreModelTestCase
 
             $command = $this->getCommand();
             $command->execute([
-                "moduleName" => $module,
+                "id" => $character,
                 "setting" => $setting,
                 "value" => $value,
             ]);
@@ -77,7 +78,7 @@ class ModuleConfigSetCommandTest extends CoreModelTestCase
             $output = $command->getDisplay();
 
             $this->assertSame(Command::FAILURE, $command->getStatusCode());
-            $this->assertStringContainsString("Module {$module}", $output);
+            $this->assertStringContainsString("Scene {$displayName}", $output);
             $this->assertStringContainsString("[ERROR]", $output);
             $this->assertStringContainsString("Setting does not exist.", $output);
         }
@@ -100,7 +101,7 @@ class ModuleConfigSetCommandTest extends CoreModelTestCase
 
         $command = $this->getCommand();
         $command->execute([
-            "moduleName" => "lotgd/tests",
+            "id" => "30000000-0000-0000-0000-000000000001",
             "setting" => "Setting",
             "value" => 13,
         ]);
@@ -108,7 +109,7 @@ class ModuleConfigSetCommandTest extends CoreModelTestCase
         $output = $command->getDisplay();
 
         $this->assertSame(Command::SUCCESS, $command->getStatusCode());
-        $this->assertStringContainsString("Module lotgd/tests", $output);
+        $this->assertStringContainsString("Scene The Village", $output);
         $this->assertStringNotContainsString("[ERROR]", $output);
         $this->assertStringNotContainsString("Setting does not exist.", $output);
     }

@@ -14,9 +14,9 @@ use LotGD\Core\Console\Command\Character\CharacterShowCommand;
 use LotGD\Core\Console\Command\ConsoleCommand;
 use LotGD\Core\Console\Command\Database\DatabaseInitCommand;
 use LotGD\Core\Console\Command\Database\DatabaseSchemaUpdateCommand;
-use LotGD\Core\Console\Command\Module\ModuleConfigListCommand;
-use LotGD\Core\Console\Command\Module\ModuleConfigResetCommand;
-use LotGD\Core\Console\Command\Module\ModuleConfigSetCommand;
+use LotGD\Core\Console\Command\Module\CharacterConfigListCommand;
+use LotGD\Core\Console\Command\Module\CharacterConfigResetCommand;
+use LotGD\Core\Console\Command\Module\CharacterConfigSetCommand;
 use LotGD\Core\Console\Command\Module\ModuleListCommand;
 use LotGD\Core\Console\Command\Module\ModuleRegisterCommand;
 use LotGD\Core\Console\Command\Module\ModuleValidateCommand;
@@ -63,9 +63,9 @@ class Main
         $this->application->add(new ConsoleCommand($this->game));
 
         // Module commands
-        $this->application->add(new ModuleConfigListCommand($this->game));
-        $this->application->add(new ModuleConfigResetCommand($this->game));
-        $this->application->add(new ModuleConfigSetCommand($this->game));
+        $this->application->add(new CharacterConfigListCommand($this->game));
+        $this->application->add(new CharacterConfigResetCommand($this->game));
+        $this->application->add(new CharacterConfigSetCommand($this->game));
         $this->application->add(new ModuleListCommand($this->game));
         $this->application->add(new ModuleRegisterCommand($this->game));
         $this->application->add(new ModuleValidateCommand($this->game));

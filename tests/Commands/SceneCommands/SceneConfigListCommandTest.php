@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace LotGD\Core\Tests\Commands\ModuleCommands;
-
-use LotGD\Core\Console\Command\Module\ModuleConfigListCommand;
+use LotGD\Core\Console\Command\Scene\SceneConfigListCommand;
 use LotGD\Core\EventManager;
 use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Game;
@@ -12,26 +10,26 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class ModuleConfigListCommandTest extends CoreModelTestCase
+class SceneConfigListCommandTest extends CoreModelTestCase
 {
     /** @var string default data set */
-    protected $dataset = "module-2";
+    protected $dataset = "scene-2";
 
     protected function getCommand(): CommandTester
     {
-        return new CommandTester(new ModuleConfigListCommand($this->g));
+        return new CommandTester(new SceneConfigListCommand($this->g));
     }
 
     public function testIfCommandRunsWithoutRegisteredEvents()
     {
         $command = $this->getCommand();
         $command->execute([
-            "moduleName" => "lotgd/tests"
+            "id" => "30000000-0000-0000-0000-000000000001",
         ]);
         $output = $command->getDisplay();
 
         $this->assertSame(Command::SUCCESS, $command->getStatusCode());
-        $this->assertStringContainsString("This module does not provide any settings.", $output);
+        $this->assertStringContainsString("There are no scene settings available.", $output);
     }
 
     public function testIfCommandEmitsEvent()
@@ -39,25 +37,25 @@ class ModuleConfigListCommandTest extends CoreModelTestCase
         /** @var Game $game */
         $game = $this->g;
 
-        $modules = [
-            "lotgd/tests",
-            "lotgd/tests-other"
+        $scenes = [
+            ["30000000-0000-0000-0000-000000000001", "The Village", "tests/village"],
+            ["30000000-0000-0000-0000-000000000002", "The Forest", "tests/forest"],
         ];
 
-        foreach ($modules as $module) {
+        foreach ($scenes as [$scene, $sceneTitle, $path]) {
             $eventManager = $this->getMockBuilder(EventManager::class)
                 ->disableOriginalConstructor()
-                ->setMethods(array('publish'))
+                ->setMethods(['publish'])
                 ->getMock();
             $eventManager->expects($this->once())
                 ->method('publish')
                 ->with(
-                    $this->equalTo("h/lotgd/core/cli/module-config-list/{$module}"),
-                    $this->callback(function (EventContextData $eventContextData) use ($module) {
+                    $this->equalTo("h/lotgd/core/cli/scene-config-list/{$path}"),
+                    $this->callback(function (EventContextData $eventContextData) use ($scene, $sceneTitle) {
                         $pass = 1;
 
-                        $pass &= $eventContextData->has("module") === true;
-                        $pass &= $eventContextData->get("module")->getLibrary() === $module;
+                        $pass &= $eventContextData->has("scene") === true;
+                        $pass &= $eventContextData->get("scene")->getTitle() === $sceneTitle;
 
                         $pass &= $eventContextData->has("io") === true;
                         $pass &= $eventContextData->get("io") instanceof SymfonyStyle;
@@ -72,14 +70,14 @@ class ModuleConfigListCommandTest extends CoreModelTestCase
 
             $command = $this->getCommand();
             $command->execute([
-                "moduleName" => $module,
+                "id" => $scene,
             ]);
 
             $output = $command->getDisplay();
 
             $this->assertSame(Command::SUCCESS, $command->getStatusCode());
-            $this->assertStringContainsString("Module {$module}", $output);
-            $this->assertStringContainsString("This module does not provide any settings.", $output);
+            $this->assertStringContainsString("Scene {$sceneTitle}", $output);
+            $this->assertStringContainsString("There are no scene settings available.", $output);
         }
     }
 
@@ -89,7 +87,7 @@ class ModuleConfigListCommandTest extends CoreModelTestCase
         $game = $this->g;
         $eventManager = $this->getMockBuilder(EventManager::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('publish'))
+            ->setMethods(['publish'])
             ->getMock();
         $eventManager->expects($this->once())
             ->method('publish')
@@ -107,7 +105,7 @@ class ModuleConfigListCommandTest extends CoreModelTestCase
 
         $command = $this->getCommand();
         $command->execute([
-            "moduleName" => "lotgd/tests"
+            "id" => "30000000-0000-0000-0000-000000000001",
         ]);
 
         $output = $command->getDisplay();
@@ -119,6 +117,6 @@ class ModuleConfigListCommandTest extends CoreModelTestCase
         $this->assertStringContainsString("setting2", $output);
         $this->assertStringContainsString("DragonMillions", $output);
         $this->assertStringContainsString("string, name of the lottery", $output);
-        $this->assertStringNotContainsString("This module does not provide any settings.", $output);
+        $this->assertStringNotContainsString("There are no scene settings available.", $output);
     }
 }
