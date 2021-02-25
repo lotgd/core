@@ -71,7 +71,7 @@ class Scene implements CreateableInterface, SceneConnectable
      * @OneToMany(targetEntity="SceneProperty", mappedBy="owner", cascade={"persist", "remove"})
      * @var ?Collection<SceneProperty>
      */
-    private ?Collection $properties;
+    private ?Collection $properties = null;
 
     /**
      * @ManyToMany(targetEntity="SceneAttachment", inversedBy="scenes", cascade={"persist"})
