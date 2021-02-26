@@ -4,6 +4,11 @@ scenes:
         title: "A scene"
         description: "This is the village."
         template: "lotgd/tests/village"
+    -
+        id: "30000000-0000-0000-0000-000000000002"
+        title: "A scene"
+        description: "This is the village."
+        template: "lotgd/tests/village"
 scene_properties:
     -
         owner: "30000000-0000-0000-0000-000000000001"

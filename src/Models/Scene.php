@@ -71,7 +71,7 @@ class Scene implements CreateableInterface, SceneConnectable
      * @OneToMany(targetEntity="SceneProperty", mappedBy="owner", cascade={"persist", "remove"})
      * @var ?Collection<SceneProperty>
      */
-    private ?Collection $properties = null;
+    private ?Collection $properties;
 
     /**
      * @ManyToMany(targetEntity="SceneAttachment", inversedBy="scenes", cascade={"persist"})
@@ -141,6 +141,7 @@ class Scene implements CreateableInterface, SceneConnectable
         $this->outgoingConnections = new ArrayCollection();
         $this->incomingConnections = new ArrayCollection();
         $this->attachments = new ArrayCollection();
+        $this->properties = new ArrayCollection();
     }
 
     public function __toString(): string

@@ -27,6 +27,36 @@ class ScenePropertyTest extends CoreModelTestCase
         $this->assertTrue($value);
     }
 
+    public function testIfUnknownScenePropertyCanBeRetrieved()
+    {
+        $em = $this->getEntityManager();
+
+        # Retrieve scene
+        $scene = $em->getRepository(Scene::class)->find("30000000-0000-0000-0000-000000000002");
+
+        # Fetch property, with default "false".
+        # Must return true, as this is whats in our dataset
+        $value = $scene->getProperty("lotgd/core/tests/property/dataset");
+
+        # Assert the value
+        $this->assertNull($value);
+    }
+
+    public function testIfFreshlyCreatedSceneCanGetAccessedProperties()
+    {
+        $em = $this->getEntityManager();
+
+        # Retrieve scene
+        $scene = new Scene(title: "A new scene", description: "Hallo Welt", template: null);
+
+        # Fetch property, with default "false".
+        # Must return true, as this is whats in our dataset
+        $value = $scene->getProperty("lotgd/core/tests/property/dataset");
+
+        # Assert the value
+        $this->assertNull($value);
+    }
+
     public function testIfPropertyCanBeSaved()
     {
         $em = $this->getEntityManager();
