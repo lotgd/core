@@ -41,7 +41,7 @@ class SceneConfigResetCommandTest extends CoreModelTestCase
             $eventManager->expects($this->once())
                 ->method('publish')
                 ->with(
-                    $this->equalTo("h/lotgd/core/cli/character-config-reset/{$path}"),
+                    $this->equalTo("h/lotgd/core/cli/scene-config-reset/{$path}"),
                     $this->callback(function (EventContextData $eventContextData) use ($scene, $sceneTitle, $setting) {
                         $pass = 1;
 
