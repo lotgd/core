@@ -60,7 +60,7 @@ class SceneConfigSetCommand extends SceneBaseCommand
             "reason" => "Setting does not exist.",
         ]);
         $newContext = $this->game->getEventManager()->publish(
-            event: "h/lotgd/core/cli/character-config-set/{$sceneTemplate}",
+            event: "h/lotgd/core/cli/scene-config-set/{$sceneTemplate}",
             contextData: $context
         );
         if ($newContext->get("return") != Command::SUCCESS) {
