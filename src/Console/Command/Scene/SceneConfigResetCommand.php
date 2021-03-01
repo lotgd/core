@@ -56,7 +56,7 @@ class SceneConfigResetCommand extends SceneBaseCommand
         ]);
 
         $newContext = $this->game->getEventManager()->publish(
-            event: "h/lotgd/core/cli/character-config-reset/{$sceneTemplate}",
+            event: "h/lotgd/core/cli/scene-config-reset/{$sceneTemplate}",
             contextData: $context
         );
         if ($newContext->get("return") != Command::SUCCESS) {
