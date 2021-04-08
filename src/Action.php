@@ -104,7 +104,7 @@ class Action implements \Serializable
         if (!$title) {
             return null;
         } elseif ($sceneRenderer) {
-            return $sceneRenderer->render($title, $this->viewpoint, ignoreErrors: true);
+            return $sceneRenderer->render($title, $this->viewpoint, ignoreErrors: true, templateValues: ["Action" => $this]);
         } else {
             return $title;
         }

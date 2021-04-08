@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Services;
 
 
+use LotGD\Core\Action;
 use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Exceptions\CharacterNotFoundException;
 use LotGD\Core\Exceptions\InsecureTwigTemplateError;
@@ -48,13 +49,14 @@ class TwigSceneRenderer
      * @param string $string
      * @param Viewpoint $viewpoint
      * @param bool $ignoreErrors If set to true, errors are ignored and the unparsed string will be returned instead.
+     * @param array $templateValues
      * @return string
      * @throws InsecureTwigTemplateError
      * @throws CharacterNotFoundException
      * @throws LoaderError
      * @throws SyntaxError
      */
-    public function render(string $string, Viewpoint $viewpoint, bool $ignoreErrors = false): string
+    public function render(string $string, Viewpoint $viewpoint, bool $ignoreErrors = false, array $templateValues = []): string
     {
         // We catch here "Tag" errors. If error, we'll exit either by returning the input ($ignoreError === true) or
         // throwing an exception.
@@ -68,14 +70,14 @@ class TwigSceneRenderer
             }
         }
 
-        $templateValues = [
+        $defaultTemplateValues = [
             "Character" => $this->game->getCharacter(),
             "Scene" => $viewpoint->getScene(),
             "Viewpoint" => $viewpoint,
         ];
 
         // Merges additional template values with important ones.
-        $templateValues = array_merge($this->templateValues, $templateValues);
+        $templateValues = array_merge($this->templateValues, $defaultTemplateValues, $templateValues);
 
         // Try to render the template
         try {
@@ -100,16 +102,18 @@ class TwigSceneRenderer
     public function getSecurityPolicy(): SecurityPolicy
     {
         $tags = ["if"];
-        $filters = ["lower", "upper", "escape"];
+        $filters = ["lower", "upper", "escape", "round"];
         $functions = ["range"];
         $methods = [
             Character::class => ["getDisplayName", "getLevel", "isAlive", "getHealth", "getMaxHealth", "getProperty"],
             Scene::class => ["getProperty"],
             Viewpoint::class => ["getData"],
+            Action::class => ["getParameters"],
         ];
         $properties = [
             "Character" => ["displayName", "level", "alive", "health", "maxHealth", "property"],
             "Viewpoint" => ["data"],
+            "Action" => ["parameters"],
         ];
 
         // Publish event to change $templateValues
