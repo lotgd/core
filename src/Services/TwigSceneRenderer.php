@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace LotGD\Core\Services;
 
 
-use Doctrine\DBAL\Schema\View;
 use LotGD\Core\Events\EventContextData;
+use LotGD\Core\Exceptions\CharacterNotFoundException;
 use LotGD\Core\Exceptions\InsecureTwigTemplateError;
 use LotGD\Core\Game;
 use LotGD\Core\Models\Character;
-use LotGD\Core\Models\CharacterProperty;
 use LotGD\Core\Models\Scene;
 use LotGD\Core\Models\Viewpoint;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\SyntaxError;
 use Twig\Extension\SandboxExtension;
 use Twig\Sandbox\SecurityError;
 use Twig\Sandbox\SecurityPolicy;
@@ -28,12 +29,31 @@ class TwigSceneRenderer
     ) {
         $this->twig = new Environment(new TwigNullLoader());
 
-        $securityPolicy = $this->getSecurityPolicy();
+        // Add a hook for additional fields
+        // This is for global changes only. Viewpoint-dependent changes should try to store the important values within
+        // the viewpoint itself.
+        $eventManager = $this->game->getEventManager();
+        $contextData = EventContextData::create(["templateValues" => []]);
+        $newContextData = $eventManager->publish("h/lotgd/core/scene-renderer/templateValues", $contextData);
+        $this->templateValues = $newContextData->get("templateValues") ?? [];
 
-        # Add Sandbox extension
+        // Add Sandbox extension
+        $securityPolicy = $this->getSecurityPolicy();
         $this->twig->addExtension(new SandboxExtension($securityPolicy, sandboxed: true));
     }
 
+    /**
+     * Renders a given string in the context if a given viewpoint.
+     *
+     * @param string $string
+     * @param Viewpoint $viewpoint
+     * @param bool $ignoreErrors If set to true, errors are ignored and the unparsed string will be returned instead.
+     * @return string
+     * @throws InsecureTwigTemplateError
+     * @throws CharacterNotFoundException
+     * @throws LoaderError
+     * @throws SyntaxError
+     */
     public function render(string $string, Viewpoint $viewpoint, bool $ignoreErrors = false): string
     {
         // We catch here "Tag" errors. If error, we'll exit either by returning the input ($ignoreError === true) or
@@ -54,11 +74,8 @@ class TwigSceneRenderer
             "Viewpoint" => $viewpoint,
         ];
 
-        // Publish event to change $templateValues
-        $eventManager = $this->game->getEventManager();
-        $contextData = EventContextData::create(["templateValues" => $templateValues]);
-        $newContextData = $eventManager->publish("h/lotgd/core/scene-renderer/templateValues", $contextData);
-        $templateValues = $newContextData->get("templateValues");
+        // Merges additional template values with important ones.
+        $templateValues = array_merge($this->templateValues, $templateValues);
 
         // Try to render the template
         try {
@@ -75,6 +92,11 @@ class TwigSceneRenderer
         return $result;
     }
 
+    /**
+     * Returns the current security policy.
+     * This method provides a hook.
+     * @return SecurityPolicy
+     */
     public function getSecurityPolicy(): SecurityPolicy
     {
         $tags = ["if"];
