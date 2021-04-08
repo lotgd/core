@@ -104,6 +104,26 @@ class TwigSceneRendererTest extends LotGDTestCase
         $this->assertSame($result, $renderResult);
     }
 
+    public function testIfViewpointDataCanBeAccessed()
+    {
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
+        $eventManager->method("publish")->willReturnArgument(1);
+        $viewpoint->method("getData")->willReturn(["test" => 7, "other" => "Hi"]);
+
+        # Get renderer
+        $renderer = new TwigSceneRenderer($game);
+
+        # Prepare the template string.
+        $template = "Hi {{ Viewpoint.data.test }}! {{ Viewpoint.data.other }}";
+        $result = "Hi 7! Hi";
+
+        # Create the result
+        $renderResult = $renderer->render($template, $viewpoint);
+
+        # Assert result
+        $this->assertSame($result, $renderResult);
+    }
+
     public function testIfRawTemplateGetsReturnedIfTemplateContainsIllegalTokens()
     {
         [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
@@ -173,7 +193,7 @@ class TwigSceneRendererTest extends LotGDTestCase
         $renderer->render("{% if 5*1 %}Hallo{%endif%}", $viewpoint, false);
 
         $this->expectException(InsecureTwigTemplateError::class);
-        $renderer->render("{{ Character.name }}", $scene, false);
+        $renderer->render("{{ Character.name }}", $viewpoint, false);
     }
 
     public function testIfPublishedEventCanModifyValueScope()
