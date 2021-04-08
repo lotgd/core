@@ -117,9 +117,18 @@ class ViewpointTest extends CoreModelTestCase
         $em->clear();
 
         $output = $em->getRepository(Viewpoint::class)->find("10000000-0000-0000-0000-000000000002");
-        $this->assertEquals($actionGroups, $output->getActionGroups());
 
-        $this->assertEquals($ag2, $input->findActionGroupById('id2'));
+        for ($i=0; $i < count($actionGroups); $i++) {
+            $should = $actionGroups[$i];
+            $is = $output->getActionGroups()[$i];
+
+            $this->assertSame($should->getId(), $is->getId());
+            $this->assertSame($should->getTitle(), $is->getTitle());
+            $this->assertSame($should->getSortKey(), $is->getSortKey());
+            $this->assertSame(count($should->getActions()), count($is->getActions()));
+        }
+
+        $this->assertEquals($ag2->getTitle(), $input->findActionGroupById('id2')->getTitle());
         $this->assertNull($input->findActionGroupById('not-there'));
 
         $testAction = new Action("30000000-0000-0000-0000-000000000004");
@@ -186,7 +195,16 @@ class ViewpointTest extends CoreModelTestCase
 
         // Not finding the scene ID should change nothing.
         $output->removeActionsWithSceneId("30000000-0000-0000-0000-000000001000");
-        $this->assertEquals($actionGroups, $output->getActionGroups());
+
+        for ($i=0; $i < count($actionGroups); $i++) {
+            $should = $actionGroups[$i];
+            $is = $output->getActionGroups()[$i];
+
+            $this->assertSame($should->getId(), $is->getId());
+            $this->assertSame($should->getTitle(), $is->getTitle());
+            $this->assertSame($should->getSortKey(), $is->getSortKey());
+            $this->assertSame(count($should->getActions()), count($is->getActions()));
+        }
 
         $ag1_output = new ActionGroup('id1', 'title1', 42);
         $ag1_output->setActions([
@@ -199,7 +217,16 @@ class ViewpointTest extends CoreModelTestCase
             $ag2
         ];
         $output->removeActionsWithSceneId("30000000-0000-0000-0000-000000000002");
-        $this->assertEquals($actionGroupsWithout2, $output->getActionGroups());
+
+        for ($i=0; $i < count($actionGroups); $i++) {
+            $should = $actionGroupsWithout2[$i];
+            $is = $output->getActionGroups()[$i];
+
+            $this->assertSame($should->getId(), $is->getId());
+            $this->assertSame($should->getTitle(), $is->getTitle());
+            $this->assertSame($should->getSortKey(), $is->getSortKey());
+            $this->assertSame(count($should->getActions()), count($is->getActions()));
+        }
     }
 
     public function testChangingSceneDescription()

@@ -3,13 +3,16 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use LotGD\Core\Models\Viewpoint;
+
 /**
  * A representation of an action the user can take to affect the game
  * state. An encapsulation of a navigation menu option.
  */
-class Action
+class Action implements \Serializable
 {
     protected string $id;
+    private ?Viewpoint $viewpoint = null;
 
     /**
      * Construct a new action with the specified Scene as its destination.
@@ -23,6 +26,41 @@ class Action
         protected array $parameters = []
     ) {
         $this->id = \bin2hex(\random_bytes(8));
+    }
+
+    public function serialize()
+    {
+        return serialize([
+            "id" => $this->id,
+            "destinationSceneId" => $this->destinationSceneId,
+            "title" => $this->title,
+            "parameters" => $this->parameters,
+        ]);
+    }
+
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+        $this->id = $data["id"];
+        $this->destinationSceneId = $data["destinationSceneId"];
+        $this->title = $data["title"];
+        $this->parameters = $data["parameters"];
+    }
+
+    /**
+     * @param Viewpoint|null $viewpoint
+     */
+    public function setViewpoint(?Viewpoint $viewpoint)
+    {
+        $this->viewpoint = $viewpoint;
+    }
+
+    /**
+     * @return Viewpoint|null
+     */
+    public function getViewpoint(): ?Viewpoint
+    {
+        return $this->viewpoint;
     }
 
     /**
@@ -51,6 +89,25 @@ class Action
     public function getTitle(): ?string
     {
         return $this->title;
+    }
+
+    /**
+     * Returns the rendered action title.
+     * @return string|null
+     * @throws Exceptions\InsecureTwigTemplateError
+     */
+    public function getRenderedTitle(): ?string
+    {
+        $title = $this->getTitle();
+        $sceneRenderer = $this->getViewpoint()?->getTwigSceneRenderer();
+
+        if (!$title) {
+            return null;
+        } elseif ($sceneRenderer) {
+            return $sceneRenderer->render($title, $this->viewpoint, ignoreErrors: true);
+        } else {
+            return $title;
+        }
     }
 
     /**

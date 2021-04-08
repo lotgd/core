@@ -25,6 +25,9 @@ class ViewpointSnapshot
         private array $attachments,
         private array $data,
     ) {
+        foreach ($this->actionGroups as $actionGroup) {
+            $actionGroup->setViewpoint(null);
+        }
     }
 
     /**
