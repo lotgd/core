@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace LotGD\Core\Services;
 
 
+use Doctrine\DBAL\Schema\View;
 use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Exceptions\InsecureTwigTemplateError;
 use LotGD\Core\Game;
 use LotGD\Core\Models\Character;
+use LotGD\Core\Models\CharacterProperty;
 use LotGD\Core\Models\Scene;
+use LotGD\Core\Models\Viewpoint;
 use Twig\Environment;
 use Twig\Extension\SandboxExtension;
 use Twig\Sandbox\SecurityError;
@@ -18,6 +21,7 @@ use Twig\Sandbox\SecurityPolicy;
 class TwigSceneRenderer
 {
     private Environment $twig;
+    private array $templateValues;
 
     public function __construct(
         private Game $game
@@ -30,7 +34,7 @@ class TwigSceneRenderer
         $this->twig->addExtension(new SandboxExtension($securityPolicy, sandboxed: true));
     }
 
-    public function render(string $string, Scene $scene, bool $ignoreErrors = false): string
+    public function render(string $string, Viewpoint $viewpoint, bool $ignoreErrors = false): string
     {
         // We catch here "Tag" errors. If error, we'll exit either by returning the input ($ignoreError === true) or
         // throwing an exception.
@@ -46,7 +50,8 @@ class TwigSceneRenderer
 
         $templateValues = [
             "Character" => $this->game->getCharacter(),
-            "Scene" => $scene,
+            "Scene" => $viewpoint->getScene(),
+            "Viewpoint" => $viewpoint,
         ];
 
         // Publish event to change $templateValues
@@ -78,9 +83,11 @@ class TwigSceneRenderer
         $methods = [
             Character::class => ["getDisplayName", "getLevel", "isAlive", "getHealth", "getMaxHealth", "getProperty"],
             Scene::class => ["getProperty"],
+            Viewpoint::class => ["getData"],
         ];
         $properties = [
-            "Character" => ["displayName", "level", "health", "maxHealth"],
+            "Character" => ["displayName", "level", "alive", "health", "maxHealth", "property"],
+            "Viewpoint" => ["data"],
         ];
 
         // Publish event to change $templateValues

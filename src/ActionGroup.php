@@ -3,15 +3,21 @@ declare(strict_types=1);
 
 namespace LotGD\Core;
 
+use LotGD\Core\Models\Viewpoint;
+
 /**
  * A grouping of navigation actions, like a submenu.
  */
-class ActionGroup implements \Countable
+class ActionGroup implements \Countable, \Serializable
 {
     const DefaultGroup = 'lotgd/core/default';
     const HiddenGroup = 'lotgd/core/hidden';
 
-    private $actions;
+    /**
+     * @var Action[]
+     */
+    private array $actions;
+    private ?Viewpoint $viewpoint = null;
 
     /**
      * Create a new ActionGroup, starting with an empty set of actions.
@@ -25,6 +31,45 @@ class ActionGroup implements \Countable
         private int $sortKey
     ) {
         $this->actions = [];
+    }
+
+    public function serialize()
+    {
+        return serialize([
+            "id" => $this->id,
+            "title" => $this->title,
+            "actions" => $this->actions,
+            "sortKey" => $this->sortKey,
+        ]);
+    }
+
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+        $this->id = $data["id"];
+        $this->title = $data["title"];
+        $this->actions = $data["actions"];
+        $this->sortKey = $data["sortKey"];
+    }
+
+    /**
+     * @param Viewpoint|null $viewpoint
+     */
+    public function setViewpoint(?Viewpoint $viewpoint)
+    {
+        $this->viewpoint = $viewpoint;
+
+        foreach ($this->actions as $action) {
+            $action->setViewpoint($viewpoint);
+        }
+    }
+
+    /**
+     * @return Viewpoint|null
+     */
+    public function getViewpoint(): ?Viewpoint
+    {
+        return $this->viewpoint;
     }
 
     /**
@@ -55,6 +100,23 @@ class ActionGroup implements \Countable
     }
 
     /**
+     * Returns the rendered title for this group.
+     * @return string
+     * @throws Exceptions\InsecureTwigTemplateError
+     */
+    public function getRenderedTitle(): string
+    {
+        $title = $this->getTitle();
+        $sceneRenderer = $this->viewpoint?->getTwigSceneRenderer();
+
+        if ($sceneRenderer) {
+            return $sceneRenderer->render($title, $this->viewpoint, ignoreErrors: true);
+        } else {
+            return $title;
+        }
+    }
+
+    /**
      * Returns the sort key for this group. The ordering of the groups in the
      * final menu displayed to users will be sorted by this key. The default
      * menu's sort key is '0'.
@@ -80,6 +142,10 @@ class ActionGroup implements \Countable
      */
     public function setActions(array $actions)
     {
+        foreach ($actions as $action) {
+            $action->setViewpoint($this->viewpoint);
+        }
+
         $this->actions = $actions;
     }
 
@@ -89,6 +155,7 @@ class ActionGroup implements \Countable
      */
     public function addAction(Action $action)
     {
+        $action->setViewpoint($this->viewpoint);
         $this->actions[] = $action;
     }
 }

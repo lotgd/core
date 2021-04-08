@@ -22,11 +22,11 @@ class ViewpointRestorationTest extends CoreModelTestCase
     protected function getActionGroup()
     {
         static $actionGroup = null;
-        if ($actionGroup !== null) {
+        if ($actionGroup === null) {
             $actionGroup = new ActionGroup("main", "Title", 0);
-            $actionGroup->addAction(new Action(1));
-            $actionGroup->addAction(new Action(2));
-            $actionGroup->addAction(new Action(3));
+            $actionGroup->addAction(new Action("30000000-0000-0000-0000-000000000001"));
+            $actionGroup->addAction(new Action("30000000-0000-0000-0000-000000000002"));
+            $actionGroup->addAction(new Action("30000000-0000-0000-0000-000000000003"));
         }
 
         return $actionGroup;
@@ -102,7 +102,17 @@ class ViewpointRestorationTest extends CoreModelTestCase
         $this->assertSame($viewpoint->getTitle(), $newViewpoint->getTitle());
         $this->assertSame($viewpoint->getDescription(), $newViewpoint->getDescription());
         $this->assertSame($viewpoint->getTemplate(), $newViewpoint->getTemplate());
-        $this->assertEquals($viewpoint->getActionGroups(), $newViewpoint->getActionGroups());;
+
+        for ($i=0; $i < count($viewpoint->getActionGroups()); $i++) {
+            $should = $viewpoint->getActionGroups()[$i];
+            $is = $newViewpoint->getActionGroups()[$i];
+
+            $this->assertSame($should->getId(), $is->getId());
+            $this->assertSame($should->getTitle(), $is->getTitle());
+            $this->assertSame($should->getSortKey(), $is->getSortKey());
+            $this->assertSame(count($should->getActions()), count($is->getActions()));
+        }
+
         $this->assertSame($viewpoint->getData(), $newViewpoint->getData());
         $this->assertSame($viewpoint->getAttachments(), $newViewpoint->getAttachments());
     }
@@ -120,7 +130,17 @@ class ViewpointRestorationTest extends CoreModelTestCase
         $this->assertSame($viewpoint->getTitle(), $newViewpoint->getTitle());
         $this->assertSame($viewpoint->getDescription(), $newViewpoint->getDescription());
         $this->assertSame($viewpoint->getTemplate(), $newViewpoint->getTemplate());
-        $this->assertEquals($viewpoint->getActionGroups(), $newViewpoint->getActionGroups());;
+
+        for ($i=0; $i < count($viewpoint->getActionGroups()); $i++) {
+            $should = $viewpoint->getActionGroups()[$i];
+            $is = $newViewpoint->getActionGroups()[$i];
+
+            $this->assertSame($should->getId(), $is->getId());
+            $this->assertSame($should->getTitle(), $is->getTitle());
+            $this->assertSame($should->getSortKey(), $is->getSortKey());
+            $this->assertSame(count($should->getActions()), count($is->getActions()));
+        }
+
         $this->assertSame($viewpoint->getData(), $newViewpoint->getData());
         $this->assertSame($viewpoint->getAttachments(), $newViewpoint->getAttachments());
     }

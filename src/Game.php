@@ -288,6 +288,8 @@ class Game
     private function navigateToScene(Scene $scene, array $parameters)
     {
         $viewpoint = $this->getCharacter()->getViewpoint();
+        $viewpoint->setTwigSceneRenderer($this->getSceneRenderer());
+
         do {
             $referrer = $viewpoint->getScene();
 
@@ -296,7 +298,7 @@ class Game
             $this->getLogger()->debug("Navigating to sceneId={$id} from referrer sceneId={$referrerId}");
 
             // Copy over the basic structure from the scene database.
-            $viewpoint->changeFromScene($scene, $this->getSceneRenderer());
+            $viewpoint->changeFromScene($scene);
 
             // Generate the default set of actions: the default group with
             // all children.

@@ -41,10 +41,16 @@ class Viewpoint implements CreateableInterface
      */
     private Character $owner;
 
-    /** @Column(type="array") */
+    /**
+     * @var ActionGroup[]
+     * @Column(type="array")
+     */
     private array $actionGroups = [];
 
-    /** @Column(type="array") */
+    /**
+     * @var Attachment[]
+     * @Column(type="array")
+     */
     private array $attachments = [];
 
     /** @Column(type="array") */
@@ -57,6 +63,7 @@ class Viewpoint implements CreateableInterface
     private ?Scene $scene = null;
 
     private ?SceneDescription $_description = null;
+    private ?TwigSceneRenderer $twigSceneRenderer = null;
 
     private static array $fillable = [
         "owner",
@@ -78,6 +85,22 @@ class Viewpoint implements CreateableInterface
     public function setOwner(Character $owner)
     {
         $this->owner = $owner;
+    }
+
+    /**
+     * @param TwigSceneRenderer $twigSceneRenderer
+     */
+    public function setTwigSceneRenderer(TwigSceneRenderer $twigSceneRenderer)
+    {
+        $this->twigSceneRenderer = $twigSceneRenderer;
+    }
+
+    /**
+     * @return TwigSceneRenderer|null
+     */
+    public function getTwigSceneRenderer(): ?TwigSceneRenderer
+    {
+        return $this->twigSceneRenderer;
     }
 
     /**
@@ -125,15 +148,11 @@ class Viewpoint implements CreateableInterface
     /**
      * Copies the static data from a scene to this Viewpoint entity.
      * @param Scene $scene
-     * @param TwigSceneRenderer $renderer Required to parse title and description.
      */
-    public function changeFromScene(Scene $scene, TwigSceneRenderer $renderer)
+    public function changeFromScene(Scene $scene)
     {
-        $title = $renderer->render($scene->getTitle(), $scene, ignoreErrors: true);
-        $description = $renderer->render($scene->getDescription(), $scene, ignoreErrors: true);
-
-        $this->setTitle($title);
-        $this->setDescription($description);
+        $this->setTitle($scene->getTitle());
+        $this->setDescription($scene->getDescription());
         $this->setTemplate($scene->getTemplate());
         $this->setScene($scene);
 
@@ -178,6 +197,10 @@ class Viewpoint implements CreateableInterface
         $this->setActionGroups($snapshot->getActionGroups());
         $this->setAttachments($snapshot->getAttachments());
         $this->setData($snapshot->getData());
+
+        foreach ($this->actionGroups as $actionGroup) {
+            $actionGroup->setViewpoint($this);
+        }
     }
 
     /**
@@ -213,6 +236,11 @@ class Viewpoint implements CreateableInterface
      */
     public function setActionGroups(array $actionGroups)
     {
+        foreach ($actionGroups as $actionGroup) {
+            if ($actionGroup instanceof ActionGroup) {
+                $actionGroup->setViewpoint($this);
+            }
+        }
         $this->actionGroups = $actionGroups;
     }
 
@@ -227,6 +255,10 @@ class Viewpoint implements CreateableInterface
         $groupId = $group->getId();
         if ($this->findActionGroupById($groupId) == true) {
             throw new ArgumentException("Group {$group} is already contained in this viewpoint.");
+        }
+
+        foreach ($group->getActions() as $action) {
+            $action->setViewpoint($this);
         }
 
         if ($after === null) {
@@ -271,9 +303,7 @@ class Viewpoint implements CreateableInterface
         $actionGroups = $this->getActionGroups();
         foreach ($actionGroups as $group) {
             if ($group->getId() == $actionGroupId) {
-                $actions = $group->getActions();
-                $actions[] = $action;
-                $group->setActions($actions);
+                $group->addAction($action);
                 break;
             }
         }
@@ -380,5 +410,35 @@ class Viewpoint implements CreateableInterface
             $actions = \array_values($actions);
             $group->setActions($actions);
         }
+    }
+
+    /**
+     * Returns the rendered version of the title
+     * @return string
+     */
+    public function getRenderedTitle(): string
+    {
+        $title = $this->getTitle();
+
+        if ($this->twigSceneRenderer) {
+            return $this->twigSceneRenderer->render($title, $this, ignoreErrors: true);
+        } else {
+            return $title;
+        }
+    }
+
+    /**
+     * Returns the rendered version of the description
+     * @return string
+     */
+    public function getRenderedDescription(): string
+    {
+        $description = $this->getDescription();
+
+        if ($this->twigSceneRenderer) {
+            return $this->twigSceneRenderer->render($description, $this, ignoreErrors: true);
+        } else {
+            return $description;
+    }
     }
 }

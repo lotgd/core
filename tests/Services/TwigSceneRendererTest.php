@@ -9,6 +9,7 @@ use LotGD\Core\Exceptions\InsecureTwigTemplateError;
 use LotGD\Core\Game;
 use LotGD\Core\Models\Character;
 use LotGD\Core\Models\Scene;
+use LotGD\Core\Models\Viewpoint;
 use LotGD\Core\PHPUnit\LotGDTestCase;
 use LotGD\Core\Services\TwigSceneRenderer;
 
@@ -43,12 +44,17 @@ class TwigSceneRendererTest extends LotGDTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        return [$game, $scene, $character, $eventManager];
+        $viewpoint = $this->getMockBuilder(Viewpoint::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $viewpoint->method("getScene")->willReturn($scene);
+
+        return [$game, $viewpoint, $character, $eventManager];
     }
 
     public function testIfSceneRendererCanBeConstructed()
     {
-        [$game, $scene, $character, $eventManager] = $this->getMockeries();
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
         $eventManager->method("publish")->willReturnArgument(1);
 
         $renderer = new TwigSceneRenderer($game);
@@ -58,7 +64,7 @@ class TwigSceneRendererTest extends LotGDTestCase
 
     public function testIfTwigSceneRendererReturnsANonTemplateStringUnmodified()
     {
-        [$game, $scene, $character, $eventManager] = $this->getMockeries();
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
         $eventManager->method("publish")->willReturnArgument(1);
 
         # Get renderer
@@ -68,7 +74,7 @@ class TwigSceneRendererTest extends LotGDTestCase
         $template = "You enter a new location.\n\nA new location.";
 
         # Create the result
-        $renderResult = $renderer->render($template, $scene);
+        $renderResult = $renderer->render($template, $viewpoint);
 
         # Assert result
         $this->assertSame($template, $renderResult);
@@ -76,7 +82,7 @@ class TwigSceneRendererTest extends LotGDTestCase
 
     public function testIfTwigSceneRendererParsesStringsWithCharacters()
     {
-        [$game, $scene, $character, $eventManager] = $this->getMockeries();
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
         $eventManager->method("publish")->willReturnArgument(1);
 
         # Get renderer
@@ -92,7 +98,7 @@ class TwigSceneRendererTest extends LotGDTestCase
             ."You are alive.";
 
         # Create the result
-        $renderResult = $renderer->render($template, $scene);
+        $renderResult = $renderer->render($template, $viewpoint);
 
         # Assert result
         $this->assertSame($result, $renderResult);
@@ -100,7 +106,7 @@ class TwigSceneRendererTest extends LotGDTestCase
 
     public function testIfRawTemplateGetsReturnedIfTemplateContainsIllegalTokens()
     {
-        [$game, $scene, $character, $eventManager] = $this->getMockeries();
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
         $eventManager->method("publish")->willReturnArgument(1);
 
         # Get renderer
@@ -110,7 +116,7 @@ class TwigSceneRendererTest extends LotGDTestCase
         $template = "Viewpoint: {{ Character.viewpoint }}";
 
         # Try to parse the result
-        $renderResult = $renderer->render($template, $scene, true);
+        $renderResult = $renderer->render($template, $viewpoint, true);
 
         # If there was an error, it should have gotten ignored, giving back the raw template.
         $this->assertSame($template, $renderResult);
@@ -118,7 +124,7 @@ class TwigSceneRendererTest extends LotGDTestCase
 
     public function testIfExceptionGetsRaisedIfTemplateContainsIllegalTokens()
     {
-        [$game, $scene, $character, $eventManager] = $this->getMockeries();
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
         $eventManager->method("publish")->willReturnArgument(1);
 
         # Get renderer
@@ -131,12 +137,12 @@ class TwigSceneRendererTest extends LotGDTestCase
         $this->expectException(InsecureTwigTemplateError::class);
 
         # Try to parse the result
-        $renderResult = $renderer->render($template, $scene, false);
+        $renderResult = $renderer->render($template, $viewpoint, false);
     }
 
     public function testIfPublishedEventCanModifySecurityPolicy()
     {
-        [$game, $scene, $character, $eventManager] = $this->getMockeries();
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
 
         # Set up a more complex "publish" method to emulate a real event.
         $eventManager->method("publish")->willReturnCallback(function($event, EventContextData $context) {
@@ -164,7 +170,7 @@ class TwigSceneRendererTest extends LotGDTestCase
 
         # Assert that if does not work anymore
         $this->expectException(InsecureTwigTemplateError::class);
-        $renderer->render("{% if 5*1 %}Hallo{%endif%}", $scene, false);
+        $renderer->render("{% if 5*1 %}Hallo{%endif%}", $viewpoint, false);
 
         $this->expectException(InsecureTwigTemplateError::class);
         $renderer->render("{{ Character.name }}", $scene, false);
@@ -172,7 +178,7 @@ class TwigSceneRendererTest extends LotGDTestCase
 
     public function testIfPublishedEventCanModifyValueScope()
     {
-        [$game, $scene, $character, $eventManager] = $this->getMockeries();
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
 
         # Set up a more complex "publish" method to emulate a real event.
         $eventManager->method("publish")->willReturnCallback(function($event, EventContextData $context) {
@@ -192,7 +198,7 @@ class TwigSceneRendererTest extends LotGDTestCase
         $renderer = new TwigSceneRenderer($game);
 
         # Assert result
-        $result = $renderer->render("{{ test }}", $scene, false);
+        $result = $renderer->render("{{ test }}", $viewpoint, false);
         $this->assertSame("A test", $result);
     }
 }
