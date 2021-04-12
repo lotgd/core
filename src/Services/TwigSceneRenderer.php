@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LotGD\Core\Services;
 
 
+use Doctrine\DBAL\Exception as DBALException;
 use LotGD\Core\Action;
 use LotGD\Core\Events\EventContextData;
 use LotGD\Core\Exceptions\CharacterNotFoundException;
@@ -35,8 +36,14 @@ class TwigSceneRenderer
         // the viewpoint itself.
         $eventManager = $this->game->getEventManager();
         $contextData = EventContextData::create(["templateValues" => []]);
-        $newContextData = $eventManager->publish("h/lotgd/core/scene-renderer/templateValues", $contextData);
-        $this->templateValues = $newContextData->get("templateValues") ?? [];
+
+        // Use try-catch here in case no database has yet been created. See #162
+        try {
+            $newContextData = $eventManager->publish("h/lotgd/core/scene-renderer/templateValues", $contextData);
+            $this->templateValues = $newContextData->get("templateValues") ?? [];
+        } catch (DBALException) {
+            $this->templateValues = [];
+        }
 
         // Add Sandbox extension
         $securityPolicy = $this->getSecurityPolicy();
@@ -125,7 +132,13 @@ class TwigSceneRenderer
             "methods" => $methods,
             "properties" => $properties,
         ]);
-        $newContextData = $eventManager->publish("h/lotgd/core/scene-renderer/securityPolicy", $contextData);
+
+        // Use try-catch here in case no database has yet been created. See #162
+        try {
+            $newContextData = $eventManager->publish("h/lotgd/core/scene-renderer/securityPolicy", $contextData);
+        } catch (DBALException) {
+            $this->templateValues = [];
+        }
 
         // Set changed values from the event.
         $tags = $newContextData->get("tags");
