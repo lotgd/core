@@ -249,6 +249,7 @@ class Game
     public function getViewpoint(): Viewpoint
     {
         $v = $this->getCharacter()->getViewpoint();
+        $v->setTwigSceneRenderer($this->getSceneRenderer());
 
         if ($v === null) {
             // No viewpoint set up for this user. Run the hook to find the default
