@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\PostLoad;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
 use LotGD\Core\Action;
 use LotGD\Core\ActionGroup;
@@ -28,6 +30,7 @@ use LotGD\Core\Tools\SceneDescription;
  * all changes from modules included.
  * @Entity
  * @Table(name="viewpoints")
+ * @HasLifecycleCallbacks
  */
 class Viewpoint implements CreateableInterface
 {
@@ -68,6 +71,16 @@ class Viewpoint implements CreateableInterface
     private static array $fillable = [
         "owner",
     ];
+
+    /**
+     * @PostLoad
+     */
+    public function onLoad()
+    {
+        foreach ($this->actionGroups as $actionGroup) {
+            $actionGroup->setViewpoint($this);
+        }
+    }
 
     /**
      * Returns the owner.
