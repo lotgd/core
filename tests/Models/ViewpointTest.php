@@ -126,6 +126,8 @@ class ViewpointTest extends CoreModelTestCase
             $this->assertSame($should->getTitle(), $is->getTitle());
             $this->assertSame($should->getSortKey(), $is->getSortKey());
             $this->assertSame(count($should->getActions()), count($is->getActions()));
+
+            $this->assertSame($output, $is->getViewpoint());
         }
 
         $this->assertEquals($ag2->getTitle(), $input->findActionGroupById('id2')->getTitle());
