@@ -69,11 +69,15 @@ class TwigSceneRenderer
         // throwing an exception.
         try {
             $template = $this->twig->createTemplate($string);
-        } catch (SecurityError $e) {
+        } catch (SecurityError | SyntaxError $e) {
             if ($ignoreErrors) {
                 return $string;
             } else {
-                throw new InsecureTwigTemplateError("Template contains illegal calls: {$e->getMessage()}");
+                if ($e instanceof SecurityError) {
+                    throw new InsecureTwigTemplateError("Template contains illegal calls: {$e->getMessage()}");
+                } else {
+                    throw $e;
+                }
             }
         }
 
@@ -94,7 +98,11 @@ class TwigSceneRenderer
             if ($ignoreErrors) {
                 return $string;
             } else {
-                throw new InsecureTwigTemplateError("Template contains illegal calls: {$e->getMessage()}");
+                if ($e instanceof SecurityError) {
+                    throw new InsecureTwigTemplateError("Template contains illegal calls: {$e->getMessage()}");
+                } else {
+                    throw $e;
+                }
             }
         }
 
@@ -109,7 +117,7 @@ class TwigSceneRenderer
     public function getSecurityPolicy(): SecurityPolicy
     {
         $tags = ["if"];
-        $filters = ["lower", "upper", "escape", "round"];
+        $filters = ["lower", "upper", "escape", "round", "abs"];
         $functions = ["range"];
         $methods = [
             Character::class => ["getDisplayName", "getLevel", "isAlive", "getHealth", "getMaxHealth", "getProperty"],

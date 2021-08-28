@@ -26,6 +26,9 @@ class TwigSceneRendererTest extends LotGDTestCase
         $character->method("getHealth")->willReturn(10);
         $character->method("getMaxHealth")->willReturn(100);
         $character->method("isAlive")->willReturn(true);
+        $character->method("getProperty")->willReturnCallback(function ($name, $default=null) {
+            return $default;
+        });
 
         # Get mock game
         $game = $this->getMockBuilder(Game::class)
@@ -96,6 +99,46 @@ class TwigSceneRendererTest extends LotGDTestCase
         $result = "Hi Frodo! How are you today? Your level is 5, and you have "
             ."10 out of 100 health points. "
             ."You are alive.";
+
+        # Create the result
+        $renderResult = $renderer->render($template, $viewpoint);
+
+        # Assert result
+        $this->assertSame($result, $renderResult);
+    }
+
+    public function testIfTwigSceneRendererParsesStringsWithCharacterProperty()
+    {
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
+        $eventManager->method("publish")->willReturnArgument(1);
+
+        # Get renderer
+        $renderer = new TwigSceneRenderer($game);
+
+        # Prepare the template string.
+        $template = "Character has {{ Character.getProperty('a/goldiNBank', -10) }} gold in bank.";
+
+        $result = "Character has -10 gold in bank.";
+
+        # Create the result
+        $renderResult = $renderer->render($template, $viewpoint);
+
+        # Assert result
+        $this->assertSame($result, $renderResult);
+    }
+
+    public function testIfTwigSceneRendererAccepsAbsFIlter()
+    {
+        [$game, $viewpoint, $character, $eventManager] = $this->getMockeries();
+        $eventManager->method("publish")->willReturnArgument(1);
+
+        # Get renderer
+        $renderer = new TwigSceneRenderer($game);
+
+        # Prepare the template string.
+        $template = "Character has a debt of {{ Character.getProperty('a/goldiNBank', -10)|abs }} gold.";
+
+        $result = "Character has a debt of 10 gold.";
 
         # Create the result
         $renderResult = $renderer->render($template, $viewpoint);
