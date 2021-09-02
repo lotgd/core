@@ -37,6 +37,7 @@
     "require-dev": {
         "phpunit/phpunit": "*",
         "phpunit/php-code-coverage": "*",
-        "friendsofphp/php-cs-fixer": "*"
+        "friendsofphp/php-cs-fixer": "*",
+        "vierbergenlars/php-semver": "*"
     }
 }
