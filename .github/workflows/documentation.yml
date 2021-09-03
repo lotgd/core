@@ -1,0 +1,20 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: PhpDocumentor
+        uses: katrinaas/actions-phpDocumentor@v1
+      - name: Save the changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          add: "docs"
+          message: Adding generated Documentation

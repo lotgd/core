@@ -1,6 +1,7 @@
 ### Project related
 vendor/
 .idea/
+build/
 
 logs/*
 
