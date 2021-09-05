@@ -345,12 +345,13 @@ class GameTest extends CoreModelTestCase
         ], $viewpointToArray($v3));
     }
 
-    public function testCorrectVersioning(){
+    public function testCorrectVersioning()
+    {
         try {
-            $version=new version(Game::getVersion());
+            $version = new version(Game::getVersion());
             $this->assertTrue(true);
         } catch(\RuntimeException $e) {
-            $this->fail(sprintf("Version failed SemVer check with error: %s",$e->getMessage()));
+            $this->fail(sprintf("Version failed SemVer check with error: %s", $e->getMessage()));
         }
     }
 }
