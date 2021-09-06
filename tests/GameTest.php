@@ -31,6 +31,7 @@ use LotGD\Core\Exceptions\ {
     ActionNotFoundException, CharacterNotFoundException, InvalidConfigurationException
 };
 use LotGD\Core\Events\EventContext;
+use vierbergenlars\SemVer\version;
 
 class DefaultSceneProvider implements EventHandler
 {
@@ -342,5 +343,15 @@ class GameTest extends CoreModelTestCase
                 ActionGroup::HiddenGroup => [],
             ]
         ], $viewpointToArray($v3));
+    }
+
+    public function testCorrectVersioning()
+    {
+        try {
+            $version = new version(Game::getVersion());
+            $this->assertTrue(true);
+        } catch(\RuntimeException $e) {
+            $this->fail(sprintf("Version failed SemVer check with error: %s", $e->getMessage()));
+        }
     }
 }

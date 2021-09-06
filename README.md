@@ -83,4 +83,4 @@ Leads
 * [austenmc](https://github.com/austenmc)
 
 Other Contributors
-* [nekosune](https://github.com/nekosune)
+* [KatrinaAS](https://github.com/katrinaas)
