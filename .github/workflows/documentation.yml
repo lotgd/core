@@ -2,18 +2,46 @@ name: Documentation
 
 on:
   pull_request:
+  push:
+    branches-ignore:
+      - master
 
 jobs:
-  build:
+    build_documentation:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v2
+          - name: PhpDocumentor
+            uses: katrinaas/actions-phpDocumentor@v1
+          - name: Save the changes
+            uses: EndBug/add-and-commit@v7
+            with:
+              add: "docs"
+              message: Adding generated Documentation
+    test:
+        if: always()
+        needs: build_documentation
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: PhpDocumentor
-        uses: katrinaas/actions-phpDocumentor@v1
-      - name: Save the changes
-        uses: EndBug/add-and-commit@v7
-        with:
-          add: "docs"
-          message: Adding generated Documentation
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Validate composer.json and composer.lock
+              run: composer validate
+
+            - name: Cache Composer packages
+              id: composer-cache
+              uses: actions/cache@v2
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-php-
+
+            - name: Install dependencies
+              if: steps.composer-cache.outputs.cache-hit != 'true'
+              run: composer install --prefer-dist --no-progress --no-suggest
+
+            - name: Run test suite
+              run: vendor/bin/phpunit --stop-on-failure
