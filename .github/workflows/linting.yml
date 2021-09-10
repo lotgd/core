@@ -1,0 +1,16 @@
+name: Documentation
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  check_linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: CheckLint
+        uses: overtrue/phplint@8.0
+        with:
+          path: .
+          options: --exclude=*.log
